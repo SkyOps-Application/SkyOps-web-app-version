@@ -3,9 +3,128 @@
  */
 
 import { Server, Socket } from 'socket.io';
-import { ServerToClientEvents, ClientToServerEvents, parseCommand, parseManualCommand } from '@atc-radar-sim/shared';
+import { ServerToClientEvents, ClientToServerEvents, parseCommand, parseManualCommand, calculateDistance, calculateBearing, ParsedCommand, AircraftData } from '@atc-radar-sim/shared';
 import { ExerciseRunner } from '../simulation/exercise-runner';
 import { EXERCISE_1, EXERCISE_2 } from '@atc-radar-sim/shared/src/data/exercises';
+import { WAYPOINTS } from '@atc-radar-sim/shared/src/data/waypoints';
+
+/**
+ * Helper function to apply a command to an aircraft
+ * Returns { handled: boolean, error?: string, distanceResult?: string }
+ */
+function applyCommandToAircraft(
+  parsed: ParsedCommand,
+  aircraft: AircraftData | undefined,
+  exerciseRunner: ExerciseRunner
+): { handled: boolean; error?: string; distanceResult?: string } {
+  // Handle DISTANCE command (doesn't need an aircraft)
+  if (parsed.type === 'DISTANCE' && typeof parsed.value === 'object' && 'item1' in parsed.value) {
+    const { item1, item2 } = parsed.value;
+    
+    // Get positions for both items
+    let pos1, pos2;
+    
+    // Try to find item1 as aircraft or waypoint
+    const aircraft1 = exerciseRunner.getAircraft(item1);
+    const waypoint1 = WAYPOINTS.find(wp => wp.id === item1 || wp.name === item1);
+    
+    if (aircraft1) {
+      pos1 = { latitude: aircraft1.position.latitude, longitude: aircraft1.position.longitude };
+    } else if (waypoint1) {
+      pos1 = { latitude: waypoint1.latitude, longitude: waypoint1.longitude };
+    }
+    
+    // Try to find item2 as aircraft or waypoint
+    const aircraft2 = exerciseRunner.getAircraft(item2);
+    const waypoint2 = WAYPOINTS.find(wp => wp.id === item2 || wp.name === item2);
+    
+    if (aircraft2) {
+      pos2 = { latitude: aircraft2.position.latitude, longitude: aircraft2.position.longitude };
+    } else if (waypoint2) {
+      pos2 = { latitude: waypoint2.latitude, longitude: waypoint2.longitude };
+    }
+    
+    if (!pos1 || !pos2) {
+      return { handled: false, error: `Could not find ${!pos1 ? item1 : item2}` };
+    }
+    
+    // Calculate distance and heading
+    const distance = calculateDistance(pos1, pos2);
+    const heading = calculateBearing(pos1, pos2);
+    
+    return {
+      handled: true,
+      distanceResult: `Distance from ${item1} to ${item2}: ${distance.toFixed(1)} NM, Heading: ${Math.round(heading).toString().padStart(3, '0')}°`,
+    };
+  }
+  
+  // For all other commands, we need an aircraft
+  if (!aircraft) {
+    return { handled: false, error: `Aircraft ${parsed.callsign} not found` };
+  }
+  
+  // Apply command based on type
+  switch (parsed.type) {
+    case 'DESCEND':
+    case 'CLIMB':
+      if (typeof parsed.value === 'number') {
+        aircraft.targetFlightLevel = parsed.value;
+      }
+      break;
+    
+    case 'TURN_LEFT':
+    case 'TURN_RIGHT':
+    case 'DIRECT':
+      if (typeof parsed.value === 'number') {
+        aircraft.assignedHeading = parsed.value;
+      }
+      break;
+    
+    case 'DIRECT_WAYPOINT':
+      if (typeof parsed.value === 'string') {
+        const waypoint = WAYPOINTS.find(wp => wp.id === parsed.value || wp.name === parsed.value);
+        if (waypoint) {
+          // Calculate heading to waypoint
+          const heading = calculateBearing(
+            { latitude: aircraft.position.latitude, longitude: aircraft.position.longitude },
+            { latitude: waypoint.latitude, longitude: waypoint.longitude }
+          );
+          aircraft.assignedHeading = Math.round(heading);
+        } else {
+          return { handled: false, error: `Waypoint ${parsed.value} not found` };
+        }
+      }
+      break;
+    
+    case 'INCREASE_SPEED':
+    case 'REDUCE_SPEED':
+      if (typeof parsed.value === 'number') {
+        aircraft.assignedSpeed = parsed.value;
+      }
+      break;
+    
+    case 'REDUCE_MACH':
+      if (typeof parsed.value === 'number') {
+        aircraft.assignedMach = parsed.value;
+        aircraft.assignedSpeed = Math.round(parsed.value * 575);
+      }
+      break;
+    
+    case 'IDENTIFY':
+      aircraft.state = 'IDENTIFIED';
+      aircraft.identified = true;
+      break;
+    
+    case 'CONTACT':
+      exerciseRunner.removeAircraft(aircraft.id);
+      break;
+  }
+  
+  // Update aircraft
+  exerciseRunner.updateAircraft(aircraft);
+  
+  return { handled: true };
+}
 
 export function setupSocketHandlers(
   io: Server<ClientToServerEvents, ServerToClientEvents>,
@@ -43,68 +162,39 @@ export function setupSocketHandlers(
         return;
       }
       
-      // Find aircraft and execute command
+      // Execute command
       try {
-        const aircraft = exerciseRunner.getAircraft(parsed.callsign || '');
-        if (!aircraft) {
+        const aircraft = parsed.callsign ? exerciseRunner.getAircraft(parsed.callsign) : undefined;
+        const result = applyCommandToAircraft(parsed, aircraft, exerciseRunner);
+        
+        if (!result.handled) {
           socket.emit('command:error', {
             command: text,
-            error: `Aircraft ${parsed.callsign} not found`,
+            error: result.error || 'Command failed',
             timestamp: new Date(),
           });
           return;
         }
         
-        // Apply command to aircraft based on type
-        switch (parsed.type) {
-          case 'DESCEND':
-          case 'CLIMB':
-            if (typeof parsed.value === 'number') {
-              aircraft.targetFlightLevel = parsed.value;
-            }
-            break;
-          
-          case 'TURN_LEFT':
-          case 'TURN_RIGHT':
-          case 'DIRECT':
-            if (typeof parsed.value === 'number') {
-              aircraft.assignedHeading = parsed.value;
-            }
-            break;
-          
-          case 'INCREASE_SPEED':
-          case 'REDUCE_SPEED':
-            if (typeof parsed.value === 'number') {
-              aircraft.assignedSpeed = parsed.value;
-            }
-            break;
-          
-          case 'REDUCE_MACH':
-            if (typeof parsed.value === 'number') {
-              aircraft.assignedMach = parsed.value;
-              aircraft.assignedSpeed = Math.round(parsed.value * 575);
-            }
-            break;
-          
-          case 'IDENTIFY':
-            aircraft.state = 'IDENTIFIED';
-            aircraft.identified = true;
-            break;
-          
-          case 'CONTACT':
-            exerciseRunner.removeAircraft(aircraft.id);
-            break;
+        // If it's a distance result, emit as session event
+        if (result.distanceResult) {
+          socket.emit('session:event', {
+            id: `distance-${Date.now()}`,
+            sessionId: 'current',
+            type: 'DISTANCE_RESULT',
+            data: result.distanceResult,
+            timestamp: new Date(),
+          });
+        } else if (aircraft) {
+          // Otherwise emit command acknowledged
+          socket.emit('command:acknowledged', {
+            aircraftId: aircraft.id,
+            commandType: parsed.type,
+            value: parsed.value,
+            timestamp: new Date(),
+            acknowledged: true,
+          });
         }
-        
-        exerciseRunner.updateAircraft(aircraft);
-        
-        socket.emit('command:acknowledged', {
-          aircraftId: aircraft.id,
-          commandType: parsed.type,
-          value: parsed.value,
-          timestamp: new Date(),
-          acknowledged: true,
-        });
       } catch (error: any) {
         socket.emit('command:error', {
           command: text,
@@ -127,68 +217,39 @@ export function setupSocketHandlers(
         return;
       }
       
-      // Find aircraft and execute command
+      // Execute command
       try {
-        const aircraft = exerciseRunner.getAircraft(data.callsign);
-        if (!aircraft) {
+        const aircraft = parsed.callsign ? exerciseRunner.getAircraft(parsed.callsign) : undefined;
+        const result = applyCommandToAircraft(parsed, aircraft, exerciseRunner);
+        
+        if (!result.handled) {
           socket.emit('command:error', {
             command: `${data.callsign} ${data.clearance}`,
-            error: `Aircraft ${data.callsign} not found`,
+            error: result.error || 'Command failed',
             timestamp: new Date(),
           });
           return;
         }
         
-        // Apply command to aircraft based on type
-        switch (parsed.type) {
-          case 'DESCEND':
-          case 'CLIMB':
-            if (typeof parsed.value === 'number') {
-              aircraft.targetFlightLevel = parsed.value;
-            }
-            break;
-          
-          case 'TURN_LEFT':
-          case 'TURN_RIGHT':
-          case 'DIRECT':
-            if (typeof parsed.value === 'number') {
-              aircraft.assignedHeading = parsed.value;
-            }
-            break;
-          
-          case 'INCREASE_SPEED':
-          case 'REDUCE_SPEED':
-            if (typeof parsed.value === 'number') {
-              aircraft.assignedSpeed = parsed.value;
-            }
-            break;
-          
-          case 'REDUCE_MACH':
-            if (typeof parsed.value === 'number') {
-              aircraft.assignedMach = parsed.value;
-              aircraft.assignedSpeed = Math.round(parsed.value * 575);
-            }
-            break;
-          
-          case 'IDENTIFY':
-            aircraft.state = 'IDENTIFIED';
-            aircraft.identified = true;
-            break;
-          
-          case 'CONTACT':
-            exerciseRunner.removeAircraft(aircraft.id);
-            break;
+        // If it's a distance result, emit as session event
+        if (result.distanceResult) {
+          socket.emit('session:event', {
+            id: `distance-${Date.now()}`,
+            sessionId: 'current',
+            type: 'DISTANCE_RESULT',
+            data: result.distanceResult,
+            timestamp: new Date(),
+          });
+        } else if (aircraft) {
+          // Otherwise emit command acknowledged
+          socket.emit('command:acknowledged', {
+            aircraftId: aircraft.id,
+            commandType: parsed.type,
+            value: parsed.value,
+            timestamp: new Date(),
+            acknowledged: true,
+          });
         }
-        
-        exerciseRunner.updateAircraft(aircraft);
-        
-        socket.emit('command:acknowledged', {
-          aircraftId: aircraft.id,
-          commandType: parsed.type,
-          value: parsed.value,
-          timestamp: new Date(),
-          acknowledged: true,
-        });
       } catch (error: any) {
         socket.emit('command:error', {
           command: `${data.callsign} ${data.clearance}`,

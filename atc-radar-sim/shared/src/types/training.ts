@@ -47,7 +47,8 @@ export type EventType =
   | 'AIRCRAFT_REMOVED'
   | 'HANDOFF_INITIATED'
   | 'HANDOFF_ACCEPTED'
-  | 'TIME_UPDATE';
+  | 'TIME_UPDATE'
+  | 'DISTANCE_RESULT';
 
 export interface Exercise {
   id: string;

@@ -111,6 +111,18 @@ export function parseManualCommand(callsign: string, clearance: string): ParsedC
     };
   }
   
+  // Direct to Waypoint: DIRECT+waypointName or D+waypointName
+  if (/^DIRECT[A-Z0-9]+$/.test(cmd) || (/^D[A-Z]+$/.test(cmd) && cmd.length > 2)) {
+    const waypointName = cmd.startsWith('DIRECT') ? cmd.substring(6) : cmd.substring(1);
+    return {
+      type: 'DIRECT_WAYPOINT',
+      callsign: cs,
+      value: waypointName,
+      raw: `${cs} ${cmd}`,
+      valid: true, // Waypoint validation happens on backend
+    };
+  }
+  
   // Increase Speed: IS+speed
   if (/^IS\d{3}$/.test(cmd)) {
     const value = parseInt(cmd.substring(2));
@@ -189,6 +201,42 @@ export function parseManualCommand(callsign: string, clearance: string): ParsedC
     raw: `${cs} ${cmd}`,
     valid: false,
     error: 'Invalid command format',
+  };
+}
+
+/**
+ * Parse distance measurement command
+ * Format: DISTANCE ITEM1 ITEM2
+ * where ITEM can be an aircraft callsign or waypoint name
+ */
+export function parseDistanceCommand(input: string): ParsedCommand {
+  const parts = input.trim().toUpperCase().split(/\s+/);
+  
+  if (parts.length !== 3) {
+    return {
+      type: 'MAINTAIN',
+      raw: input,
+      valid: false,
+      error: 'Distance command format: DISTANCE ITEM1 ITEM2',
+    };
+  }
+  
+  const [keyword, item1, item2] = parts;
+  
+  if (keyword !== 'DISTANCE') {
+    return {
+      type: 'MAINTAIN',
+      raw: input,
+      valid: false,
+      error: 'Command must start with DISTANCE',
+    };
+  }
+  
+  return {
+    type: 'DISTANCE',
+    value: { item1, item2 },
+    raw: input,
+    valid: true,
   };
 }
 
@@ -555,6 +603,12 @@ export function formatCommand(command: ParsedCommand): string {
  */
 export function parseCommand(input: string): ParsedCommand {
   const parts = input.trim().split(/\s+/);
+  
+  // Check if it's a distance command
+  if (parts.length > 0 && parts[0].toUpperCase() === 'DISTANCE') {
+    return parseDistanceCommand(input);
+  }
+  
   if (parts.length < 2) {
     return {
       type: 'MAINTAIN',

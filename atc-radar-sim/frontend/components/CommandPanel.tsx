@@ -52,6 +52,28 @@ export function CommandPanel() {
         };
       }
     }
+    
+    // Listen for distance results from server
+    const socket = getSocket();
+    const handleDistanceResult = (event: any) => {
+      if (event.type === 'DISTANCE_RESULT') {
+        setHistory((prev) => [
+          {
+            command: event.data,
+            timestamp: new Date(event.timestamp),
+            valid: true,
+          },
+          ...prev.slice(0, 49),
+        ]);
+        audioManager.play('confirmation');
+      }
+    };
+    
+    socket.on('session:event', handleDistanceResult);
+    
+    return () => {
+      socket.off('session:event', handleDistanceResult);
+    };
   }, []);
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -167,7 +189,11 @@ export function CommandPanel() {
         </div>
         
         <div className="mt-2 text-xs text-gray-400">
-          Examples: VNA123 D120 (descend), UAL456 TL030 (turn left), DAL789 IS280 (increase speed)
+          <div>Altitude: VNA123 C120 (climb), VNA123 D90 (descend)</div>
+          <div>Heading: VNA123 R270 (turn right), VNA123 F180 (fly heading)</div>
+          <div>Speed: VNA123 IS280 (increase), VNA123 IM0.80 (Mach)</div>
+          <div>Direct-to: VNA123 DIRECTTSH or VNA123 DTSH</div>
+          <div>Identify: VNA123 ID | Measure: DISTANCE VNA123 UAL456</div>
         </div>
       </form>
     </div>

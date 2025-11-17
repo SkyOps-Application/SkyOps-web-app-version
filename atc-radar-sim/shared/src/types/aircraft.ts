@@ -77,7 +77,7 @@ export interface AircraftData {
 export interface AircraftCommand {
   aircraftId: string;
   commandType: CommandType;
-  value?: number | string;
+  value?: number | string | { item1: string; item2: string };
   timestamp: Date;
   controllerId?: string;
   acknowledged: boolean;
@@ -93,6 +93,8 @@ export type CommandType =
   | 'REDUCE_MACH'       // RM0.78 - Reduce to Mach 0.78
   | 'MAINTAIN'          // M250 - Maintain 250kt
   | 'DIRECT'            // DCT WAYPOINT - Direct to waypoint
+  | 'DIRECT_WAYPOINT'   // DIRECTTSH or DTSH - Direct to specific waypoint
+  | 'DISTANCE'          // DISTANCE ITEM1 ITEM2 - Measure distance
   | 'SQUAWK'            // SQ1234 - Set squawk code
   | 'IDENTIFY'          // IDENT - Identify aircraft
   | 'CONTACT'           // CT123.45 - Contact frequency
@@ -101,7 +103,7 @@ export type CommandType =
 export interface ParsedCommand {
   type: CommandType;
   callsign?: string;
-  value?: number | string;
+  value?: number | string | { item1: string; item2: string };
   raw: string;
   valid: boolean;
   error?: string;

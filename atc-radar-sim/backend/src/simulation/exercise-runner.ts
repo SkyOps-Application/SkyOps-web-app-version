@@ -220,6 +220,13 @@ export class ExerciseRunner {
     // Update all aircraft positions
     this.aircraftData.forEach((aircraft) => {
       this.updateAircraftPosition(aircraft);
+    });
+    
+    // Check for separation violations
+    this.checkSeparationViolations();
+    
+    // Emit all aircraft updates
+    this.aircraftData.forEach((aircraft) => {
       this.io.emit('aircraft:update', aircraft);
     });
   }
@@ -341,6 +348,52 @@ export class ExerciseRunner {
    * Update aircraft position (using internal 2D coordinate system)
    */
   private updateAircraftPosition(aircraft: AircraftData) {
+    // If aircraft has an assigned heading (from controller), use it
+    // Otherwise, follow the route
+    if (!aircraft.assignedHeading && aircraft.route && aircraft.route.length > 0) {
+      // Find current position in route
+      const currentWaypointId = aircraft.currentWaypoint || aircraft.route[0];
+      const currentIndex = aircraft.route.indexOf(currentWaypointId);
+      
+      if (currentIndex >= 0 && currentIndex < aircraft.route.length - 1) {
+        // Get next waypoint
+        const nextWaypointId = aircraft.route[currentIndex + 1];
+        const nextWaypoint = WAYPOINTS.find(wp => wp.id === nextWaypointId || wp.name === nextWaypointId);
+        
+        if (nextWaypoint) {
+          // Calculate distance to next waypoint
+          const dx = nextWaypoint.longitude - aircraft.position.longitude;
+          const dy = nextWaypoint.latitude - aircraft.position.latitude;
+          const distanceToWaypoint = Math.sqrt(dx * dx + dy * dy);
+          
+          // If within 2 NM of waypoint, move to next waypoint in route
+          if (distanceToWaypoint < 2) {
+            aircraft.currentWaypoint = nextWaypointId;
+            aircraft.nextWaypoint = aircraft.route[currentIndex + 2];
+            
+            // Update heading to next waypoint if exists
+            if (aircraft.nextWaypoint) {
+              const nextNextWaypoint = WAYPOINTS.find(wp => wp.id === aircraft.nextWaypoint || wp.name === aircraft.nextWaypoint);
+              if (nextNextWaypoint) {
+                const bearing = Math.atan2(
+                  nextNextWaypoint.longitude - nextWaypoint.longitude,
+                  nextNextWaypoint.latitude - nextWaypoint.latitude
+                ) * (180 / Math.PI);
+                aircraft.heading = (bearing + 360) % 360;
+              }
+            }
+          } else {
+            // Update heading to point toward next waypoint
+            const bearing = Math.atan2(dx, dy) * (180 / Math.PI);
+            aircraft.heading = (bearing + 360) % 360;
+          }
+        }
+      }
+    } else if (aircraft.assignedHeading !== undefined) {
+      // Use assigned heading from controller
+      aircraft.heading = aircraft.assignedHeading;
+    }
+    
     // Calculate distance traveled in this update (1 second * playback speed)
     const distanceNM = (aircraft.speed / 3600) * this.playbackSpeed;
     
@@ -354,18 +407,18 @@ export class ExerciseRunner {
     aircraft.position.latitude += dy;
     aircraft.position.longitude += dx;
     
-    // Update altitude if climbing/descending
+    // Update altitude if climbing/descending - 100 ft per simulation tick (per second at 1x speed)
     if (aircraft.targetFlightLevel && aircraft.flightLevel !== aircraft.targetFlightLevel) {
       const diff = aircraft.targetFlightLevel - aircraft.flightLevel;
-      const rate = diff > 0 ? 2000 : -2000; // 2000 fpm climb/descent
-      const altChange = (rate / 60) * this.playbackSpeed; // Per second
+      const altChangePerTick = 100; // 100 ft per tick
+      const altChange = (diff > 0 ? altChangePerTick : -altChangePerTick) * this.playbackSpeed;
       
       aircraft.position.altitude += altChange;
       aircraft.flightLevel = Math.round(aircraft.position.altitude / 100);
-      aircraft.verticalSpeed = rate;
+      aircraft.verticalSpeed = diff > 0 ? altChangePerTick * 60 : -altChangePerTick * 60; // Convert to ft/min for display
       
-      // Check if reached target
-      if (Math.abs(aircraft.flightLevel - aircraft.targetFlightLevel) < 5) {
+      // Check if reached target (within 100 ft)
+      if (Math.abs(aircraft.position.altitude - aircraft.targetFlightLevel * 100) < 100) {
         aircraft.flightLevel = aircraft.targetFlightLevel;
         aircraft.position.altitude = aircraft.targetFlightLevel * 100;
         aircraft.verticalSpeed = 0;
@@ -376,6 +429,52 @@ export class ExerciseRunner {
     
     aircraft.position.timestamp = new Date();
     aircraft.lastUpdate = new Date();
+  }
+  
+  /**
+   * Check for separation violations between all aircraft
+   * Separation is lost when BOTH conditions are true:
+   * - Horizontal distance < 10 NM
+   * - Vertical separation < 1000 ft
+   */
+  private checkSeparationViolations() {
+    const aircraftArray = Array.from(this.aircraftData.values());
+    
+    // Clear all conflict flags first
+    aircraftArray.forEach(ac => ac.conflict = false);
+    
+    // Check all pairs of aircraft
+    for (let i = 0; i < aircraftArray.length; i++) {
+      for (let j = i + 1; j < aircraftArray.length; j++) {
+        const ac1 = aircraftArray[i];
+        const ac2 = aircraftArray[j];
+        
+        // Calculate horizontal distance (2D Euclidean distance in NM)
+        const dx = ac2.position.longitude - ac1.position.longitude;
+        const dy = ac2.position.latitude - ac1.position.latitude;
+        const horizontalDistance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Calculate vertical separation (in feet)
+        const verticalSeparation = Math.abs(ac2.position.altitude - ac1.position.altitude);
+        
+        // Check if separation is lost (BOTH conditions must be true)
+        if (horizontalDistance < 10 && verticalSeparation < 1000) {
+          // Mark both aircraft as in conflict
+          ac1.conflict = true;
+          ac2.conflict = true;
+          
+          // Emit separation violation event
+          this.io.emit('separation:violation', {
+            aircraft1: ac1.callsign,
+            aircraft2: ac2.callsign,
+            horizontalDistance,
+            verticalDistance: verticalSeparation,
+            timestamp: new Date(),
+            severity: horizontalDistance < 5 ? 'CRITICAL' : 'WARNING',
+          });
+        }
+      }
+    }
   }
   
   /**
