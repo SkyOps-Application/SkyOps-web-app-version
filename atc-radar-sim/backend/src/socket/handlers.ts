@@ -99,12 +99,35 @@ function applyCommandToAircraft(
     case 'INCREASE_SPEED':
     case 'REDUCE_SPEED':
       if (typeof parsed.value === 'number') {
+        // Validate: Cannot change speed by more than 20 knots
+        const currentSpeed = aircraft.speed;
+        const speedDiff = Math.abs(parsed.value - currentSpeed);
+        
+        if (speedDiff > 20) {
+          return { 
+            handled: false, 
+            error: `Unable ${parsed.type === 'INCREASE_SPEED' ? 'Increase' : 'Reduce'}: Speed change cannot exceed 20 knots (requested: ${speedDiff} knots)` 
+          };
+        }
+        
         aircraft.assignedSpeed = parsed.value;
       }
       break;
     
+    case 'INCREASE_MACH':
     case 'REDUCE_MACH':
       if (typeof parsed.value === 'number') {
+        // Validate: Cannot change Mach by more than 0.3
+        const currentMach = aircraft.machNumber || 0.78;
+        const machDiff = Math.abs(parsed.value - currentMach);
+        
+        if (machDiff > 0.3) {
+          return { 
+            handled: false, 
+            error: `Unable ${parsed.type === 'INCREASE_MACH' ? 'Increase' : 'Reduce'}: Mach change cannot exceed 0.3 (requested: ${machDiff.toFixed(2)})` 
+          };
+        }
+        
         aircraft.assignedMach = parsed.value;
         aircraft.assignedSpeed = Math.round(parsed.value * 575);
       }

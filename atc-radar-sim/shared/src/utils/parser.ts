@@ -111,9 +111,9 @@ export function parseManualCommand(callsign: string, clearance: string): ParsedC
     };
   }
   
-  // Direct to Waypoint: DIRECT+waypointName or D+waypointName
-  if (/^DIRECT[A-Z0-9]+$/.test(cmd) || (/^D[A-Z]+$/.test(cmd) && cmd.length > 2)) {
-    const waypointName = cmd.startsWith('DIRECT') ? cmd.substring(6) : cmd.substring(1);
+  // Direct to Waypoint: DIRECT+waypointName or DR+waypointName
+  if (/^DIRECT[A-Z0-9]+$/.test(cmd) || /^DR[A-Z0-9]+$/.test(cmd)) {
+    const waypointName = cmd.startsWith('DIRECT') ? cmd.substring(6) : cmd.substring(2);
     return {
       type: 'DIRECT_WAYPOINT',
       callsign: cs,
@@ -149,11 +149,23 @@ export function parseManualCommand(callsign: string, clearance: string): ParsedC
     };
   }
   
-  // Increase Mach: IM+decimal
+  // Increase Mach: IM+decimal (max 2 decimal places)
   if (/^IM\d\.\d{1,2}$/.test(cmd)) {
     const value = parseFloat(cmd.substring(2));
+    // Check if more than 2 decimal places
+    const decimalPart = cmd.substring(2).split('.')[1];
+    if (decimalPart && decimalPart.length > 2) {
+      return {
+        type: 'INCREASE_SPEED',
+        callsign: cs,
+        value,
+        raw: `${cs} ${cmd}`,
+        valid: false,
+        error: 'Mach number cannot have more than 2 decimal places',
+      };
+    }
     return {
-      type: 'INCREASE_SPEED',
+      type: 'INCREASE_MACH',
       callsign: cs,
       value,
       raw: `${cs} ${cmd}`,
@@ -162,9 +174,21 @@ export function parseManualCommand(callsign: string, clearance: string): ParsedC
     };
   }
   
-  // Reduce Mach: RM+decimal
+  // Reduce Mach: RM+decimal (max 2 decimal places)
   if (/^RM\d\.\d{1,2}$/.test(cmd)) {
     const value = parseFloat(cmd.substring(2));
+    // Check if more than 2 decimal places
+    const decimalPart = cmd.substring(2).split('.')[1];
+    if (decimalPart && decimalPart.length > 2) {
+      return {
+        type: 'REDUCE_MACH',
+        callsign: cs,
+        value,
+        raw: `${cs} ${cmd}`,
+        valid: false,
+        error: 'Mach number cannot have more than 2 decimal places',
+      };
+    }
     return {
       type: 'REDUCE_MACH',
       callsign: cs,
@@ -206,7 +230,7 @@ export function parseManualCommand(callsign: string, clearance: string): ParsedC
 
 /**
  * Parse distance measurement command
- * Format: DISTANCE ITEM1 ITEM2
+ * Format: DISTANCE ITEM1 ITEM2 or DT ITEM1 ITEM2
  * where ITEM can be an aircraft callsign or waypoint name
  */
 export function parseDistanceCommand(input: string): ParsedCommand {
@@ -217,18 +241,18 @@ export function parseDistanceCommand(input: string): ParsedCommand {
       type: 'MAINTAIN',
       raw: input,
       valid: false,
-      error: 'Distance command format: DISTANCE ITEM1 ITEM2',
+      error: 'Distance command format: DISTANCE ITEM1 ITEM2 or DT ITEM1 ITEM2',
     };
   }
   
   const [keyword, item1, item2] = parts;
   
-  if (keyword !== 'DISTANCE') {
+  if (keyword !== 'DISTANCE' && keyword !== 'DT') {
     return {
       type: 'MAINTAIN',
       raw: input,
       valid: false,
-      error: 'Command must start with DISTANCE',
+      error: 'Command must start with DISTANCE or DT',
     };
   }
   
@@ -604,8 +628,8 @@ export function formatCommand(command: ParsedCommand): string {
 export function parseCommand(input: string): ParsedCommand {
   const parts = input.trim().split(/\s+/);
   
-  // Check if it's a distance command
-  if (parts.length > 0 && parts[0].toUpperCase() === 'DISTANCE') {
+  // Check if it's a distance command (DISTANCE or DT)
+  if (parts.length > 0 && (parts[0].toUpperCase() === 'DISTANCE' || parts[0].toUpperCase() === 'DT')) {
     return parseDistanceCommand(input);
   }
   

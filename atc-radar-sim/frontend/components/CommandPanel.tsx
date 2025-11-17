@@ -188,12 +188,14 @@ export function CommandPanel() {
           </button>
         </div>
         
-        <div className="mt-2 text-xs text-gray-400">
-          <div>Altitude: VNA123 C120 (climb), VNA123 D90 (descend)</div>
-          <div>Heading: VNA123 R270 (turn right), VNA123 F180 (fly heading)</div>
-          <div>Speed: VNA123 IS280 (increase), VNA123 IM0.80 (Mach)</div>
-          <div>Direct-to: VNA123 DIRECTTSH or VNA123 DTSH</div>
-          <div>Identify: VNA123 ID | Measure: DISTANCE VNA123 UAL456</div>
+        <div className="mt-2 text-xs text-gray-400 space-y-1">
+          <div><strong>Altitude:</strong> VNA123 C120 (climb) | VNA123 D90 (descend) | VNA123 SC120 (stop climb) | VNA123 SD90 (stop descend)</div>
+          <div><strong>Heading:</strong> VNA123 R270 (turn right) | VNA123 L090 (turn left) | VNA123 F180 (fly heading)</div>
+          <div><strong>Speed:</strong> VNA123 IS280 (increase, max ±20kts) | VNA123 RS240 (reduce)</div>
+          <div><strong>Mach:</strong> VNA123 IM0.80 (increase, max ±0.3) | VNA123 RM0.76 (reduce, max 2 decimals)</div>
+          <div><strong>Direct-to:</strong> VNA123 DRPCA (direct to waypoint)</div>
+          <div><strong>Distance:</strong> DT VNA123 UAL456 (aircraft-aircraft) | DT VNA123 TSH (aircraft-waypoint) | DT TSH AC (waypoint-waypoint)</div>
+          <div><strong>Other:</strong> VNA123 ID (identify) | VNA123 CT (contact/handoff)</div>
         </div>
       </form>
     </div>

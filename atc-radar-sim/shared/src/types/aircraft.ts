@@ -90,10 +90,11 @@ export type CommandType =
   | 'TURN_RIGHT'        // TR270 - Turn right heading 270
   | 'INCREASE_SPEED'    // IS250 - Increase speed to 250kt
   | 'REDUCE_SPEED'      // RS210 - Reduce speed to 210kt
+  | 'INCREASE_MACH'     // IM0.78 - Increase to Mach 0.78
   | 'REDUCE_MACH'       // RM0.78 - Reduce to Mach 0.78
   | 'MAINTAIN'          // M250 - Maintain 250kt
   | 'DIRECT'            // DCT WAYPOINT - Direct to waypoint
-  | 'DIRECT_WAYPOINT'   // DIRECTTSH or DTSH - Direct to specific waypoint
+  | 'DIRECT_WAYPOINT'   // DIRECTTSH or DRTSH - Direct to specific waypoint
   | 'DISTANCE'          // DISTANCE ITEM1 ITEM2 - Measure distance
   | 'SQUAWK'            // SQ1234 - Set squawk code
   | 'IDENTIFY'          // IDENT - Identify aircraft
