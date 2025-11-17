@@ -1,0 +1,187 @@
+// Prisma schema for ATC Radar Simulation
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User management
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      UserRole @default(TRAINEE)
+  
+  firstName    String?
+  lastName     String?
+  phoneNumber  String?
+  organization String?
+  avatar       String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastLogin DateTime?
+  
+  trainingSessions TrainingSession[]
+  createdExercises Exercise[]
+  
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  INSTRUCTOR
+  TRAINEE
+}
+
+// Waypoints and navigation
+model Waypoint {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  code        String?      @unique
+  latitude    Float
+  longitude   Float
+  type        WaypointType
+  description String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  routes Route[]
+  
+  @@map("waypoints")
+}
+
+enum WaypointType {
+  FIX
+  VOR
+  NDB
+  AIRPORT
+  RUNWAY
+  CUSTOM
+}
+
+// Routes
+model Route {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  
+  waypoints Waypoint[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  flightPlans FlightPlan[]
+  
+  @@map("routes")
+}
+
+// Flight plans
+model FlightPlan {
+  id          String   @id @default(uuid())
+  callsign    String
+  aircraftType String
+  
+  departure    String
+  destination  String
+  alternate    String?
+  
+  route   Route  @relation(fields: [routeId], references: [id])
+  routeId String
+  
+  cruiseLevel Int
+  cruiseSpeed Int
+  
+  departureTime        DateTime
+  estimatedArrivalTime DateTime
+  
+  remarks String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("flight_plans")
+}
+
+// Exercises
+model Exercise {
+  id          String       @id @default(uuid())
+  name        String
+  description String
+  difficulty  Difficulty
+  duration    Int          // seconds
+  objectives  String[]
+  
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  trainingSessions TrainingSession[]
+  
+  @@map("exercises")
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+// Training sessions
+model TrainingSession {
+  id         String        @id @default(uuid())
+  
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  exerciseId String
+  
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+  
+  status SessionStatus @default(ACTIVE)
+  
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  
+  // Performance metrics
+  commandsIssued         Int @default(0)
+  correctCommands        Int @default(0)
+  separationViolations   Int @default(0)
+  averageResponseTime    Float @default(0)
+  score                  Float?
+  
+  events SessionEvent[]
+  
+  @@map("training_sessions")
+}
+
+enum SessionStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ABANDONED
+}
+
+// Session events (for replay)
+model SessionEvent {
+  id        String   @id @default(uuid())
+  
+  session   TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sessionId String
+  
+  timestamp DateTime @default(now())
+  type      String
+  data      Json
+  
+  @@map("session_events")
+  @@index([sessionId, timestamp])
+}
+
