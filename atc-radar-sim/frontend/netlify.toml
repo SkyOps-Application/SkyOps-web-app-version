@@ -5,9 +5,13 @@
   # Build command - MUST build shared package first
   command = "cd ../shared && npm install && npm run build && cd ../frontend && npm install && npm run build"
   
-  # Publish directory
+  # Publish directory - for Next.js, use .next or out depending on export
   publish = ".next"
 
 # Node version
 [build.environment]
   NODE_VERSION = "20"
+
+# Next.js Runtime (Essential for Next.js on Netlify)
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
