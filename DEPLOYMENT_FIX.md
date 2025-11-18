@@ -6,8 +6,16 @@ Both Netlify (Frontend) and Render (Backend) can't find `@atc-radar-sim/shared` 
 1. It's a monorepo with workspaces
 2. The shared package needs to be built BEFORE backend/frontend
 3. The platforms don't automatically handle workspace dependencies
+4. Node.js can't resolve workspace dependencies at runtime in production
 
-## ✅ Solutions
+## ✅ Solution Applied
+
+I've added **automatic copying** of the shared package into `node_modules`:
+- Backend: `postbuild` script copies shared after TypeScript compilation
+- Frontend: `prebuild` script copies shared before Next.js build
+- This ensures Node.js can find `@atc-radar-sim/shared` at runtime
+
+## 🚀 Updated Deployment Steps
 
 ### **Option A: Deploy with Updated Build Commands** (Recommended)
 

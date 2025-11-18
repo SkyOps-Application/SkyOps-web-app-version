@@ -11,9 +11,3 @@
 # Node version
 [build.environment]
   NODE_VERSION = "20"
-
-# Ignore builds on non-frontend changes (optional)
-[build.ignore]
-  # Ignore if no changes in frontend or shared
-  paths = ["atc-radar-sim/backend/**"]
-

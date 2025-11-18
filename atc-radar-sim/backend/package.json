@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && npm run postbuild",
+    "postbuild": "mkdir -p node_modules/@atc-radar-sim && cp -r ../shared node_modules/@atc-radar-sim/shared",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
