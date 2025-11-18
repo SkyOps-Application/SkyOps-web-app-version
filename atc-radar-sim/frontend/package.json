@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "prebuild": "mkdir -p node_modules/@atc-radar-sim/shared && cp -r ../shared/dist node_modules/@atc-radar-sim/shared/ && cp ../shared/package.json node_modules/@atc-radar-sim/shared/ || true",
+    "prebuild": "mkdir -p node_modules/@atc-radar-sim && cp -r ../shared node_modules/@atc-radar-sim/ || true",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit"
