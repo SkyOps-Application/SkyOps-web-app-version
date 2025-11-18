@@ -1,0 +1,19 @@
+[build]
+  # Base directory (where your frontend is)
+  base = "atc-radar-sim/frontend"
+  
+  # Build command - MUST build shared package first
+  command = "cd ../shared && npm install && npm run build && cd ../frontend && npm install && npm run build"
+  
+  # Publish directory
+  publish = ".next"
+
+# Node version
+[build.environment]
+  NODE_VERSION = "20"
+
+# Ignore builds on non-frontend changes (optional)
+[build.ignore]
+  # Ignore if no changes in frontend or shared
+  paths = ["atc-radar-sim/backend/**"]
+
