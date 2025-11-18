@@ -35,6 +35,9 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
   const [measurementEnd, setMeasurementEnd] = useState<{ x: number; y: number } | null>(null);
   const [isMeasuring, setIsMeasuring] = useState(false);
   
+  // Waypoint labels toggle
+  const [showWaypointLabels, setShowWaypointLabels] = useState(true);
+  
   // Keyboard shortcuts for zoom
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -284,15 +287,17 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
             fill="transparent"
           />
           
-          {/* Waypoint name */}
-          <Text
-            x={pos.x + 10}
+          {/* Waypoint name - conditionally rendered */}
+          {showWaypointLabels && (
+            <Text
+              x={pos.x + 10}
             y={pos.y - 6}
             text={waypoint.name}
             fontSize={10}
             fill="#FFD43B"
             fontFamily="monospace"
-          />
+            />
+          )}
         </Group>
       );
     });
@@ -532,6 +537,16 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
           <div className="w-8 h-0.5 mr-2" style={{ background: '#00CED1', opacity: 0.8 }}></div>
           <span>Exercise 2</span>
         </div>
+      </div>
+      
+      {/* Waypoint Toggle Button */}
+      <div className="absolute bottom-4 left-4">
+        <button
+          onClick={() => setShowWaypointLabels(!showWaypointLabels)}
+          className="bg-black bg-opacity-70 hover:bg-opacity-90 px-4 py-2 rounded text-white text-sm font-semibold transition-all border border-yellow-400/30 hover:border-yellow-400/60"
+        >
+          {showWaypointLabels ? '🏷️ Hide Waypoint Labels' : '🏷️ Show Waypoint Labels'}
+        </button>
       </div>
     </div>
   );

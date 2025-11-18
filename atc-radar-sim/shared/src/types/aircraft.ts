@@ -37,7 +37,8 @@ export interface AircraftData {
   
   // Position and movement
   position: Position;
-  heading: number;        // degrees (0-360)
+  heading: number;        // degrees (0-360) - current heading (for animation)
+  targetHeading?: number; // degrees (0-360) - target heading for smooth turning
   speed: number;          // knots
   machNumber?: number;    // Mach speed
   verticalSpeed: number;  // feet per minute

@@ -22,6 +22,7 @@ export class ExerciseRunner {
   private spawnedAircraft: Set<string> = new Set();
   private aircraftData: Map<string, AircraftData> = new Map();
   private lastUpdateTime: number = 0; // Track last update to prevent double updates
+  private tickCounter: number = 0; // Count ticks for position updates
   
   constructor(io: Server<ClientToServerEvents, ServerToClientEvents>) {
     this.io = io;
@@ -132,6 +133,7 @@ export class ExerciseRunner {
    */
   seekTo(minutes: number) {
     this.currentTime = Math.max(0, minutes);
+    this.tickCounter = 0; // Reset tick counter
     
     console.log(`Seeking to ${this.currentTime} minutes`);
     
@@ -189,10 +191,11 @@ export class ExerciseRunner {
     }
     this.lastUpdateTime = now;
     
+    // Increment tick counter
+    this.tickCounter++;
+    
     // Increment time based on playback speed
-    // playbackSpeed = 1 means 1 second per real second
-    // playbackSpeed = 2 means 2 seconds per real second, etc.
-    const incrementMinutes = this.playbackSpeed / 60; // Convert seconds to minutes
+    const incrementMinutes = this.playbackSpeed / 60;
     this.currentTime += incrementMinutes;
     
     const exerciseStartMin = parseTime(this.exercise.startTime);
@@ -217,15 +220,26 @@ export class ExerciseRunner {
       }
     });
     
-    // Update all aircraft positions
+    // Position updates: every 5 seconds at 1x speed, proportionally faster at higher speeds
+    // At 1x: update every 5 ticks
+    // At 2x: update every 3 ticks
+    // At 3x: update every 2 ticks
+    // At 4x: update every tick
+    const positionUpdateInterval = Math.max(1, Math.floor(5 / this.playbackSpeed));
+    const shouldUpdatePosition = this.tickCounter % positionUpdateInterval === 0;
+    
+    // Always update smooth turning animation
     this.aircraftData.forEach((aircraft) => {
-      this.updateAircraftPosition(aircraft);
+      this.updateSmoothTurning(aircraft);
+      if (shouldUpdatePosition) {
+        this.updateAircraftPosition(aircraft);
+      }
     });
     
     // Check for separation violations
     this.checkSeparationViolations();
     
-    // Emit all aircraft updates
+    // Emit all aircraft updates (for smooth animation rendering)
     this.aircraftData.forEach((aircraft) => {
       this.io.emit('aircraft:update', aircraft);
     });
@@ -345,6 +359,36 @@ export class ExerciseRunner {
   }
   
   /**
+   * Update smooth turning animation (called every tick)
+   * Gradually rotate aircraft toward target heading over 15-20 seconds
+   */
+  private updateSmoothTurning(aircraft: AircraftData) {
+    // If there's a target heading, gradually turn toward it
+    if (aircraft.targetHeading !== undefined) {
+      const targetHeading = aircraft.targetHeading;
+      const currentHeading = aircraft.heading;
+      
+      // Calculate shortest turn direction
+      let delta = targetHeading - currentHeading;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      
+      // Turn rate: 3 degrees per second at 1x speed (20 seconds for 60° turn)
+      // Adjust for playback speed
+      const turnRate = 3 * this.playbackSpeed;
+      
+      if (Math.abs(delta) < turnRate) {
+        // Reached target heading
+        aircraft.heading = targetHeading;
+        aircraft.targetHeading = undefined;
+      } else {
+        // Continue turning
+        aircraft.heading = (currentHeading + (delta > 0 ? turnRate : -turnRate) + 360) % 360;
+      }
+    }
+  }
+  
+  /**
    * Update aircraft position (using internal 2D coordinate system)
    */
   private updateAircraftPosition(aircraft: AircraftData) {
@@ -371,7 +415,7 @@ export class ExerciseRunner {
             aircraft.currentWaypoint = nextWaypointId;
             aircraft.nextWaypoint = aircraft.route[currentIndex + 2];
             
-            // Update heading to next waypoint if exists
+            // Set target heading to next waypoint if exists
             if (aircraft.nextWaypoint) {
               const nextNextWaypoint = WAYPOINTS.find(wp => wp.id === aircraft.nextWaypoint || wp.name === aircraft.nextWaypoint);
               if (nextNextWaypoint) {
@@ -379,23 +423,26 @@ export class ExerciseRunner {
                   nextNextWaypoint.longitude - nextWaypoint.longitude,
                   nextNextWaypoint.latitude - nextWaypoint.latitude
                 ) * (180 / Math.PI);
-                aircraft.heading = (bearing + 360) % 360;
+                aircraft.targetHeading = (bearing + 360) % 360;
               }
             }
           } else {
-            // Update heading to point toward next waypoint
+            // Set target heading to point toward next waypoint
             const bearing = Math.atan2(dx, dy) * (180 / Math.PI);
-            aircraft.heading = (bearing + 360) % 360;
+            aircraft.targetHeading = (bearing + 360) % 360;
           }
         }
       }
     } else if (aircraft.assignedHeading !== undefined) {
-      // Use assigned heading from controller
-      aircraft.heading = aircraft.assignedHeading;
+      // Set target heading from controller (smooth turn)
+      aircraft.targetHeading = aircraft.assignedHeading;
     }
     
-    // Calculate distance traveled in this update (1 second * playback speed)
-    const distanceNM = (aircraft.speed / 3600) * this.playbackSpeed;
+    // Calculate distance traveled in this update
+    // Use position update interval to get correct distance
+    const positionUpdateInterval = Math.max(1, Math.floor(5 / this.playbackSpeed));
+    const effectiveTimeStep = positionUpdateInterval * this.playbackSpeed; // seconds
+    const distanceNM = (aircraft.speed / 3600) * effectiveTimeStep;
     
     // Convert heading to radians (0 = North, 90 = East)
     const headingRad = (aircraft.heading * Math.PI) / 180;
