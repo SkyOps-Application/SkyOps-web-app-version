@@ -22,6 +22,12 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
   const [isSupported, setIsSupported] = useState(false);
   const [transcript, setTranscript] = useState('');
   const recognitionRef = useRef<any>(null);
+  const optionsRef = useRef(options);
+  
+  // Update options ref when they change
+  useEffect(() => {
+    optionsRef.current = options;
+  }, [options]);
 
   useEffect(() => {
     // Check if browser supports Web Speech API
@@ -29,71 +35,125 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
       (window as any).SpeechRecognition || 
       (window as any).webkitSpeechRecognition;
     
+    console.log('🎤 Voice Command Hook: Checking Web Speech API support...');
+    console.log('🎤 SpeechRecognition available:', !!SpeechRecognition);
+    
     if (SpeechRecognition) {
       setIsSupported(true);
+      console.log('✅ Web Speech API is supported');
       
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
-      recognition.lang = options.language || 'en-US';
+      recognition.lang = optionsRef.current.language || 'en-US';
       recognition.maxAlternatives = 1;
 
       recognition.onstart = () => {
+        console.log('🎤 Recognition started');
         setIsListening(true);
         setTranscript('');
       };
 
       recognition.onresult = (event: any) => {
+        console.log('🎤 Recognition result received');
         const result = event.results[0][0];
         const spokenText = result.transcript;
         const confidence = result.confidence;
+        
+        console.log('🎤 Transcript:', spokenText);
+        console.log('🎤 Confidence:', confidence);
         
         setTranscript(spokenText);
         
         // Parse voice input to command
         const command = parseVoiceToCommand(spokenText);
+        console.log('🎤 Parsed command:', command);
         
-        if (command && options.onCommand) {
-          options.onCommand(command);
+        if (command && optionsRef.current.onCommand) {
+          optionsRef.current.onCommand(command);
+        } else if (!command) {
+          console.warn('⚠️ Could not parse command from transcript:', spokenText);
         }
       };
 
       recognition.onerror = (event: any) => {
+        console.error('❌ Recognition error:', event.error);
         setIsListening(false);
-        if (options.onError) {
-          options.onError(event.error);
+        if (optionsRef.current.onError) {
+          optionsRef.current.onError(event.error);
         }
       };
 
       recognition.onend = () => {
+        console.log('🎤 Recognition ended');
         setIsListening(false);
       };
 
       recognitionRef.current = recognition;
     } else {
       setIsSupported(false);
+      console.error('❌ Web Speech API is not supported in this browser');
     }
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.abort();
+        try {
+          recognitionRef.current.abort();
+        } catch (e) {
+          // Ignore abort errors
+        }
       }
     };
-  }, [options]);
+  }, []);
 
   const startListening = () => {
+    console.log('🎤 startListening called');
+    console.log('🎤 recognitionRef.current:', !!recognitionRef.current);
+    console.log('🎤 isListening:', isListening);
+    
     if (recognitionRef.current && !isListening) {
       try {
+        console.log('🎤 Attempting to start recognition...');
         recognitionRef.current.start();
-      } catch (error) {
-        console.error('Failed to start recognition:', error);
+        console.log('✅ Recognition start() called successfully');
+      } catch (error: any) {
+        console.error('❌ Failed to start recognition:', error);
+        console.error('❌ Error name:', error?.name);
+        console.error('❌ Error message:', error?.message);
+        
+        // If already started, try to stop and restart
+        if (error?.name === 'InvalidStateError') {
+          console.log('🔄 Attempting to stop and restart...');
+          try {
+            recognitionRef.current.stop();
+            setTimeout(() => {
+              try {
+                recognitionRef.current.start();
+              } catch (e) {
+                console.error('❌ Failed to restart:', e);
+              }
+            }, 100);
+          } catch (e) {
+            console.error('❌ Failed to stop:', e);
+          }
+        }
       }
+    } else if (!recognitionRef.current) {
+      console.error('❌ Recognition not initialized');
+    } else if (isListening) {
+      console.warn('⚠️ Already listening');
     }
   };
 
   const stopListening = () => {
+    console.log('🎤 stopListening called');
     if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+        console.log('✅ Recognition stopped');
+      } catch (error) {
+        console.error('❌ Failed to stop recognition:', error);
+      }
     }
   };
 
