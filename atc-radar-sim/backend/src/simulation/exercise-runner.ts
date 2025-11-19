@@ -281,42 +281,45 @@ export class ExerciseRunner {
       initialAltitude = (typeof acData.flightLevel === 'number' ? acData.flightLevel : parseInt(acData.flightLevel)) * 100;
     }
     
-    // Calculate position if elapsed time > 0
+    // Calculate position if elapsed time > 0 (using geographic calculations)
     let latitude = spawnWaypoint.latitude;
     let longitude = spawnWaypoint.longitude;
     let currentWaypointIndex = 0;
     
-    // Simple position calculation: move towards next waypoint
+    // Position calculation: move towards next waypoint using spherical Earth model
     if (elapsedMinutes > 0 && acData.route.length > 1) {
       const nextWaypoint = WAYPOINTS.find(wp => wp.id === acData.route[1]);
       if (nextWaypoint) {
-        // Calculate distance traveled
+        // Calculate distance traveled (in nautical miles)
         const distanceNM = (acData.speed / 60) * elapsedMinutes;
         
-        // Simple linear interpolation
-        const bearing = Math.atan2(
-          nextWaypoint.longitude - spawnWaypoint.longitude,
-          nextWaypoint.latitude - spawnWaypoint.latitude
+        // Calculate bearing to next waypoint using spherical trigonometry
+        const bearing = calculateBearing(
+          { latitude: spawnWaypoint.latitude, longitude: spawnWaypoint.longitude },
+          { latitude: nextWaypoint.latitude, longitude: nextWaypoint.longitude }
         );
         
-        const latDiff = Math.cos(bearing) * (distanceNM / 60); // Rough conversion
-        const lonDiff = Math.sin(bearing) * (distanceNM / 60);
+        // Calculate new position using spherical Earth model
+        const newPos = calculateDestination(
+          { latitude: spawnWaypoint.latitude, longitude: spawnWaypoint.longitude },
+          distanceNM,
+          bearing
+        );
         
-        latitude += latDiff;
-        longitude += lonDiff;
+        latitude = newPos.latitude;
+        longitude = newPos.longitude;
       }
     }
     
-    // Calculate heading to next waypoint
+    // Calculate heading to next waypoint using geographic bearing
     let heading = 0;
     if (acData.route.length > 1) {
       const nextWaypoint = WAYPOINTS.find(wp => wp.id === acData.route[1]);
       if (nextWaypoint) {
-        const bearing = Math.atan2(
-          nextWaypoint.longitude - longitude,
-          nextWaypoint.latitude - latitude
-        ) * (180 / Math.PI);
-        heading = (bearing + 360) % 360;
+        heading = calculateBearing(
+          { latitude, longitude },
+          { latitude: nextWaypoint.latitude, longitude: nextWaypoint.longitude }
+        );
       }
     }
     
