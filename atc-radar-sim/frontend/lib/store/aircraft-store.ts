@@ -30,9 +30,16 @@ export const useAircraftStore = create<AircraftStore>((set, get) => ({
   
   updateAircraft: (aircraft) =>
     set((state) => ({
-      aircraft: state.aircraft.map(ac => 
-        ac.id === aircraft.id ? aircraft : ac
-      )
+      aircraft: state.aircraft.map(ac => {
+        if (ac.id === aircraft.id) {
+          // Preserve labelRotation from existing aircraft (user-set UI state)
+          return {
+            ...aircraft,
+            labelRotation: ac.labelRotation !== undefined ? ac.labelRotation : aircraft.labelRotation
+          };
+        }
+        return ac;
+      })
     })),
   
   removeAircraft: (aircraftId) =>
@@ -45,7 +52,14 @@ export const useAircraftStore = create<AircraftStore>((set, get) => ({
       const existingIds = new Set(state.aircraft.map(ac => ac.id));
       const updatedAircraft = state.aircraft.map(ac => {
         const update = aircraftList.find(u => u.id === ac.id);
-        return update || ac;
+        if (update) {
+          // Preserve labelRotation from existing aircraft (user-set UI state)
+          return {
+            ...update,
+            labelRotation: ac.labelRotation !== undefined ? ac.labelRotation : update.labelRotation
+          };
+        }
+        return ac;
       });
       
       // Add new aircraft that don't exist

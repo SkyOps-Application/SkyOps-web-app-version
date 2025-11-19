@@ -482,11 +482,13 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
         onTap={() => selectAircraft(ac.id)}
         onContextMenu={(e) => {
           e.evt.preventDefault();
-          // Right-click rotates entire label by 15 degrees
+          // Right-click rotates entire label by 15 degrees clockwise
           const currentRotation = ac.labelRotation !== undefined ? ac.labelRotation : 45;
+          const newRotation = (currentRotation + 15) % 360;
+          console.log(`🔄 Label rotation for ${ac.callsign}: ${currentRotation}° → ${newRotation}°`);
           updateAircraft({
             ...ac,
-            labelRotation: (currentRotation + 15) % 360,
+            labelRotation: newRotation,
           });
         }}
       >
