@@ -13,6 +13,7 @@ import { getSocket, connectSocket, disconnectSocket } from '@/lib/socket';
 import { useAircraftStore } from '@/lib/store/aircraft-store';
 import { useUIStore } from '@/lib/store/ui-store';
 import { audioManager } from '@/lib/audio';
+import { useVoiceCommand } from '@/hooks/useVoiceCommand';
 
 export default function RadarPage() {
   const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
@@ -27,6 +28,32 @@ export default function RadarPage() {
   const [currentClearance, setCurrentClearance] = useState('');
   const [commandLog, setCommandLog] = useState<{ time: string; text: string; valid?: boolean }[]>([]);
   const [exerciseId, setExerciseId] = useState(1); // Default to Exercise 1
+  
+  // Voice command integration
+  const { isListening, isSupported: voiceSupported, startListening, stopListening } = useVoiceCommand({
+    onCommand: (cmd) => {
+      // Parse command format: "CALLSIGN CLEARANCE"
+      const parts = cmd.split(' ');
+      if (parts.length >= 2) {
+        const callsign = parts[0];
+        const clearance = parts.slice(1).join(' ');
+        setCurrentCallsign(callsign);
+        setCurrentClearance(clearance);
+        
+        // Auto-submit
+        setTimeout(() => {
+          const socket = getSocket();
+          socket.emit('command:manual', { callsign, clearance });
+        }, 100);
+        
+        audioManager.play('confirmation');
+      }
+    },
+    onError: (error) => {
+      console.error('Voice recognition error:', error);
+      audioManager.play('error');
+    },
+  });
   
   useEffect(() => {
     // Update dimensions on resize
@@ -258,6 +285,7 @@ export default function RadarPage() {
                   onChange={(e) => setCurrentCallsign(e.target.value.toUpperCase())}
                   placeholder="Callsign"
                   className="px-3 py-2 border-2 border-gray-300 rounded text-[#0C2D57] font-bold uppercase w-24"
+                  disabled={isListening}
                 />
                 <input
                   type="text"
@@ -266,10 +294,27 @@ export default function RadarPage() {
                   placeholder="Command"
                   className="px-3 py-2 border-2 border-gray-300 rounded text-[#0C2D57] font-bold uppercase w-32"
                   onKeyPress={(e) => e.key === 'Enter' && handleAddClearance()}
+                  disabled={isListening}
                 />
+                {voiceSupported && (
+                  <button
+                    type="button"
+                    onClick={isListening ? stopListening : startListening}
+                    className={`px-3 py-2 rounded font-bold transition-all flex items-center gap-1 ${
+                      isListening
+                        ? 'bg-[#E53935] text-white animate-pulse'
+                        : 'bg-[#0C2D57] text-white hover:bg-[#1a3d6f]'
+                    }`}
+                    title={isListening ? 'Stop listening' : 'Voice command'}
+                  >
+                    <span className="text-xl">{isListening ? '🔴' : '🎤'}</span>
+                    {isListening ? 'LISTENING...' : 'VOICE'}
+                  </button>
+                )}
                 <button 
                   onClick={handleAddClearance}
                   className="text-[#E53935] font-bold text-lg hover:text-[#c62828] transition-colors whitespace-nowrap"
+                  disabled={isListening}
                 >
                   ADD CLEARANCE
                 </button>
