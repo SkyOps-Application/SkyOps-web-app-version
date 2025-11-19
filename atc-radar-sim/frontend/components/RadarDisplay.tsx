@@ -485,10 +485,12 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
           // Right-click rotates entire label by 15 degrees clockwise
           const currentRotation = ac.labelRotation !== undefined ? ac.labelRotation : 45;
           const newRotation = (currentRotation + 15) % 360;
-          console.log(`🔄 Label rotation for ${ac.callsign}: ${currentRotation}° → ${newRotation}°`);
+          // If wrapped to 0, use 360 instead (avoid conflict with server's default 0)
+          const finalRotation = newRotation === 0 ? 360 : newRotation;
+          console.log(`🔄 Label rotation for ${ac.callsign}: ${currentRotation}° → ${finalRotation}°`);
           updateAircraft({
             ...ac,
-            labelRotation: newRotation,
+            labelRotation: finalRotation,
           });
         }}
       >
