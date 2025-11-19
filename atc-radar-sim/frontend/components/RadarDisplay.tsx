@@ -10,7 +10,7 @@ import { useAircraftStore } from '@/lib/store/aircraft-store';
 import { useUIStore } from '@/lib/store/ui-store';
 import { AircraftData } from '@atc-radar-sim/shared';
 import { latLngToScreen, screenToLatLng, RADAR_COLORS } from '@atc-radar-sim/shared';
-import { WAYPOINTS } from '@atc-radar-sim/shared/src/data/waypoints';
+import { WAYPOINTS, ROUTES } from '@atc-radar-sim/shared/src/data/waypoints';
 import { EXERCISE_1, EXERCISE_2 } from '@atc-radar-sim/shared/src/data/exercises';
 
 export type ExerciseView = 'all' | 'exercise1' | 'exercise2';
@@ -37,6 +37,9 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
   
   // Waypoint labels toggle
   const [showWaypointLabels, setShowWaypointLabels] = useState(true);
+  
+  // Airway routes toggle
+  const [showAirwayRoutes, setShowAirwayRoutes] = useState(true);
   
   // Keyboard shortcuts for zoom
   useEffect(() => {
@@ -187,6 +190,85 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
     }
     
     return <>{gridLines}</>;
+  };
+  
+  // Render airway routes (thin white lines)
+  const renderAirwayRoutes = () => {
+    const routes: React.ReactElement[] = [];
+    
+    // Helper to get waypoint by name
+    const getWaypoint = (name: string) => WAYPOINTS.find(w => w.id === name || w.name === name);
+    
+    // Render each airway route
+    Object.entries(ROUTES).forEach(([routeName, waypointNames]) => {
+      const points: number[] = [];
+      
+      for (const name of waypointNames) {
+        const waypoint = getWaypoint(name);
+        if (waypoint) {
+          const pos = latLngToScreen(
+            { latitude: waypoint.latitude, longitude: waypoint.longitude },
+            center,
+            zoom,
+            { width, height }
+          );
+          points.push(pos.x, pos.y);
+        }
+      }
+      
+      if (points.length >= 4) { // At least 2 points
+        routes.push(
+          <Line
+            key={`airway-${routeName}`}
+            points={points}
+            stroke="rgba(255, 255, 255, 0.3)" // Light white
+            strokeWidth={1}
+            lineCap="round"
+            lineJoin="round"
+          />
+        );
+      }
+    });
+    
+    return routes;
+  };
+  
+  // Render boundary line (purple)
+  const renderBoundary = () => {
+    const boundaryWaypoints = [
+      'CAMPU', 'POPET', 'GONLY', 'PLK', 'PCA', 'VEPAM', 
+      'KARAN', 'PTH', 'ELSAS', 'CN', 'BIBAN', 'PQU', 'CAMPU' // Close the loop
+    ];
+    
+    const points: number[] = [];
+    
+    for (const name of boundaryWaypoints) {
+      const waypoint = WAYPOINTS.find(w => w.id === name || w.name === name);
+      if (waypoint) {
+        const pos = latLngToScreen(
+          { latitude: waypoint.latitude, longitude: waypoint.longitude },
+          center,
+          zoom,
+          { width, height }
+        );
+        points.push(pos.x, pos.y);
+      }
+    }
+    
+    if (points.length >= 4) {
+      return (
+        <Line
+          key="boundary"
+          points={points}
+          stroke="#9333EA" // Purple
+          strokeWidth={2}
+          opacity={0.8}
+          lineCap="round"
+          lineJoin="round"
+        />
+      );
+    }
+    return null;
   };
   
   // Render routes for exercises
@@ -496,7 +578,13 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
           {/* Grid */}
           {renderGrid()}
           
-          {/* Routes - render behind waypoints and aircraft */}
+          {/* Airway routes (thin white lines) - render first in background */}
+          {showAirwayRoutes && renderAirwayRoutes()}
+          
+          {/* Boundary line (purple) */}
+          {showAirwayRoutes && renderBoundary()}
+          
+          {/* Exercise routes - render behind waypoints and aircraft */}
           {renderRoutes()}
           
           {/* Waypoints */}
@@ -539,13 +627,19 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
         </div>
       </div>
       
-      {/* Waypoint Toggle Button */}
-      <div className="absolute bottom-4 left-4">
+      {/* Toggle Buttons */}
+      <div className="absolute bottom-4 left-4 flex flex-col gap-2">
         <button
           onClick={() => setShowWaypointLabels(!showWaypointLabels)}
           className="bg-black bg-opacity-70 hover:bg-opacity-90 px-4 py-2 rounded text-white text-sm font-semibold transition-all border border-yellow-400/30 hover:border-yellow-400/60"
         >
           {showWaypointLabels ? '🏷️ Hide Waypoint Labels' : '🏷️ Show Waypoint Labels'}
+        </button>
+        <button
+          onClick={() => setShowAirwayRoutes(!showAirwayRoutes)}
+          className="bg-black bg-opacity-70 hover:bg-opacity-90 px-4 py-2 rounded text-white text-sm font-semibold transition-all border border-purple-400/30 hover:border-purple-400/60"
+        >
+          {showAirwayRoutes ? '✈️ Hide Airways' : '✈️ Show Airways'}
         </button>
       </div>
     </div>
