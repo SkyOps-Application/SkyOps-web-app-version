@@ -6,7 +6,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc && npm run postbuild",
-    "postbuild": "node -e \"const fs=require('fs');const path=require('path');function createBridge(src,dist){const dir=path.dirname(src);fs.mkdirSync(dir,{recursive:true});const rel=path.relative(dir,dist);fs.writeFileSync(src,'module.exports=require('+JSON.stringify(rel)+');\\n');}createBridge('src/data/exercises.js','dist/data/exercises.js');createBridge('src/data/waypoints.js','dist/data/waypoints.js');\"",
+    "postbuild": "node -e \"const fs=require('fs');const path=require('path');function createBridge(src,dist){const dir=path.dirname(src);fs.mkdirSync(dir,{recursive:true});const rel=path.relative(dir,dist);fs.writeFileSync(src,'module.exports=require('+JSON.stringify(rel)+');\\n');}createBridge('src/data/exercises.js','dist/data/exercises.js');createBridge('src/data/waypoints.js','dist/data/waypoints.js');createBridge('src/utils/coordinates.js','dist/utils/coordinates.js');\"",
     "dev": "tsc --watch",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
