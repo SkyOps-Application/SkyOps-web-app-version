@@ -13,15 +13,12 @@ import { latLngToScreen, screenToLatLng, RADAR_COLORS } from '@atc-radar-sim/sha
 import { WAYPOINTS, ROUTES } from '@atc-radar-sim/shared/src/data/waypoints';
 import { EXERCISE_1, EXERCISE_2 } from '@atc-radar-sim/shared/src/data/exercises';
 
-export type ExerciseView = 'all' | 'exercise1' | 'exercise2';
-
 interface RadarDisplayProps {
   width: number;
   height: number;
-  exerciseView?: ExerciseView;
 }
 
-export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDisplayProps) {
+export function RadarDisplay({ width, height }: RadarDisplayProps) {
   const aircraft = useAircraftStore((state) => state.aircraft);
   const selectedAircraftId = useAircraftStore((state) => state.selectedAircraftId);
   const selectAircraft = useAircraftStore((state) => state.selectAircraft);
@@ -279,7 +276,7 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
     const getWaypoint = (name: string) => WAYPOINTS.find(w => w.id === name || w.name === name);
     
     // Helper to render a single route
-    const renderRoute = (waypointNames: string[], color: string, key: string) => {
+    const renderRoute = (waypointNames: string[], key: string) => {
       const points: number[] = [];
       
       for (const name of waypointNames) {
@@ -300,7 +297,7 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
           <Line
             key={key}
             points={points}
-            stroke={color}
+            stroke="rgba(255, 255, 255, 0.6)" // White
             strokeWidth={2}
             opacity={0.6}
             dash={[10, 5]}
@@ -315,27 +312,23 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
     // Collect all unique routes from both exercises
     const exerciseRoutes = new Map<string, string[]>();
     
-    // Exercise 1 routes - use magenta/pink
-    if (exerciseView === 'all' || exerciseView === 'exercise1') {
-      EXERCISE_1.aircraft.forEach((ac, idx) => {
-        const routeKey = ac.route.join('-');
-        if (!exerciseRoutes.has(routeKey)) {
-          exerciseRoutes.set(routeKey, ac.route);
-          routes.push(renderRoute(ac.route, '#FF69B4', `ex1-route-${idx}`) as React.ReactElement);
-        }
-      });
-    }
+    // Exercise 1 routes - white color
+    EXERCISE_1.aircraft.forEach((ac, idx) => {
+      const routeKey = ac.route.join('-');
+      if (!exerciseRoutes.has(routeKey)) {
+        exerciseRoutes.set(routeKey, ac.route);
+        routes.push(renderRoute(ac.route, `ex1-route-${idx}`) as React.ReactElement);
+      }
+    });
     
-    // Exercise 2 routes - use cyan/light blue
-    if (exerciseView === 'all' || exerciseView === 'exercise2') {
-      EXERCISE_2.aircraft.forEach((ac, idx) => {
-        const routeKey = ac.route.join('-');
-        if (!exerciseRoutes.has(routeKey)) {
-          exerciseRoutes.set(routeKey, ac.route);
-          routes.push(renderRoute(ac.route, '#00CED1', `ex2-route-${idx}`) as React.ReactElement);
-        }
-      });
-    }
+    // Exercise 2 routes - white color
+    EXERCISE_2.aircraft.forEach((ac, idx) => {
+      const routeKey = ac.route.join('-');
+      if (!exerciseRoutes.has(routeKey)) {
+        exerciseRoutes.set(routeKey, ac.route);
+        routes.push(renderRoute(ac.route, `ex2-route-${idx}`) as React.ReactElement);
+      }
+    });
     
     return routes.filter(r => r !== null);
   };
@@ -612,19 +605,6 @@ export function RadarDisplay({ width, height, exerciseView = 'all' }: RadarDispl
         <p className="text-white">• 0 key: Reset zoom</p>
         <p className="text-white">• Right-click aircraft: Rotate label</p>
         <p className="text-white">• Click aircraft: Select</p>
-      </div>
-      
-      {/* Route Legend */}
-      <div className="absolute top-4 right-4 bg-black bg-opacity-70 px-4 py-3 rounded text-white text-xs">
-        <p className="text-yellow-300 font-semibold mb-2 text-sm">Exercise Routes:</p>
-        <div className="flex items-center mb-1">
-          <div className="w-8 h-0.5 mr-2" style={{ background: '#FF69B4', opacity: 0.8 }}></div>
-          <span>Exercise 1</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-8 h-0.5 mr-2" style={{ background: '#00CED1', opacity: 0.8 }}></div>
-          <span>Exercise 2</span>
-        </div>
       </div>
       
       {/* Toggle Buttons */}

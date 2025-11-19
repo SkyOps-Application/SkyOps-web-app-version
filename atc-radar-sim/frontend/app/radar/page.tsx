@@ -6,8 +6,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { RadarDisplay, ExerciseView } from '@/components/RadarDisplay';
-import { ExerciseSelector } from '@/components/ExerciseSelector';
+import { RadarDisplay } from '@/components/RadarDisplay';
 import { CommandPanel } from '@/components/CommandPanel';
 import { AircraftList } from '@/components/AircraftList';
 import { getSocket, connectSocket, disconnectSocket } from '@/lib/socket';
@@ -28,7 +27,6 @@ export default function RadarPage() {
   const [currentClearance, setCurrentClearance] = useState('');
   const [commandLog, setCommandLog] = useState<{ time: string; text: string; valid?: boolean }[]>([]);
   const [exerciseId, setExerciseId] = useState(1); // Default to Exercise 1
-  const [exerciseView, setExerciseView] = useState<ExerciseView>('all'); // Route view filter
   
   useEffect(() => {
     // Update dimensions on resize
@@ -242,17 +240,10 @@ export default function RadarPage() {
       
       {/* Main Map Area */}
       <div className="flex-1 relative overflow-hidden">
-        {/* Radar Display with Exercise Routes */}
+        {/* Radar Display */}
         <RadarDisplay 
           width={dimensions.width} 
           height={dimensions.height}
-          exerciseView={exerciseView}
-        />
-        
-        {/* Exercise Selector Overlay */}
-        <ExerciseSelector 
-          currentView={exerciseView}
-          onViewChange={setExerciseView}
         />
       </div>
       
