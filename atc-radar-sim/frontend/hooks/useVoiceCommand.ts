@@ -245,7 +245,7 @@ function parseVoiceToCommand(spokenText: string): string | null {
 
 /**
  * Extract callsign from spoken text
- * Handles phonetic alphabet (e.g., "hotel victor november")
+ * Handles phonetic alphabet (e.g., "hotel victor november") and shorthand (e.g., "hvn")
  */
 function extractCallsign(text: string): string | null {
   const phoneticMap: { [key: string]: string } = {
@@ -257,9 +257,22 @@ function extractCallsign(text: string): string | null {
     'zulu': 'Z',
   };
   
+  // Handle direct callsign format (e.g., "VJC793", "HVN123", "hvn 465")
+  const directMatch = text.match(/\b([A-Z]{3}\s*\d{2,4})\b/i);
+  if (directMatch) {
+    return directMatch[1].replace(/\s+/g, '').toUpperCase();
+  }
+  
+  // Handle shorthand like "hvn 465" or "vjc 793"
+  const shorthandMatch = text.match(/\b([a-z]{2,3})\s+(\d{2,4})\b/i);
+  if (shorthandMatch) {
+    return (shorthandMatch[1] + shorthandMatch[2]).toUpperCase();
+  }
+  
   const words = text.split(/\s+/);
   let callsign = '';
   let numberPart = '';
+  let foundNumber = false;
   
   // Extract phonetic letters
   for (let i = 0; i < Math.min(words.length, 10); i++) {
@@ -269,9 +282,10 @@ function extractCallsign(text: string): string | null {
     if (phoneticMap[word]) {
       callsign += phoneticMap[word];
     }
-    // Check if it's a number (e.g., "one two three" -> "123")
-    else if (/^\d+$/.test(word)) {
-      numberPart += word;
+    // Check if it's a multi-digit number (e.g., "465")
+    else if (/^\d{2,4}$/.test(word)) {
+      numberPart = word;
+      foundNumber = true;
       break;
     }
     // Convert spoken numbers to digits
@@ -279,17 +293,16 @@ function extractCallsign(text: string): string | null {
       const digit = spokenNumberToDigit(word);
       if (digit !== null) {
         numberPart += digit;
+        foundNumber = true;
+        // Continue collecting digits
+      } else if (callsign.length > 0 && foundNumber) {
+        // Stop if we've collected callsign + numbers
+        break;
       } else if (callsign.length > 0) {
         // Stop if we've started the callsign and hit a non-phonetic word
         break;
       }
     }
-  }
-  
-  // Handle direct callsign format (e.g., "VJC793", "HVN123")
-  const directMatch = text.match(/\b([A-Z]{3}\d{2,4})\b/i);
-  if (directMatch) {
-    return directMatch[1].toUpperCase();
   }
   
   return callsign + numberPart || null;
@@ -336,11 +349,30 @@ function extractAltitude(text: string): string | null {
  * Extract heading from spoken text
  */
 function extractHeading(text: string): string | null {
+  // Handle mishearing "two seven zero" as "to 70", "to seventy", etc.
+  // Common speech recognition errors for headings
+  const misheardPatterns = [
+    /heading\s*to\s*(\d{2,3})/i,     // "heading to 70" -> 270
+    /heading\s*too\s*(\d{2,3})/i,    // "heading too 70" -> 270
+    /heading\s*2\s*(\d{2})/i,        // "heading 2 70" -> 270
+  ];
+  
+  for (const pattern of misheardPatterns) {
+    const match = text.match(pattern);
+    if (match) {
+      let hdg = match[1];
+      // If it's a 2-digit number after "to", prepend "2"
+      if (hdg.length === 2) {
+        hdg = '2' + hdg;
+      }
+      return hdg.padStart(3, '0');
+    }
+  }
+  
   // Match "heading XXX" or plain three-digit number
-  const match = text.match(/heading\s*(\d{1,3})|(\d{3})/);
-  if (match) {
-    const hdg = match[1] || match[2];
-    return hdg.padStart(3, '0');
+  const directMatch = text.match(/heading\s*(\d{3})/);
+  if (directMatch) {
+    return directMatch[1].padStart(3, '0');
   }
   
   // Match spoken numbers (e.g., "two seven zero")
@@ -354,6 +386,11 @@ function extractHeading(text: string): string | null {
       continue;
     }
     if (foundHeading) {
+      // Skip filler words
+      if (words[i] === 'to' || words[i] === 'too') {
+        continue;
+      }
+      
       const digit = spokenNumberToDigit(words[i]);
       if (digit !== null) {
         digits += digit;
