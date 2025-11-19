@@ -580,7 +580,7 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
           {showAirwayRoutes && renderBoundary()}
           
           {/* Exercise routes - render behind waypoints and aircraft */}
-          {renderRoutes()}
+          {showAirwayRoutes && renderRoutes()}
           
           {/* Waypoints */}
           {renderWaypoints()}
