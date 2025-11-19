@@ -1,14 +1,14 @@
 /**
  * Waypoint and route types
- * NOTE: latitude/longitude are internal 2D coordinates (NOT real-world coordinates)
- * These represent positions on an artificial training canvas measured in nautical miles
+ * Uses WGS84 Decimal Degrees (real-world coordinates)
+ * Vietnam/Southeast Asia airspace region
  */
 
 export interface Waypoint {
   id: string;
   name: string;
-  latitude: number;  // Internal Y coordinate (NM)
-  longitude: number; // Internal X coordinate (NM)
+  latitude: number;  // WGS84 latitude in decimal degrees
+  longitude: number; // WGS84 longitude in decimal degrees
   type: WaypointType;
   description?: string;
 }
