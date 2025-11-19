@@ -439,12 +439,12 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
       zoom,
       { width, height }
     );
-    
+
     // Determine colors based on state
-    const isOutOfBoundary = ac.outOfBoundary || false;
+    const isOutOfBoundary = (ac as any).outOfBoundary || false;
     const isConflict = ac.conflict || false;
     const isIdentified = ac.identified || false;
-    
+
     let markerColor = '#FFFFFF'; // White = not identified
     let labelColor = '#E08A00'; // Orange label text
     

@@ -8,6 +8,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { parseCommand, formatCommand } from '@atc-radar-sim/shared';
 import { getSocket } from '@/lib/socket';
 import { audioManager } from '@/lib/audio';
+import { useVoiceCommand } from '@/hooks/useVoiceCommand';
 
 interface CommandHistory {
   command: string;
@@ -19,40 +20,39 @@ interface CommandHistory {
 export function CommandPanel() {
   const [command, setCommand] = useState('');
   const [history, setHistory] = useState<CommandHistory[]>([]);
-  const [isListening, setIsListening] = useState(false);
-  const [voiceSupported, setVoiceSupported] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
   
   const inputRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<any>(null);
+  
+  // Voice command hook
+  const { isListening, isSupported: voiceSupported, transcript, startListening, stopListening } = useVoiceCommand({
+    onCommand: (cmd) => {
+      // Voice command parsed successfully, set it in the input
+      setCommand(cmd);
+      setVoiceTranscript(transcript);
+      audioManager.play('confirmation');
+      
+      // Auto-submit the command
+      setTimeout(() => {
+        handleSubmitCommand(cmd);
+      }, 100);
+    },
+    onError: (error) => {
+      console.error('Voice recognition error:', error);
+      audioManager.play('error');
+      setHistory((prev) => [
+        {
+          command: `Voice error: ${error}`,
+          timestamp: new Date(),
+          valid: false,
+          error: `Failed to recognize voice: ${error}`,
+        },
+        ...prev.slice(0, 49),
+      ]);
+    },
+  });
   
   useEffect(() => {
-    // Check for voice recognition support
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        setVoiceSupported(true);
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = false;
-        recognitionRef.current.interimResults = false;
-        recognitionRef.current.lang = 'en-US';
-        
-        recognitionRef.current.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          setCommand(transcript.toUpperCase());
-          setIsListening(false);
-        };
-        
-        recognitionRef.current.onerror = (event: any) => {
-          console.error('Speech recognition error:', event.error);
-          setIsListening(false);
-        };
-        
-        recognitionRef.current.onend = () => {
-          setIsListening(false);
-        };
-      }
-    }
-    
     // Listen for distance results from server
     const socket = getSocket();
     const handleDistanceResult = (event: any) => {
@@ -76,17 +76,15 @@ export function CommandPanel() {
     };
   }, []);
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmitCommand = (cmd: string) => {
+    if (!cmd.trim()) return;
     
-    if (!command.trim()) return;
-    
-    const parsed = parseCommand(command);
+    const parsed = parseCommand(cmd);
     
     // Add to history
     setHistory((prev) => [
       {
-        command: parsed.valid ? formatCommand(parsed) : command,
+        command: parsed.valid ? formatCommand(parsed) : cmd,
         timestamp: new Date(),
         valid: parsed.valid,
         error: parsed.error,
@@ -97,7 +95,7 @@ export function CommandPanel() {
     if (parsed.valid) {
       // Send command to server
       const socket = getSocket();
-      socket.emit('command:text', command);
+      socket.emit('command:text', cmd);
       
       // Play confirmation sound
       audioManager.play('confirmation');
@@ -110,17 +108,16 @@ export function CommandPanel() {
     inputRef.current?.focus();
   };
   
-  const startVoiceRecognition = () => {
-    if (recognitionRef.current && !isListening) {
-      setIsListening(true);
-      recognitionRef.current.start();
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmitCommand(command);
   };
   
-  const stopVoiceRecognition = () => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
+  const toggleVoiceRecognition = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
   };
   
@@ -161,7 +158,7 @@ export function CommandPanel() {
             type="text"
             value={command}
             onChange={(e) => setCommand(e.target.value.toUpperCase())}
-            placeholder="Enter command (e.g., VNA123 D120)"
+            placeholder="Enter command (e.g., VNA123 D120) or use voice"
             className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
             autoComplete="off"
           />
@@ -169,26 +166,43 @@ export function CommandPanel() {
           {voiceSupported && (
             <button
               type="button"
-              onClick={isListening ? stopVoiceRecognition : startVoiceRecognition}
-              className={`px-4 py-2 rounded font-medium transition-colors ${
+              onClick={toggleVoiceRecognition}
+              className={`px-4 py-2 rounded font-medium transition-colors flex items-center gap-2 ${
                 isListening
-                  ? 'bg-red-600 hover:bg-red-700'
+                  ? 'bg-red-600 hover:bg-red-700 animate-pulse'
                   : 'bg-blue-600 hover:bg-blue-700'
               }`}
+              title={isListening ? 'Stop listening' : 'Start voice command'}
             >
-              {isListening ? 'Stop' : 'Voice'}
+              <span className="text-xl">{isListening ? '🔴' : '🎤'}</span>
+              {isListening ? 'Listening...' : 'Voice'}
             </button>
           )}
           
           <button
             type="submit"
             className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded font-medium transition-colors"
+            disabled={isListening}
           >
             Send
           </button>
         </div>
         
+        {/* Voice transcript indicator */}
+        {isListening && (
+          <div className="mt-2 p-2 bg-blue-900 bg-opacity-30 rounded border border-blue-600 text-blue-300 text-sm">
+            🎤 Listening... Speak your command (e.g., "Victor Juliet Charlie 793 descend flight level 120")
+          </div>
+        )}
+        
+        {voiceTranscript && !isListening && (
+          <div className="mt-2 p-2 bg-green-900 bg-opacity-30 rounded text-green-300 text-sm">
+            Heard: "{voiceTranscript}"
+          </div>
+        )}
+        
         <div className="mt-2 text-xs text-gray-400 space-y-1">
+          <div><strong>Text Commands:</strong></div>
           <div><strong>Altitude:</strong> VNA123 C120 (climb) | VNA123 D90 (descend) | VNA123 SC120 (stop climb) | VNA123 SD90 (stop descend)</div>
           <div><strong>Heading:</strong> VNA123 R270 (turn right) | VNA123 L090 (turn left) | VNA123 F180 (fly heading)</div>
           <div><strong>Speed:</strong> VNA123 IS280 (increase, max ±20kts) | VNA123 RS240 (reduce)</div>
@@ -196,6 +210,14 @@ export function CommandPanel() {
           <div><strong>Direct-to:</strong> VNA123 DRPCA (direct to waypoint)</div>
           <div><strong>Distance:</strong> DT VNA123 UAL456 (aircraft-aircraft) | DT VNA123 TSH (aircraft-waypoint) | DT TSH AC (waypoint-waypoint)</div>
           <div><strong>Other:</strong> VNA123 ID (identify) | VNA123 CT (contact/handoff)</div>
+          {voiceSupported && (
+            <>
+              <div className="mt-2"><strong>Voice Commands:</strong></div>
+              <div>Say: "Victor Juliet Charlie 793 descend flight level 120" → VJC793 D120</div>
+              <div>Say: "Hotel Victor November 123 turn right heading two seven zero" → HVN123 R270</div>
+              <div>Say: "Victor November Alpha 456 identify" → VNA456 ID</div>
+            </>
+          )}
         </div>
       </form>
     </div>
