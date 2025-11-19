@@ -466,7 +466,7 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
     
     // Label position with circular rotation around aircraft
     const labelDistance = 35; // Distance from aircraft center
-    const labelRotation = ac.labelRotation || 45; // Default: 45 degrees (bottom-right)
+    const labelRotation = ac.labelRotation !== undefined ? ac.labelRotation : 45; // Default: 45 degrees (bottom-right)
     const labelAngle = (labelRotation * Math.PI) / 180;
     const labelX = pos.x + Math.cos(labelAngle) * labelDistance;
     const labelY = pos.y + Math.sin(labelAngle) * labelDistance;
@@ -478,11 +478,11 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
         onTap={() => selectAircraft(ac.id)}
         onContextMenu={(e) => {
           e.evt.preventDefault();
-          // Right-click rotates entire label by 5 degrees
-          const currentRotation = ac.labelRotation || 0;
+          // Right-click rotates entire label by 15 degrees
+          const currentRotation = ac.labelRotation !== undefined ? ac.labelRotation : 45;
           updateAircraft({
             ...ac,
-            labelRotation: (currentRotation + 5) % 360,
+            labelRotation: (currentRotation + 15) % 360,
           });
         }}
       >

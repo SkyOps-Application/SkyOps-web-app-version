@@ -9,6 +9,111 @@ import { EXERCISE_1, EXERCISE_2 } from '@atc-radar-sim/shared/src/data/exercises
 import { WAYPOINTS } from '@atc-radar-sim/shared/src/data/waypoints';
 
 /**
+ * Format command acknowledgment message according to requirements
+ */
+function formatCommandMessage(callsign: string, parsed: ParsedCommand): string {
+  const value = parsed.value;
+  
+  switch (parsed.type) {
+    case 'DESCEND':
+      if (typeof value === 'number') {
+        if (value >= 100) {
+          return `${callsign} Descend to FL${value}`;
+        } else {
+          return `${callsign} Descend to ${value}00ft`;
+        }
+      }
+      break;
+    
+    case 'CLIMB':
+      if (typeof value === 'number') {
+        if (value >= 100) {
+          return `${callsign} Climb to FL${value}`;
+        } else {
+          return `${callsign} Climb to ${value}00ft`;
+        }
+      }
+      break;
+    
+    case 'STOP_DESCEND':
+      if (typeof value === 'number') {
+        if (value >= 100) {
+          return `${callsign} Stop Descend at FL${value}`;
+        } else {
+          return `${callsign} Stop Descend at ${value}00ft`;
+        }
+      }
+      break;
+    
+    case 'STOP_CLIMB':
+      if (typeof value === 'number') {
+        if (value >= 100) {
+          return `${callsign} Stop Climb at FL${value}`;
+        } else {
+          return `${callsign} Stop Climb at ${value}00ft`;
+        }
+      }
+      break;
+    
+    case 'TURN_RIGHT':
+      if (typeof value === 'number') {
+        return `${callsign} Turn Right heading ${value.toString().padStart(3, '0')}`;
+      }
+      break;
+    
+    case 'TURN_LEFT':
+      if (typeof value === 'number') {
+        return `${callsign} Turn Left heading ${value.toString().padStart(3, '0')}`;
+      }
+      break;
+    
+    case 'DIRECT':
+      if (typeof value === 'number') {
+        return `${callsign} Fly heading ${value.toString().padStart(3, '0')}`;
+      }
+      break;
+    
+    case 'INCREASE_SPEED':
+      if (typeof value === 'number') {
+        return `${callsign} Increase Speed to ${value} knots`;
+      }
+      break;
+    
+    case 'REDUCE_SPEED':
+      if (typeof value === 'number') {
+        return `${callsign} Reduce Speed to ${value} knots`;
+      }
+      break;
+    
+    case 'INCREASE_MACH':
+      if (typeof value === 'number') {
+        return `${callsign} Increase Mach number ${value.toFixed(2)}`;
+      }
+      break;
+    
+    case 'REDUCE_MACH':
+      if (typeof value === 'number') {
+        return `${callsign} Reduce Mach number ${value.toFixed(2)}`;
+      }
+      break;
+    
+    case 'CONTACT':
+      return `${callsign} Contact`;
+    
+    case 'IDENTIFY':
+      return `${callsign} Identified`;
+    
+    case 'DIRECT_WAYPOINT':
+      if (typeof value === 'string') {
+        return `${callsign} Direct to ${value}`;
+      }
+      break;
+  }
+  
+  return `${callsign} Command acknowledged`;
+}
+
+/**
  * Helper function to apply a command to an aircraft
  * Returns { handled: boolean, error?: string, distanceResult?: string }
  */
@@ -212,13 +317,15 @@ export function setupSocketHandlers(
             timestamp: new Date(),
           });
         } else if (aircraft) {
-          // Otherwise emit command acknowledged
+          // Otherwise emit command acknowledged with formatted message
+          const message = formatCommandMessage(aircraft.callsign, parsed);
           socket.emit('command:acknowledged', {
             aircraftId: aircraft.id,
             commandType: parsed.type,
             value: parsed.value,
             timestamp: new Date(),
             acknowledged: true,
+            message, // Add formatted message
           });
         }
       } catch (error: any) {
@@ -267,13 +374,15 @@ export function setupSocketHandlers(
             timestamp: new Date(),
           });
         } else if (aircraft) {
-          // Otherwise emit command acknowledged
+          // Otherwise emit command acknowledged with formatted message
+          const message = formatCommandMessage(aircraft.callsign, parsed);
           socket.emit('command:acknowledged', {
             aircraftId: aircraft.id,
             commandType: parsed.type,
             value: parsed.value,
             timestamp: new Date(),
             acknowledged: true,
+            message, // Add formatted message
           });
         }
       } catch (error: any) {

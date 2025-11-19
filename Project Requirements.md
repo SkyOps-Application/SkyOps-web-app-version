@@ -69,6 +69,27 @@
 | 17 | RM+SỐ THẬP PHÂN | \- Tàu giảm từ số mach cũ lên số mach được chỉ định\- Mũi tên kế bên số mach hướng xuống |  |
 | 18 | CT  | Tàu biến mất khỏi map | \- Cho tàu chuyển sóng (contact) |
 | 19 | ID | Tàu trên màn hình đang màu trắng chuyển sang màu vàng | \- Nhận diện tàu bay |
+| 20 | DR+Tên điểm | Tàu đi thẳng đến một điểm bất kỳ (waypoint) có sẵn trên map | \- Cho tàu về thẳng (Direct) về một điểm bất kỳ |
+| 21 | DT \[Tàu/điểm1\] \[tàu/điểm 2\] | Màn hình hiển thị khoảng cách giữa hai điểm/hai tàu/một tàu một điểm. | \- Đo khoảng cách giữa hai điểm, hai tàu hoặc một tàu và một điểm |
+
+
+| STT | Nhập lệnh (HAI KHUNG BÊN TRÁI) | Hiển thị thời gian và lệnh đã cấp cho tàu (KHUNG BÊN PHẢI)<br>- Thời gian này là thời gian đồng hồ của web đang chạy đến bao nhiêu á | VÍ DỤ |
+| --- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 1 | D+SỐ | `[CALLSIGN] DESCEND TO FL [SỐ ĐÃ CẤP]`<br>hoặc `[CALLSIGN] DESCEND TO [SỐ ĐÃ CẤP + 00] ft` | `- HVN123 D120: HVN123 Descend to FL120`<br>`- HVN123 D90: HVN123 Descend to 9000ft` |
+| 2 | C+SỐ | `[CALLSIGN] CLIMB TO FL [SỐ ĐÃ CẤP]`<br>hoặc `[CALLSIGN] CLIMB TO [SỐ ĐÃ CẤP + 00] ft` | `- HVN123 C240: HVN123 Climb to FL120`<br>`- HVN123 C70: HVN123 Climb to 7000ft` |
+| 3 | SD+SỐ | `[CALLSIGN] STOP DESCEND AT FL [SỐ ĐÃ CẤP]`<br>hoặc `[CALLSIGN] STOP DESCEND AT [SỐ ĐÃ CẤP + 00] ft` | `- HVN123 SD100: HVN123 Stop Descend at FL120`<br>`- HVN123 SD50: HVN123 Stop Descend at 5000ft` |
+| 4 | SC+SỐ | `[CALLSIGN] STOP CLIMB AT FL [SỐ ĐÃ CẤP]`<br>hoặc `[CALLSIGN] STOP CLIMB AT [SỐ ĐÃ CẤP + 00] ft` | `- HVN123 SC330: HVN123 Stop Climb at FL120`<br>`- HVN123 SC80: HVN123 Stop Climb at 8000ft` |
+| 5 | R+SỐ | `[CALLSIGN] TURN RIGHT HEADING [SỐ ĐÃ CẤP]` | `- HVN123 R025: HVN123 Turn Right heading 025` |
+| 6 | L+SỐ | `[CALLSIGN] TURN LEFT HEADING [SỐ ĐÃ CẤP]` | `- HVN123 L160: HVN123 Turn Left heading 160` |
+| 7 | F+SỐ | `[CALLSIGN] FLY HEADING [SỐ ĐÃ CẤP]` | `- HVN123 F360: HVN123 Fly heading 025` |
+| 8 | IS+SỐ | `[CALLSIGN] INCREASE SPEED TO [SỐ ĐÃ CẤP] KNOTS` | `- HVN123 IS250: HVN123 Increase Speed to 250 knots` |
+| 9 | RS+SỐ | `[CALLSIGN] REDUCE SPEED TO [SỐ ĐÃ CẤP] KNOTS` | `- HVN123 RS220: HVN123 Reduce Speed to 220 knots` |
+| 10 | IM+SỐ THẬP PHÂN | `[CALLSIGN] INCREASE MACH NUMBER [SỐ ĐÃ CẤP]` | `- HVN123 IM0.80: HVN123 Increase Mach number 0.80` |
+| 11 | RM+SỐ THẬP PHÂN | `[CALLSIGN] REDUCE MACH NUMBER [SỐ ĐÃ CẤP]` | `- HVN123 RM0.79: HVN123 Reduce Mach number 0.79` |
+| 12 | CT | `[CALLSIGN] CONTACT` | `- HVN123 CT: HVN123 Contact` |
+| 13 | ID | `[CALLSIGN] IDENTIFIED` | `- HVN123 ID: HVN123 Indentified` |
+| 14 | DR+Tên điểm | `[CALLSIGN] DIRECT TO [TÊN ĐIỂM]` | `- HVN123 DRAC: HVN123 Direct to AC` |
+
 
 
 
