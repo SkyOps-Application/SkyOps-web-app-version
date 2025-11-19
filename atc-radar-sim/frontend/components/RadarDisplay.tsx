@@ -455,7 +455,7 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
       markerColor = '#E53935'; // Red = conflict
       labelColor = '#E53935'; // Red label text
     } else if (isIdentified) {
-      markerColor = '#FFD43B'; // Yellow = identified
+      markerColor = '#00FF00'; // Green = identified
       labelColor = '#E08A00'; // Orange label text (stays orange)
     }
     
