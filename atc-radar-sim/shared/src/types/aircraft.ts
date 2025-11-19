@@ -82,11 +82,14 @@ export interface AircraftCommand {
   timestamp: Date;
   controllerId?: string;
   acknowledged: boolean;
+  message?: string; // Formatted command message for display
 }
 
 export type CommandType =
   | 'DESCEND'           // D120 - Descend to FL120
   | 'CLIMB'             // C120 - Climb to FL120
+  | 'STOP_DESCEND'      // SD120 - Stop descending at FL120
+  | 'STOP_CLIMB'        // SC120 - Stop climbing at FL120
   | 'TURN_LEFT'         // TL030 - Turn left heading 030
   | 'TURN_RIGHT'        // TR270 - Turn right heading 270
   | 'INCREASE_SPEED'    // IS250 - Increase speed to 250kt
