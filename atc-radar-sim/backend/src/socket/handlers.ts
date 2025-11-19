@@ -111,6 +111,7 @@ function applyCommandToAircraft(
         }
         
         aircraft.assignedSpeed = parsed.value;
+        aircraft.speed = parsed.value; // Update displayed speed immediately
       }
       break;
     
@@ -129,7 +130,9 @@ function applyCommandToAircraft(
         }
         
         aircraft.assignedMach = parsed.value;
+        aircraft.machNumber = parsed.value; // Update displayed mach immediately
         aircraft.assignedSpeed = Math.round(parsed.value * 575);
+        aircraft.speed = Math.round(parsed.value * 575); // Update displayed speed immediately
       }
       break;
     

@@ -92,10 +92,8 @@ export const WAYPOINTS: Waypoint[] = [
   { id: 'DONDA', name: 'DONDA', latitude: 14.703333, longitude: 112.005000, type: 'FIX' },
   
   // R468 Route (TSH - SAPEN - POPET - PNH)
-  // SAPEN: approximately 1/3 of the way from TSH to PNH
-  { id: 'SAPEN', name: 'SAPEN', latitude: 11.060000, longitude: 106.050000, type: 'FIX' },
-  // POPET: approximately 2/3 of the way from TSH to PNH
-  { id: 'POPET', name: 'POPET', latitude: 11.305000, longitude: 105.440000, type: 'FIX' },
+  { id: 'SAPEN', name: 'SAPEN', latitude: 11.020000, longitude: 106.183333, type: 'FIX' },
+  { id: 'POPET', name: 'POPET', latitude: 11.100000, longitude: 105.950000, type: 'FIX' },
   
   // Additional waypoints
   { id: 'ATGAS', name: 'ATGAS', latitude: 10.404722, longitude: 105.517222, type: 'FIX' },
@@ -145,13 +143,14 @@ export const WAYPOINTS: Waypoint[] = [
   { id: 'AGSIS', name: 'AGSIS', latitude: 11.030556, longitude: 108.831111, type: 'FIX' },
   { id: 'MIMUX', name: 'MIMUX', latitude: 11.305000, longitude: 111.103333, type: 'FIX' },
   { id: 'NOBID', name: 'NOBID', latitude: 13.312222, longitude: 108.581944, type: 'FIX' },
-  { id: 'DONXO', name: 'DONXO', latitude: 11.088056, longitude: 106.638333, type: 'FIX' },
+  { id: 'BUKMA', name: 'BUKMA', latitude: 10.847222, longitude: 107.030833, type: 'FIX' },
+  { id: 'DONXO', name: 'DONXO', latitude: 11.423333, longitude: 106.951667, type: 'FIX' },
   { id: 'RUNOP', name: 'RUNOP', latitude: 11.088056, longitude: 106.638333, type: 'FIX' },
   { id: 'MOXEP', name: 'MOXEP', latitude: 10.899444, longitude: 106.462778, type: 'FIX' },
-  { id: 'MULAD', name: 'MULAD', latitude: 12.336389, longitude: 107.810000, type: 'FIX' },
-  { id: 'ONEBI', name: 'ONEBI', latitude: 11.754167, longitude: 108.355278, type: 'FIX' },
-  { id: 'LEDUP', name: 'LEDUP', latitude: 10.888611, longitude: 106.964167, type: 'FIX' },
-  { id: 'BODOD', name: 'BODOD', latitude: 9.683056, longitude: 106.897778, type: 'FIX' },
+  { id: 'MULAD', name: 'MULAD', latitude: 12.548056, longitude: 107.574722, type: 'FIX' },
+  { id: 'ONEBI', name: 'ONEBI', latitude: 11.938056, longitude: 108.308611, type: 'FIX' },
+  { id: 'LEDUP', name: 'LEDUP', latitude: 10.775833, longitude: 107.146944, type: 'FIX' },
+  { id: 'BODOD', name: 'BODOD', latitude: 9.639444, longitude: 106.858056, type: 'FIX' },
   { id: 'QL', name: 'QL', latitude: 9.176111, longitude: 105.176667, type: 'FIX' },
   { id: 'VEPKI', name: 'VEPKI', latitude: 9.105833, longitude: 106.373611, type: 'FIX' },
   { id: 'CONDA', name: 'CONDA', latitude: 8.957222, longitude: 106.474722, type: 'FIX' },

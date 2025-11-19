@@ -464,9 +464,9 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
     const headingEndX = pos.x + Math.sin(headingRad) * headingLength;
     const headingEndY = pos.y - Math.cos(headingRad) * headingLength;
     
-    // Label position with rotation
-    const labelDistance = 25;
-    const labelRotation = ac.labelRotation || 0;
+    // Label position with circular rotation around aircraft
+    const labelDistance = 35; // Distance from aircraft center
+    const labelRotation = ac.labelRotation || 45; // Default: 45 degrees (bottom-right)
     const labelAngle = (labelRotation * Math.PI) / 180;
     const labelX = pos.x + Math.cos(labelAngle) * labelDistance;
     const labelY = pos.y + Math.sin(labelAngle) * labelDistance;
