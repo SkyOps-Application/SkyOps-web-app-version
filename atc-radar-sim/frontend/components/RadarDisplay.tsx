@@ -119,8 +119,8 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
       const dx = e.evt.clientX - dragStart.x;
       const dy = e.evt.clientY - dragStart.y;
       
-      // Slower pan sensitivity for better control
-      const panSensitivity = 0.15 / zoom;
+      // Much slower pan sensitivity for precise control
+      const panSensitivity = 0.06 / zoom;
       const newCenter = {
         latitude: center.latitude + dy * panSensitivity, // Fixed: + instead of -
         longitude: center.longitude - dx * panSensitivity, // Fixed: - instead of +
@@ -297,10 +297,8 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
           <Line
             key={key}
             points={points}
-            stroke="rgba(255, 255, 255, 0.6)" // White
-            strokeWidth={2}
-            opacity={0.6}
-            dash={[10, 5]}
+            stroke="rgba(255, 255, 255, 0.3)" // Light white like airway routes
+            strokeWidth={1}
             lineCap="round"
             lineJoin="round"
           />
