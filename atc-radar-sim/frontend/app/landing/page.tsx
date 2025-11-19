@@ -74,6 +74,13 @@ export default function LandingPage() {
           </div>
         </div>
       </main>
+
+      {/* Copyright Footer */}
+      <footer className="relative z-10 pb-6 text-center">
+        <p className="text-white text-sm drop-shadow-lg">
+          Copyright by Que Anh and Quynh Anh
+        </p>
+      </footer>
     </div>
   );
 }

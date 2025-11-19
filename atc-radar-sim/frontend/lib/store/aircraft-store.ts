@@ -56,10 +56,11 @@ export const useAircraftStore = create<AircraftStore>((set, get) => ({
       const updatedAircraft = state.aircraft.map(ac => {
         const update = aircraftList.find(u => u.id === ac.id);
         if (update) {
-          // Preserve labelRotation from existing aircraft (user-set UI state)
+          // ALWAYS preserve labelRotation from existing aircraft (user-set UI state)
+          // Server updates should never overwrite user's label rotation
           return {
             ...update,
-            labelRotation: ac.labelRotation !== undefined ? ac.labelRotation : update.labelRotation
+            labelRotation: ac.labelRotation // Always use existing, never from server
           };
         }
         return ac;
