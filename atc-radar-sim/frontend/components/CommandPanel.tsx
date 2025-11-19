@@ -191,7 +191,7 @@ export function CommandPanel() {
         {/* Voice transcript indicator */}
         {isListening && (
           <div className="mt-2 p-2 bg-blue-900 bg-opacity-30 rounded border border-blue-600 text-blue-300 text-sm">
-            🎤 Listening... Speak your command (e.g., "Victor Juliet Charlie 793 descend flight level 120")
+            🎤 Listening... Speak your command (e.g., "Victor Juliet Charlie seven niner tree descend to flight level one two zero")
           </div>
         )}
         
@@ -212,10 +212,12 @@ export function CommandPanel() {
           <div><strong>Other:</strong> VNA123 ID (identify) | VNA123 CT (contact/handoff)</div>
           {voiceSupported && (
             <>
-              <div className="mt-2"><strong>Voice Commands:</strong></div>
-              <div>Say: "Victor Juliet Charlie 793 descend flight level 120" → VJC793 D120</div>
-              <div>Say: "Hotel Victor November 123 turn right heading two seven zero" → HVN123 R270</div>
-              <div>Say: "Victor November Alpha 456 identify" → VNA456 ID</div>
+              <div className="mt-2"><strong>Voice Commands (ICAO Phonetics):</strong></div>
+              <div>Say: "Victor Juliet Charlie seven niner tree descend to flight level one two zero" → VJC793 D120</div>
+              <div>Say: "Hotel Victor November one two tree turn right heading two seven zero" → HVN123 R270</div>
+              <div>Say: "Victor November Alpha four five six increase speed to two five zero knots" → VNA456 IS250</div>
+              <div>Say: "Victor Juliet Charlie seven niner tree identified" → VJC793 ID</div>
+              <div className="text-yellow-300 text-xs mt-1">Numbers: 3=tree, 9=niner (ICAO standard)</div>
             </>
           )}
         </div>

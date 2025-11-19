@@ -121,19 +121,19 @@ function parseVoiceToCommand(spokenText: string): string | null {
   let command = '';
   
   // Altitude commands
-  if (text.includes('descend') || text.includes('descent')) {
+  if (text.includes('descend to')) {
     const alt = extractAltitude(text);
     if (alt) command = `${callsign} D${alt}`;
   }
-  else if (text.includes('climb')) {
+  else if (text.includes('climb to')) {
     const alt = extractAltitude(text);
     if (alt) command = `${callsign} C${alt}`;
   }
-  else if (text.includes('stop descend') || text.includes('stop descent')) {
+  else if (text.includes('stop descend at') || text.includes('stop descent at')) {
     const alt = extractAltitude(text);
     if (alt) command = `${callsign} SD${alt}`;
   }
-  else if (text.includes('stop climb')) {
+  else if (text.includes('stop climb at')) {
     const alt = extractAltitude(text);
     if (alt) command = `${callsign} SC${alt}`;
   }
@@ -236,12 +236,13 @@ function extractCallsign(text: string): string | null {
 }
 
 /**
- * Convert spoken numbers to digits
+ * Convert spoken numbers to digits (ICAO standard)
  */
 function spokenNumberToDigit(word: string): string | null {
   const numberMap: { [key: string]: string } = {
-    'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'four': '4',
-    'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9',
+    'zero': '0', 'one': '1', 'two': '2', 'three': '3', 'tree': '3', 
+    'four': '4', 'five': '5', 'six': '6', 'seven': '7', 
+    'eight': '8', 'nine': '9', 'niner': '9',
   };
   return numberMap[word] || null;
 }
