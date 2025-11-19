@@ -5,7 +5,8 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Circle, Line, Text, Group, Rect, RegularPolygon } from 'react-konva';
+import { Stage, Layer, Circle, Line, Text, Group, Rect, RegularPolygon, Image as KonvaImage } from 'react-konva';
+import Konva from 'konva';
 import { useAircraftStore } from '@/lib/store/aircraft-store';
 import { useUIStore } from '@/lib/store/ui-store';
 import { AircraftData } from '@atc-radar-sim/shared';
@@ -16,6 +17,157 @@ import { EXERCISE_1, EXERCISE_2 } from '@atc-radar-sim/shared/src/data/exercises
 interface RadarDisplayProps {
   width: number;
   height: number;
+}
+
+// Create realistic radar background with sea, land, and glow effects
+function createRadarBackground(width: number, height: number): HTMLCanvasElement {
+  const bg = document.createElement("canvas");
+  bg.width = width;
+  bg.height = height;
+  const g = bg.getContext("2d")!;
+  
+  // -----------------------------
+  // 1. SEA + VIGNETTE
+  // -----------------------------
+  // Sea: gradient from very dark blue -> lighter blue
+  const seaGrad = g.createLinearGradient(0, 0, 0, height);
+  seaGrad.addColorStop(0, "#021529");
+  seaGrad.addColorStop(0.5, "#032545");
+  seaGrad.addColorStop(1, "#04375b");
+  g.fillStyle = seaGrad;
+  g.fillRect(0, 0, width, height);
+  
+  // Vignette (darker edges)
+  const vignette = g.createRadialGradient(
+    width * 0.5, height * 0.5, 0,
+    width * 0.5, height * 0.5, Math.max(width, height) * 0.7
+  );
+  vignette.addColorStop(0, "rgba(0,0,0,0)");
+  vignette.addColorStop(1, "rgba(0,0,0,0.35)");
+  g.fillStyle = vignette;
+  g.fillRect(0, 0, width, height);
+  
+  // -----------------------------
+  // 2. LAND (COASTLINE APPROXIMATION)
+  // -----------------------------
+  g.fillStyle = "#0a3b2c"; // Land color (very dark green)
+  
+  // Main landmass (Vietnam-like shape)
+  g.beginPath();
+  g.moveTo(width * 0.45, height * 0.15);
+  g.bezierCurveTo(
+    width * 0.55, height * 0.20,
+    width * 0.60, height * 0.35,
+    width * 0.55, height * 0.48
+  );
+  g.bezierCurveTo(
+    width * 0.50, height * 0.62,
+    width * 0.45, height * 0.75,
+    width * 0.40, height * 0.88
+  );
+  g.bezierCurveTo(
+    width * 0.35, height * 0.82,
+    width * 0.32, height * 0.72,
+    width * 0.33, height * 0.60
+  );
+  g.bezierCurveTo(
+    width * 0.34, height * 0.45,
+    width * 0.38, height * 0.30,
+    width * 0.45, height * 0.15
+  );
+  g.closePath();
+  g.fill();
+  
+  // Small landmass on the right (island/border)
+  g.beginPath();
+  g.moveTo(width * 0.70, height * 0.30);
+  g.bezierCurveTo(
+    width * 0.78, height * 0.28,
+    width * 0.82, height * 0.40,
+    width * 0.78, height * 0.48
+  );
+  g.bezierCurveTo(
+    width * 0.74, height * 0.52,
+    width * 0.69, height * 0.50,
+    width * 0.68, height * 0.43
+  );
+  g.closePath();
+  g.fill();
+  
+  // Small island at bottom
+  g.beginPath();
+  g.moveTo(width * 0.55, height * 0.82);
+  g.bezierCurveTo(
+    width * 0.60, height * 0.80,
+    width * 0.63, height * 0.84,
+    width * 0.59, height * 0.88
+  );
+  g.bezierCurveTo(
+    width * 0.55, height * 0.90,
+    width * 0.51, height * 0.88,
+    width * 0.52, height * 0.84
+  );
+  g.closePath();
+  g.fill();
+  
+  // Coastline border (slightly lighter)
+  g.strokeStyle = "#155440";
+  g.lineWidth = 2;
+  g.globalAlpha = 0.7;
+  g.stroke();
+  g.globalAlpha = 1;
+  
+  // -----------------------------
+  // 3. NOISE TEXTURE
+  // -----------------------------
+  const noiseSize = 256;
+  const noiseCanvas = document.createElement("canvas");
+  noiseCanvas.width = noiseSize;
+  noiseCanvas.height = noiseSize;
+  const ng = noiseCanvas.getContext("2d")!;
+  const imgData = ng.createImageData(noiseSize, noiseSize);
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const v = 15 + Math.random() * 40; // brightness
+    imgData.data[i] = v;
+    imgData.data[i + 1] = v;
+    imgData.data[i + 2] = v;
+    imgData.data[i + 3] = 35; // low alpha
+  }
+  ng.putImageData(imgData, 0, 0);
+  
+  g.globalAlpha = 0.35;
+  for (let y = 0; y < height; y += noiseSize) {
+    for (let x = 0; x < width; x += noiseSize) {
+      g.drawImage(noiseCanvas, x, y);
+    }
+  }
+  g.globalAlpha = 1;
+  
+  // -----------------------------
+  // 4. GLOW AROUND ACC CENTER
+  // -----------------------------
+  function drawGlow(cx: number, cy: number, radius: number, color: string, alpha: number = 0.7) {
+    g.save();
+    g.globalAlpha = alpha;
+    g.fillStyle = color;
+    g.shadowColor = color;
+    g.shadowBlur = radius * 0.8;
+    g.beginPath();
+    g.arc(cx, cy, radius, 0, Math.PI * 2);
+    g.fill();
+    g.restore();
+  }
+  
+  // Main glow at center waypoint cluster
+  drawGlow(width * 0.45, height * 0.55, 90, "#18e0ff", 0.6);
+  
+  // Secondary glow in north
+  drawGlow(width * 0.48, height * 0.30, 60, "#18e0ff", 0.4);
+  
+  // Secondary glow in south
+  drawGlow(width * 0.42, height * 0.78, 50, "#18e0ff", 0.3);
+  
+  return bg;
 }
 
 export function RadarDisplay({ width, height }: RadarDisplayProps) {
@@ -37,6 +189,15 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
   
   // Airway routes toggle
   const [showAirwayRoutes, setShowAirwayRoutes] = useState(true);
+  
+  // Background canvas with sea/land coastline
+  const [backgroundImage, setBackgroundImage] = useState<HTMLCanvasElement | null>(null);
+  
+  // Create radar background on mount or size change
+  useEffect(() => {
+    const bg = createRadarBackground(width, height);
+    setBackgroundImage(bg);
+  }, [width, height]);
   
   // Keyboard shortcuts for zoom
   useEffect(() => {
@@ -501,12 +662,13 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
           dash={[4, 4]}
         />
         
-        {/* Aircraft square marker */}
-        <Rect
-          x={pos.x - squareSize / 2}
-          y={pos.y - squareSize / 2}
-          width={squareSize}
-          height={squareSize}
+        {/* Aircraft triangular marker (pointing in heading direction) */}
+        <RegularPolygon
+          x={pos.x}
+          y={pos.y}
+          sides={3}
+          radius={5}
+          rotation={ac.heading - 90} // Rotate triangle to point in heading direction
           fill={markerColor}
           stroke={isSelected ? '#00FFFF' : markerColor}
           strokeWidth={isSelected ? 2 : 0}
@@ -566,6 +728,17 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
         onMouseLeave={handleMouseUp}
       >
         <Layer>
+          {/* Background image (sea, land, coastline, glow) */}
+          {backgroundImage && (
+            <KonvaImage
+              image={backgroundImage}
+              x={0}
+              y={0}
+              width={width}
+              height={height}
+            />
+          )}
+          
           {/* Grid */}
           {renderGrid()}
           
