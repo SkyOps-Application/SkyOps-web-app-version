@@ -92,8 +92,10 @@ export const WAYPOINTS: Waypoint[] = [
   { id: 'DONDA', name: 'DONDA', latitude: 14.703333, longitude: 112.005000, type: 'FIX' },
   
   // R468 Route (TSH - SAPEN - POPET - PNH)
-  { id: 'SAPEN', name: 'SAPEN', latitude: 10.818333, longitude: 106.650556, type: 'FIX' },
-  { id: 'POPET', name: 'POPET', latitude: 10.818333, longitude: 106.650556, type: 'FIX' },
+  // SAPEN: approximately 1/3 of the way from TSH to PNH
+  { id: 'SAPEN', name: 'SAPEN', latitude: 11.060000, longitude: 106.050000, type: 'FIX' },
+  // POPET: approximately 2/3 of the way from TSH to PNH
+  { id: 'POPET', name: 'POPET', latitude: 11.305000, longitude: 105.440000, type: 'FIX' },
   
   // Additional waypoints
   { id: 'ATGAS', name: 'ATGAS', latitude: 10.404722, longitude: 105.517222, type: 'FIX' },
