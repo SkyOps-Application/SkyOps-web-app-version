@@ -10,6 +10,7 @@ import {
 } from '@atc-radar-sim/shared';
 import { WAYPOINTS } from '@atc-radar-sim/shared/src/data/waypoints';
 import { Exercise, ExerciseAircraft, parseTime, formatTime } from '@atc-radar-sim/shared/src/data/exercises';
+import { calculateDistance, calculateBearing, calculateDestination } from '@atc-radar-sim/shared/src/utils/coordinates';
 
 export class ExerciseRunner {
   private io: Server<ClientToServerEvents, ServerToClientEvents>;
@@ -389,7 +390,7 @@ export class ExerciseRunner {
   }
   
   /**
-   * Update aircraft position (using internal 2D coordinate system)
+   * Update aircraft position (using WGS84 geographic coordinates)
    */
   private updateAircraftPosition(aircraft: AircraftData) {
     // If aircraft has an assigned heading (from controller), use it
@@ -405,10 +406,11 @@ export class ExerciseRunner {
         const nextWaypoint = WAYPOINTS.find(wp => wp.id === nextWaypointId || wp.name === nextWaypointId);
         
         if (nextWaypoint) {
-          // Calculate distance to next waypoint
-          const dx = nextWaypoint.longitude - aircraft.position.longitude;
-          const dy = nextWaypoint.latitude - aircraft.position.latitude;
-          const distanceToWaypoint = Math.sqrt(dx * dx + dy * dy);
+          // Calculate distance to next waypoint using Haversine formula
+          const distanceToWaypoint = calculateDistance(
+            { latitude: aircraft.position.latitude, longitude: aircraft.position.longitude },
+            { latitude: nextWaypoint.latitude, longitude: nextWaypoint.longitude }
+          );
           
           // If within 2 NM of waypoint, move to next waypoint in route
           if (distanceToWaypoint < 2) {
@@ -419,17 +421,20 @@ export class ExerciseRunner {
             if (aircraft.nextWaypoint) {
               const nextNextWaypoint = WAYPOINTS.find(wp => wp.id === aircraft.nextWaypoint || wp.name === aircraft.nextWaypoint);
               if (nextNextWaypoint) {
-                const bearing = Math.atan2(
-                  nextNextWaypoint.longitude - nextWaypoint.longitude,
-                  nextNextWaypoint.latitude - nextWaypoint.latitude
-                ) * (180 / Math.PI);
-                aircraft.targetHeading = (bearing + 360) % 360;
+                const bearing = calculateBearing(
+                  { latitude: nextWaypoint.latitude, longitude: nextWaypoint.longitude },
+                  { latitude: nextNextWaypoint.latitude, longitude: nextNextWaypoint.longitude }
+                );
+                aircraft.targetHeading = bearing;
               }
             }
           } else {
             // Set target heading to point toward next waypoint
-            const bearing = Math.atan2(dx, dy) * (180 / Math.PI);
-            aircraft.targetHeading = (bearing + 360) % 360;
+            const bearing = calculateBearing(
+              { latitude: aircraft.position.latitude, longitude: aircraft.position.longitude },
+              { latitude: nextWaypoint.latitude, longitude: nextWaypoint.longitude }
+            );
+            aircraft.targetHeading = bearing;
           }
         }
       }
@@ -444,15 +449,15 @@ export class ExerciseRunner {
     const effectiveTimeStep = positionUpdateInterval * this.playbackSpeed; // seconds
     const distanceNM = (aircraft.speed / 3600) * effectiveTimeStep;
     
-    // Convert heading to radians (0 = North, 90 = East)
-    const headingRad = (aircraft.heading * Math.PI) / 180;
+    // Update position using spherical Earth model
+    const newPosition = calculateDestination(
+      { latitude: aircraft.position.latitude, longitude: aircraft.position.longitude },
+      distanceNM,
+      aircraft.heading
+    );
     
-    // Update position using 2D vector math (1 unit = 1 NM)
-    const dy = Math.cos(headingRad) * distanceNM; // North/South movement
-    const dx = Math.sin(headingRad) * distanceNM; // East/West movement
-    
-    aircraft.position.latitude += dy;
-    aircraft.position.longitude += dx;
+    aircraft.position.latitude = newPosition.latitude;
+    aircraft.position.longitude = newPosition.longitude;
     
     // Update altitude if climbing/descending - 100 ft per simulation tick (per second at 1x speed)
     if (aircraft.targetFlightLevel && aircraft.flightLevel !== aircraft.targetFlightLevel) {
@@ -496,10 +501,11 @@ export class ExerciseRunner {
         const ac1 = aircraftArray[i];
         const ac2 = aircraftArray[j];
         
-        // Calculate horizontal distance (2D Euclidean distance in NM)
-        const dx = ac2.position.longitude - ac1.position.longitude;
-        const dy = ac2.position.latitude - ac1.position.latitude;
-        const horizontalDistance = Math.sqrt(dx * dx + dy * dy);
+        // Calculate horizontal distance using Haversine formula (in NM)
+        const horizontalDistance = calculateDistance(
+          { latitude: ac1.position.latitude, longitude: ac1.position.longitude },
+          { latitude: ac2.position.latitude, longitude: ac2.position.longitude }
+        );
         
         // Calculate vertical separation (in feet)
         const verticalSeparation = Math.abs(ac2.position.altitude - ac1.position.altitude);
