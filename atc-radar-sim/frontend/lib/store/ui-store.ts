@@ -38,14 +38,14 @@ interface UIStore {
   toggleSettingsPanel: () => void;
 }
 
-// Center on the exercise area (internal 2D coordinates)
-// TSH is at (0,0), main area extends to PLK/DAN
-const DEFAULT_CENTER = { latitude: 100, longitude: 50 };
+// Center on TSH (Tan Son Nhat) - WGS84 coordinates
+// Vietnam airspace approximately 7-17°N, 103-114°E
+const DEFAULT_CENTER = { latitude: 12.5, longitude: 107.5 };
 
 export const useUIStore = create<UIStore>((set) => ({
   radarSettings: {
     center: DEFAULT_CENTER,
-    zoom: 1.2, // Adjusted zoom for 2D coordinate system
+    zoom: 1.0, // Adjusted zoom for real coordinates
     showGrid: true,
     showWaypoints: true,
     showRoutes: true,
