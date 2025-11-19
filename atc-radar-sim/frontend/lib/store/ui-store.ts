@@ -64,17 +64,17 @@ export const useUIStore = create<UIStore>((set) => ({
   
   setZoom: (zoom) =>
     set((state) => ({
-      radarSettings: { ...state.radarSettings, zoom: Math.max(0.5, Math.min(4.0, zoom)) },
+      radarSettings: { ...state.radarSettings, zoom: Math.max(0.5, Math.min(8.0, zoom)) },
     })),
   
   zoomIn: () =>
     set((state) => ({
-      radarSettings: { ...state.radarSettings, zoom: Math.min(4.0, state.radarSettings.zoom + 0.1) },
+      radarSettings: { ...state.radarSettings, zoom: Math.min(8.0, state.radarSettings.zoom + 0.05) },
     })),
   
   zoomOut: () =>
     set((state) => ({
-      radarSettings: { ...state.radarSettings, zoom: Math.max(0.5, state.radarSettings.zoom - 0.1) },
+      radarSettings: { ...state.radarSettings, zoom: Math.max(0.5, state.radarSettings.zoom - 0.05) },
     })),
   
   toggleGrid: () =>

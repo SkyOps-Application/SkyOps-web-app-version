@@ -43,15 +43,15 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === '+' || e.key === '=') {
         // Zoom in
-        const newZoom = Math.min(5, zoom + 0.2);
+        const newZoom = Math.min(8.0, zoom + 0.1);
         useUIStore.getState().setZoom(newZoom);
       } else if (e.key === '-' || e.key === '_') {
         // Zoom out
-        const newZoom = Math.max(0.3, zoom - 0.2);
+        const newZoom = Math.max(0.5, zoom - 0.1);
         useUIStore.getState().setZoom(newZoom);
       } else if (e.key === '0') {
         // Reset zoom
-        useUIStore.getState().setZoom(0.8);
+        useUIStore.getState().setZoom(1.0);
       }
     };
     
@@ -75,14 +75,14 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
     return () => window.removeEventListener('wheel', preventScroll);
   }, []);
   
-  // Handle wheel zoom - more sensitive
+  // Handle wheel zoom - slower for better control
   const handleWheel = (e: any) => {
     e.evt.preventDefault();
     e.evt.stopPropagation();
     
-    // Larger zoom delta for easier zooming
-    const zoomDelta = e.evt.deltaY > 0 ? -0.15 : 0.15;
-    const newZoom = Math.max(0.3, Math.min(5, zoom + zoomDelta));
+    // Smaller zoom delta for smoother, more controlled zooming
+    const zoomDelta = e.evt.deltaY > 0 ? -0.05 : 0.05;
+    const newZoom = Math.max(0.5, Math.min(8.0, zoom + zoomDelta));
     useUIStore.getState().setZoom(newZoom);
   };
   
@@ -119,8 +119,8 @@ export function RadarDisplay({ width, height }: RadarDisplayProps) {
       const dx = e.evt.clientX - dragStart.x;
       const dy = e.evt.clientY - dragStart.y;
       
-      // Improved pan sensitivity - map follows cursor
-      const panSensitivity = 0.4 / zoom;
+      // Slower pan sensitivity for better control
+      const panSensitivity = 0.15 / zoom;
       const newCenter = {
         latitude: center.latitude + dy * panSensitivity, // Fixed: + instead of -
         longitude: center.longitude - dx * panSensitivity, // Fixed: - instead of +
