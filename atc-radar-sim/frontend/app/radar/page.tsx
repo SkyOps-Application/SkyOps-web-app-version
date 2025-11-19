@@ -94,10 +94,11 @@ export default function RadarPage() {
     socket.on('command:acknowledged', (cmd) => {
       audioManager.play('confirmation');
       
-      // Add to command log
+      // Add to command log - use formatted message from backend if available
       const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+      const displayText = cmd.message || `Command acknowledged for ${cmd.aircraftId}`;
       setCommandLog(prev => [
-        { time: timeStr, text: `Command acknowledged for ${cmd.aircraftId}`, valid: true },
+        { time: timeStr, text: displayText, valid: true },
         ...prev.slice(0, 49),
       ]);
     });
