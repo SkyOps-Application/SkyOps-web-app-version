@@ -54,6 +54,7 @@ export interface AircraftData {
   phase: FlightPhase;
   identified: boolean;    // Whether aircraft has been identified by controller
   conflict: boolean;      // Whether aircraft is in separation conflict
+  outOfBoundary: boolean; // Whether aircraft is outside the boundary
   
   // Route information
   departure: string;      // ICAO code

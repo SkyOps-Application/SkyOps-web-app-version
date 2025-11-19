@@ -10,7 +10,7 @@ import {
 } from '@atc-radar-sim/shared';
 import { WAYPOINTS } from '@atc-radar-sim/shared/src/data/waypoints';
 import { Exercise, ExerciseAircraft, parseTime, formatTime } from '@atc-radar-sim/shared/src/data/exercises';
-import { calculateDistance, calculateBearing, calculateDestination } from '@atc-radar-sim/shared/src/utils/coordinates';
+import { calculateDistance, calculateBearing, calculateDestination, isPointInPolygon, LatLng } from '@atc-radar-sim/shared/src/utils/coordinates';
 
 export class ExerciseRunner {
   private io: Server<ClientToServerEvents, ServerToClientEvents>;
@@ -24,9 +24,27 @@ export class ExerciseRunner {
   private aircraftData: Map<string, AircraftData> = new Map();
   private lastUpdateTime: number = 0; // Track last update to prevent double updates
   private tickCounter: number = 0; // Count ticks for position updates
+  private boundaryPolygon: LatLng[] = []; // Boundary polygon for out-of-boundary checks
   
   constructor(io: Server<ClientToServerEvents, ServerToClientEvents>) {
     this.io = io;
+    // Initialize boundary polygon
+    this.initializeBoundary();
+  }
+  
+  /**
+   * Initialize the boundary polygon from waypoints
+   */
+  private initializeBoundary() {
+    const boundaryWaypoints = [
+      'CAMPU', 'POPET', 'GONLY', 'PLK', 'PCA', 'VEPAM', 
+      'KARAN', 'PTH', 'ELSAS', 'CN', 'BIBAN', 'PQU'
+    ];
+    
+    this.boundaryPolygon = boundaryWaypoints
+      .map(name => WAYPOINTS.find(wp => wp.id === name || wp.name === name))
+      .filter((wp): wp is typeof WAYPOINTS[0] => wp !== undefined)
+      .map(wp => ({ latitude: wp.latitude, longitude: wp.longitude }));
   }
   
   /**
@@ -240,6 +258,9 @@ export class ExerciseRunner {
     // Check for separation violations
     this.checkSeparationViolations();
     
+    // Check for boundary violations
+    this.checkBoundaryViolations();
+    
     // Emit all aircraft updates (for smooth animation rendering)
     this.aircraftData.forEach((aircraft) => {
       this.io.emit('aircraft:update', aircraft);
@@ -344,6 +365,7 @@ export class ExerciseRunner {
       phase: verticalSpeed > 0 ? 'CLIMB' : 'CRUISE',
       identified: false,
       conflict: false,
+      outOfBoundary: false,
       labelRotation: 0,
       departure: acData.spawnPoint,
       destination: acData.destination,
@@ -531,6 +553,24 @@ export class ExerciseRunner {
         }
       }
     }
+  }
+  
+  /**
+   * Check for aircraft flying outside the boundary
+   */
+  private checkBoundaryViolations() {
+    if (this.boundaryPolygon.length === 0) return;
+    
+    this.aircraftData.forEach(aircraft => {
+      const position: LatLng = {
+        latitude: aircraft.position.latitude,
+        longitude: aircraft.position.longitude
+      };
+      
+      // Check if aircraft is outside the boundary
+      const isInside = isPointInPolygon(position, this.boundaryPolygon);
+      aircraft.outOfBoundary = !isInside;
+    });
   }
   
   /**
