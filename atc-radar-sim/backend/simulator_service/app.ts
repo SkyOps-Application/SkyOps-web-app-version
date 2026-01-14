@@ -1,14 +1,11 @@
 import express from 'express';
-import cors from 'cors';
-import { env } from './config/env';
+import { corsMiddleware } from './middleware/cors';
 import routes from './routes';
 
 const app = express();
 
 // Middleware
-app.use(cors({
-    origin: env.CORS_ORIGIN,
-}));
+app.use(corsMiddleware);
 app.use(express.json());
 
 // Routes
