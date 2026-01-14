@@ -4,19 +4,19 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch simulator_service/index.ts",
     "build": "tsc && npm run postbuild",
     "postbuild": "mkdir -p node_modules/@atc-radar-sim && cp -r ../shared node_modules/@atc-radar-sim/",
     "start": "node dist/index.js",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint simulator_service --ext .ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:seed": "tsx src/database/seed.ts"
+    "db:seed": "tsx simulator_service/database/seed.ts"
   },
   "dependencies": {
-    "@atc-radar-sim/shared": "*",
+    "@atc-radar-sim/shared": "^1.0.0",
     "@prisma/client": "^5.22.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -38,4 +38,3 @@
     "typescript": "^5.3.3"
   }
 }
-

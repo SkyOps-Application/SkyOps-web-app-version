@@ -269,19 +269,19 @@ export function setupSocketHandlers(
     socket.emit('aircraft:batch', aircraft);
     
     // Handle session join
-    socket.on('session:join', (sessionId) => {
+    socket.on('session:join', (sessionId: string) => {
       socket.join(`session-${sessionId}`);
       console.log(`Client ${socket.id} joined session ${sessionId}`);
     });
     
     // Handle session leave
-    socket.on('session:leave', (sessionId) => {
+    socket.on('session:leave', (sessionId: string) => {
       socket.leave(`session-${sessionId}`);
       console.log(`Client ${socket.id} left session ${sessionId}`);
     });
     
     // Handle command input (text)
-    socket.on('command:text', (text) => {
+    socket.on('command:text', (text: string) => {
       const parsed = parseCommand(text);
       
       if (!parsed.valid) {
@@ -427,7 +427,7 @@ export function setupSocketHandlers(
       socket.emit('aircraft:batch', aircraft);
     });
     
-    socket.on('aircraft:requestById', (aircraftId) => {
+    socket.on('aircraft:requestById', (aircraftId: string) => {
       const aircraft = exerciseRunner.getAircraft(aircraftId);
       if (aircraft) {
         socket.emit('aircraft:update', aircraft);
@@ -435,7 +435,7 @@ export function setupSocketHandlers(
     });
     
     // Handle exercise control
-    socket.on('exercise:load', (exerciseId) => {
+    socket.on('exercise:load', (exerciseId: number) => {
       console.log(`Loading exercise ${exerciseId} for client ${socket.id}`);
       const exercise = exerciseId === 1 ? EXERCISE_1 : exerciseId === 2 ? EXERCISE_2 : null;
       if (exercise) {
@@ -464,18 +464,18 @@ export function setupSocketHandlers(
       exerciseRunner.stop();
     });
     
-    socket.on('exercise:setSpeed', (speed) => {
+    socket.on('exercise:setSpeed', (speed: number) => {
       console.log(`Setting speed to ${speed}x for client ${socket.id}`);
       exerciseRunner.setSpeed(speed);
     });
     
-    socket.on('exercise:seekTo', (minutes) => {
+    socket.on('exercise:seekTo', (minutes: number) => {
       console.log(`Seeking to ${minutes} minutes for client ${socket.id}`);
       exerciseRunner.seekTo(minutes);
     });
     
     // Handle session control (legacy)
-    socket.on('session:start', (exerciseId) => {
+    socket.on('session:start', (exerciseId: number) => {
       console.log(`Starting exercise ${exerciseId} (legacy) for client ${socket.id}`);
       const exercise = exerciseId === 1 ? EXERCISE_1 : exerciseId === 2 ? EXERCISE_2 : null;
       if (exercise) {
