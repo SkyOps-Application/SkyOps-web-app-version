@@ -45,7 +45,7 @@ def register_user():
         return jsonify({"error": "Error registering user", "details": str(e)}), 500
 
 
-@user_bp.route("/profile", methods=["GET"])
+@user_bp.route("/history", methods=["GET"])
 @jwt_required
 def get_history():
     try:
@@ -57,7 +57,7 @@ def get_history():
         history = get_user_history(user_id)
         if not history:
             current_app.logger.warning(f"No history found")
-            return jsonify({"error": "User not found"}), 404
+            return jsonify({"error": "History not found for this user"}), 404
             
         return jsonify(history.model_dump()), 200
         
