@@ -2,20 +2,20 @@ from sqlalchemy import Column, String, Integer, ForeignKey, DateTime # type: ign
 from sqlalchemy.orm import relationship # type: ignore
 from ..database import Base
 import uuid
-import datetime
+from datetime import datetime
 
 class UserModel(Base):
     __tablename__ = "users"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    email = Column(String, primary_key=True, index=True)
+    email = Column(String, index=True)
     age = Column(Integer, nullable=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)
 
     # relations
-    history = relationship('History', backref='user', lazy=True)
+    history = relationship('UserHistoryModel', backref='user', lazy=True)
 
 
     def __repr__(self):

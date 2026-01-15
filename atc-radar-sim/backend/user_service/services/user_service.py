@@ -2,8 +2,7 @@ from ..models.model_dto import UserSchema, UserResponseSchema
 from ..models.model_db import UserModel
 from ..database import db_session
 from typing import List, Optional, Union
-import random
-import string
+
 import hashlib
 import logging
 
@@ -20,24 +19,31 @@ def create_user(user: UserSchema) -> UserResponseSchema:
     if not user.password:
         raise ValueError("Password is required")
 
-    hashed_password = hash_password(user.password)
-    
-    db_user = UserModel(
-        email=user.email,
-        age=user.age,
-        last_name=user.last_name,
-        first_name=user.first_name,
-        password_hash=hashed_password
-    )
-    
-    # Add and commit to database
     db = db_session()
     try:
+        # Check if user with email already exists
+        existing_user = db.query(UserModel).filter(UserModel.email == user.email).first()
+        if existing_user:
+            raise ValueError("Email already in use")
+            
+        hashed_password = hash_password(user.password)
+        
+        db_user = UserModel(
+            email=user.email,
+            age=user.age,
+            last_name=user.last_name,
+            first_name=user.first_name,
+            password_hash=hashed_password
+        )
+        
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
         return UserResponseSchema(
-            email=db_user.email
+            email=db_user.email,
+            first_name=db_user.first_name,
+            last_name=db_user.last_name,
+            age=db_user.age
         )
     except Exception as e:
         db.rollback()

@@ -1,35 +1,41 @@
-import os
+import logging
 from flask import Flask
-from extensions import db
-from flask_migrate import Migrate
-from models.model_db import User, History # Ensure models are imported
-from routes.auth_route import auth_bp
-from dotenv import load_dotenv
 
-load_dotenv()
 
-def create_app():
-    app = Flask(__name__)
-    
-    # Configuration
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/skyops_user_db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
+from .database import init_db
+from .routes import user_bp, auth_bp
+import os
 
-    # Initialize Extensions
-    db.init_app(app)
-    Migrate(app, db)
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
 
-    # Register Blueprints
-    app.register_blueprint(auth_bp)
+# Create Flask app
+app = Flask(__name__)
+app.logger.setLevel(logging.DEBUG)
 
-    @app.route('/health')
-    def health():
-        return {'status': 'healthy', 'service': 'user_service'}
+# Force stdout to be unbuffered
+import sys
+sys.stdout.reconfigure(line_buffering=True)
 
-    return app
+# Register blueprints
+app.register_blueprint(user_bp, url_prefix='/')
+app.register_blueprint(auth_bp, url_prefix='/')
 
-app = create_app()
 
-if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+@app.route("/health")
+def health():
+    return {"status": "UP"}
+
+def run_app():
+    """Entry point for the application script"""
+    # Initialize the database before starting the app
+    init_db()
+
+    app.run(host="0.0.0.0", port=5000, debug=True)
+
+if __name__ == "__main__":
+    run_app()

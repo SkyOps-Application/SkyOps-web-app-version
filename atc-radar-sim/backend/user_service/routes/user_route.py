@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, g, current_app
 from pydantic import ValidationError
 
-from ..models_dto import UserSchema, RegisterSchema, UserResponseSchema
+from ..models.model_dto import UserSchema, UserResponseSchema
 from ..services.user_service import (
     create_user as create_user_service,
     get_user_history,
@@ -15,20 +15,30 @@ user_bp = Blueprint('user', __name__)
 def register_user():
     try:
         data = request.get_json()
-        register_schema = RegisterSchema.model_validate(data)
+        
+        register_schema = UserSchema(**data)
         new_user = create_user_service(register_schema)
         
         current_app.logger.info(f"Registered new user: {register_schema.email}")
         
-        return jsonify(UserResponseSchema(
-            email=new_user.email,
-            first_name=new_user.first_name,
-            last_name=new_user.last_name
-        ).model_dump()), 201
+        return jsonify(new_user.model_dump()), 201
 
     except ValidationError as e:
         current_app.logger.warning(f"Invalid registration data: {e.errors()}")
-        return jsonify({"error": "Invalid registration data", "details": e.errors()}), 400
+        # Parse Pydantic errors to list of dicts that are JSON serializable
+        errors = []
+        for error in e.errors():
+            err_dict = {
+                "loc": error["loc"],
+                "msg": error["msg"],
+                "type": error["type"]
+            }
+            errors.append(err_dict)
+        return jsonify({"error": "Invalid registration data", "details": errors}), 400
+
+    except ValueError as e:
+        current_app.logger.warning(f"Registration error: {str(e)}")
+        return jsonify({"error": "Registration failed", "details": str(e)}), 400
 
     except Exception as e:
         current_app.logger.error(f"Error registering user: {str(e)}")
