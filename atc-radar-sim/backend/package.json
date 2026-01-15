@@ -4,7 +4,8 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch simulator_service/index.ts",
+    "sim": "tsx watch simulator_service/index.ts",
+    "noti": "tsx watch notification_service/worker.ts",
     "build": "tsc && npm run postbuild",
     "postbuild": "mkdir -p node_modules/@atc-radar-sim && cp -r ../shared node_modules/@atc-radar-sim/",
     "start": "node dist/index.js",
@@ -13,13 +14,13 @@
   },
   "dependencies": {
     "@atc-radar-sim/shared": "^1.0.0",
-    "@types/ioredis": "^4.28.10",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.6.1",
     "express": "^4.21.2",
     "ioredis": "^5.9.1",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.12",
     "socket.io": "^4.8.1",
     "xlsx": "^0.18.5",
     "zod": "^3.24.1"
@@ -28,9 +29,15 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/ioredis": "^4.28.10",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^20.17.10",
-    "tsx": "^4.19.2",
-    "typescript": "^5.3.3"
-  }
+    "@types/node": "^20.19.29",
+    "@types/nodemailer": "^7.0.5",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }

@@ -21,7 +21,6 @@ def process_history_log(data):
     # For proof of concept, we will try to find a default user or just log if missing
     # In real app, user_id should be real UUID.
     
-    # For testing, let's find the first user in DB if userId is generic
     user_id = data.get('userId')
     
     db = db_session()

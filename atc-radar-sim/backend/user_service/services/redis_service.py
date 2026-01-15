@@ -40,3 +40,20 @@ class RedisService:
         except Exception as e:
             logging.error(f"Error consuming from Redis: {e}")
         return None
+
+    def add_to_queue(self, queue_name, data):
+        """
+        Push data to a Redis list (queue)
+        """
+        if not self.client:
+            logging.warning("Redis client not initialized, skipping queue push")
+            return False
+            
+        try:
+            message = json.dumps(data)
+            self.client.rpush(queue_name, message)
+            logging.info(f"Pushed task to {queue_name}: {data}")
+            return True
+        except Exception as e:
+            logging.error(f"Failed to push to Redis queue: {e}")
+            return False
