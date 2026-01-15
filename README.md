@@ -24,22 +24,40 @@ A comprehensive Air Traffic Control radar simulation system for training purpose
 - Web Speech API for voice recognition
 
 ### Backend
-- Node.js with Express
-- TypeScript
-- Socket.io for real-time updates
-- Prisma ORM
-- PostgreSQL database
-- JWT authentication
+- **Core Simulator**: Node.js with Express, Socket.io (Real-time simulation)
+- **User Service**: Python Flask (Authentication, User Management)
+- **Notification Service**: (Planned) System notifications and alerts
+- PostgreSQL & Redis (Message Queue & Caching)
+
+## Microservices Architecture
+
+The backend is composed of three main microservices:
+
+1. **User Service**: 
+   - Built with **Python (Flask)**.
+   - Responsibilities: User registration, authentication (JWT), profile management, and training history tracking.
+   - Enforces security policies (password complexity, email uniqueness).
+
+2. **Simulator Service**: 
+   - Built with **Node.js (Express)**.
+   - Responsibilities: Core ATC simulation logic, real-time aircraft tracking, command parsing, and Socket.io communication.
+   - Handles the state of the airspace and collision detection.
+
+3. **Notification Service**:
+   - Responsibilities: Handling asynchronous events, sending alerts, emails, and system notifications.
+   - Decoupled via Redis message queue.
 
 ## Project Structure
 
 ```
 atc-radar-sim/
-├── frontend/          # Next.js application
-├── backend/           # Express API server
-├── shared/            # Shared types and utilities
-├── database/          # Database schemas and migrations
-└── package.json       # Root workspace config
+├── frontend/               # Next.js application
+├── backend/                
+│   ├── simulator_service/  # Node.js: Radar logic & Socket.io
+│   ├── user_service/       # Python: Auth & Users
+│   ├── notification_service/ # Notifications
+├── shared/                 # Shared types and utilities
+└── package.json            # Root workspace config
 ```
 
 ## Getting Started
