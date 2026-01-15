@@ -17,7 +17,7 @@ def login():
                 "email": request.form.get("username"),  # OAuth uses 'username' 
                 "password": request.form.get("password")
             }
-        else:  # Fallback to JSON
+        else: 
             login_data = request.get_json()
             
         login_schema = LoginSchema.model_validate(login_data)
@@ -43,9 +43,7 @@ def login():
             token_type="bearer"
         )
         
-        # Include onboarding status in response
         response_data = token.model_dump()
-        response_data["onboarded"] = user.onboarded
         
         return jsonify(response_data), 200
         
