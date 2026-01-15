@@ -1,0 +1,12 @@
+flask
+uvicorn
+sqlalchemy
+psycopg2-binary
+pyjwt
+passlib[bcrypt]
+redis
+python-multipart
+pydantic
+Flask-SQLAlchemy
+Flask-Migrate
+python-dotenv
