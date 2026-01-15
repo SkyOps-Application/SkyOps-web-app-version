@@ -12,7 +12,7 @@ class TokenSchema(BaseModel):
     token_type: str
 
 class UserResponseSchema(UserSchema):
-    password: str
+    email: str
 
 class LoginSchema(BaseModel):
     email: str

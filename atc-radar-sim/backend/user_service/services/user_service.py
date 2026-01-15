@@ -1,7 +1,7 @@
 from ..models.model_dto import UserSchema, UserResponseSchema
 from ..models.model_db import UserModel
 from ..database import db_session
-from typing import List, Optional
+from typing import List, Optional, Union
 import random
 import string
 import hashlib
@@ -42,5 +42,69 @@ def create_user(user: UserSchema) -> UserResponseSchema:
     except Exception as e:
         db.rollback()
         raise e
+    finally:
+        db.close()
+
+def update_user(id: str, update_user: UserSchema) -> Optional[UserResponseSchema]:
+    """
+    Update user
+    """
+    db = db_session()
+    try:
+        # Find the user
+        user = db.query(UserModel).filter(UserModel.id == id).first()
+        if not user:
+            return None
+
+        user.first_name = update_user.first_name
+        user.last_name = update_user.last_name
+        
+        db.commit()
+        db.refresh(user)
+        
+        # Return the updated user
+        return UserResponseSchema(
+            email=user.email,
+        )
+    except Exception as e:
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+
+def get_user(id: str) -> Optional[UserResponseSchema]:
+    """
+    Retrieve user by ID
+    """
+    db = db_session()
+    try:
+        user = db.query(UserModel).filter(UserModel.id == id).first()
+        if user:
+            return UserResponseSchema(
+                email=user.email,
+            )
+        return None
+    finally:
+        db.close()
+
+def get_user_history(id: str) -> List:
+    """
+    Retrieve user history by user ID
+    """
+    db = db_session()
+    try:
+        user = db.query(UserModel).filter(UserModel.id == id).first()
+        if not user:
+            return []
+        
+        history = []
+        for record in user.history:
+            history.append({
+                "timestamp": record.timestamp,
+                "duration": record.duration,
+                "violations": record.violations,
+                "traffic_count": record.traffic_count
+            })
+        return history
     finally:
         db.close()

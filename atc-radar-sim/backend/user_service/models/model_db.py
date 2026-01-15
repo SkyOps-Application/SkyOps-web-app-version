@@ -1,5 +1,5 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime # type: ignore
+from sqlalchemy.orm import relationship # type: ignore
 from ..database import Base
 import uuid
 import datetime
