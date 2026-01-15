@@ -9,25 +9,22 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def generate_random_password(length=10):
-    """Generate a random password of specified length"""
-    chars = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(random.choice(chars) for _ in range(length))
-
 def hash_password(password):
     """Hash a password using SHA-256"""
     return hashlib.sha256(password.encode()).hexdigest()
 
 def create_user(user: UserSchema) -> UserResponseSchema:
     """
-    Create a new user with a random password and persist it to the database
+    Create a new user with user-provided password and persist it to the database
     """
-    # Generate a random password
-    random_password = generate_random_password()
-    hashed_password = hash_password(random_password)
+    if not user.password:
+        raise ValueError("Password is required")
+
+    hashed_password = hash_password(user.password)
     
     db_user = UserModel(
         email=user.email,
+        age=user.age,
         last_name=user.last_name,
         first_name=user.first_name,
         password_hash=hashed_password
@@ -39,11 +36,15 @@ def create_user(user: UserSchema) -> UserResponseSchema:
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
+        return UserResponseSchema(
+            email=db_user.email
+        )
     except Exception as e:
         db.rollback()
         raise e
     finally:
         db.close()
+
 
 def update_user(id: str, update_user: UserSchema) -> Optional[UserResponseSchema]:
     """
@@ -56,6 +57,7 @@ def update_user(id: str, update_user: UserSchema) -> Optional[UserResponseSchema
         if not user:
             return None
 
+        user.age = update_user.age
         user.first_name = update_user.first_name
         user.last_name = update_user.last_name
         

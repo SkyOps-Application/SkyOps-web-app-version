@@ -9,6 +9,7 @@ class UserModel(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     email = Column(String, primary_key=True, index=True)
+    age = Column(Integer, nullable=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)

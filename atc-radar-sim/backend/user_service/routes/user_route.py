@@ -1,0 +1,58 @@
+from flask import Blueprint, request, jsonify, g, current_app
+from pydantic import ValidationError
+
+from ..models_dto import UserSchema, RegisterSchema, UserResponseSchema
+from ..services.user_service import (
+    create_user as create_user_service,
+    get_user_history,
+)
+from ..services.auth_service import jwt_required
+import os
+
+user_bp = Blueprint('user', __name__)
+
+@user_bp.route("/register", methods=["POST"])
+def register_user():
+    try:
+        data = request.get_json()
+        register_schema = RegisterSchema.model_validate(data)
+        new_user = create_user_service(register_schema)
+        
+        current_app.logger.info(f"Registered new user: {register_schema.email}")
+        
+        return jsonify(UserResponseSchema(
+            email=new_user.email,
+            first_name=new_user.first_name,
+            last_name=new_user.last_name
+        ).model_dump()), 201
+
+    except ValidationError as e:
+        current_app.logger.warning(f"Invalid registration data: {e.errors()}")
+        return jsonify({"error": "Invalid registration data", "details": e.errors()}), 400
+
+    except Exception as e:
+        current_app.logger.error(f"Error registering user: {str(e)}")
+        return jsonify({"error": "Error registering user", "details": str(e)}), 500
+
+
+@user_bp.route("/profile", methods=["GET"])
+@jwt_required
+def get_history():
+    try:
+        # Get user id from the JWT token
+        user_id = g.user_id
+        current_app.logger.debug(f"Retrieving history")
+        
+        # Get the user's history
+        history = get_user_history(user_id)
+        if not history:
+            current_app.logger.warning(f"No history found")
+            return jsonify({"error": "User not found"}), 404
+            
+        return jsonify(history.model_dump()), 200
+        
+    except Exception as e:
+        current_app.logger.error(f"Error retrieving history: {str(e)}")
+        return jsonify({"error": "Error retrieving history", "details": str(e)}), 500
+
+    

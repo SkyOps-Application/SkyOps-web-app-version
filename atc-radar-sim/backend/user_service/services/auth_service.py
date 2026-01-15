@@ -82,8 +82,8 @@ def jwt_required(f: Callable) -> Callable:
         if "error" in payload:
             return jsonify({"error": payload["error"]}), 401
         
-        # Store user email in Flask's g object for the view function to use
-        g.user_email = payload.get("sub")
+        # Store user id in Flask's g object for the view function to use
+        g.user_id = payload.get("sub")
             
         return f(*args, **kwargs)
     
