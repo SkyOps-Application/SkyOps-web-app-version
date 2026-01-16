@@ -22,12 +22,12 @@ def register_user():
         
         current_app.logger.info(f"Registered new user: {register_schema.email}")
         
-        # Trigger Welcome Email via Redis Queue
+        # Welcome Email via Redis Queue hehe
         redis_service = RedisService()
         email_task = {
             "type": "WELCOME",
             "email": register_schema.email,
-            "name": f"{register_schema.first_name} {register_schema.last_name}"
+            "first_name": register_schema.first_name
         }
         redis_service.add_to_queue("notification_queue", email_task)
 
@@ -64,7 +64,7 @@ def get_history():
         user_id = g.user_id
         current_app.logger.debug(f"Retrieving history")
         
-        # Get the user's history
+        # user's history
         history = get_user_history(user_id)
         if not history:
             current_app.logger.warning(f"No history found")
