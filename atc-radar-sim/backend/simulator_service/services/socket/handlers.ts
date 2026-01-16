@@ -13,7 +13,7 @@ import { WAYPOINTS } from '@atc-radar-sim/shared/src/data/waypoints';
  */
 function formatCommandMessage(callsign: string, parsed: ParsedCommand): string {
   const value = parsed.value;
-  
+
   switch (parsed.type) {
     case 'DESCEND':
       if (typeof value === 'number') {
@@ -24,7 +24,7 @@ function formatCommandMessage(callsign: string, parsed: ParsedCommand): string {
         }
       }
       break;
-    
+
     case 'CLIMB':
       if (typeof value === 'number') {
         if (value >= 100) {
@@ -34,7 +34,7 @@ function formatCommandMessage(callsign: string, parsed: ParsedCommand): string {
         }
       }
       break;
-    
+
     case 'STOP_DESCEND':
       if (typeof value === 'number') {
         if (value >= 100) {
@@ -44,7 +44,7 @@ function formatCommandMessage(callsign: string, parsed: ParsedCommand): string {
         }
       }
       break;
-    
+
     case 'STOP_CLIMB':
       if (typeof value === 'number') {
         if (value >= 100) {
@@ -54,62 +54,62 @@ function formatCommandMessage(callsign: string, parsed: ParsedCommand): string {
         }
       }
       break;
-    
+
     case 'TURN_RIGHT':
       if (typeof value === 'number') {
         return `${callsign} Turn Right heading ${value.toString().padStart(3, '0')}`;
       }
       break;
-    
+
     case 'TURN_LEFT':
       if (typeof value === 'number') {
         return `${callsign} Turn Left heading ${value.toString().padStart(3, '0')}`;
       }
       break;
-    
+
     case 'DIRECT':
       if (typeof value === 'number') {
         return `${callsign} Fly heading ${value.toString().padStart(3, '0')}`;
       }
       break;
-    
+
     case 'INCREASE_SPEED':
       if (typeof value === 'number') {
         return `${callsign} Increase Speed to ${value} knots`;
       }
       break;
-    
+
     case 'REDUCE_SPEED':
       if (typeof value === 'number') {
         return `${callsign} Reduce Speed to ${value} knots`;
       }
       break;
-    
+
     case 'INCREASE_MACH':
       if (typeof value === 'number') {
         return `${callsign} Increase Mach number ${value.toFixed(2)}`;
       }
       break;
-    
+
     case 'REDUCE_MACH':
       if (typeof value === 'number') {
         return `${callsign} Reduce Mach number ${value.toFixed(2)}`;
       }
       break;
-    
+
     case 'CONTACT':
       return `${callsign} Contact`;
-    
+
     case 'IDENTIFY':
       return `${callsign} Identified`;
-    
+
     case 'DIRECT_WAYPOINT':
       if (typeof value === 'string') {
         return `${callsign} Direct to ${value}`;
       }
       break;
   }
-  
+
   return `${callsign} Command acknowledged`;
 }
 
@@ -125,49 +125,49 @@ function applyCommandToAircraft(
   // Handle DISTANCE command (doesn't need an aircraft)
   if (parsed.type === 'DISTANCE' && typeof parsed.value === 'object' && 'item1' in parsed.value) {
     const { item1, item2 } = parsed.value;
-    
+
     // Get positions for both items
     let pos1, pos2;
-    
+
     // Try to find item1 as aircraft or waypoint
     const aircraft1 = exerciseRunner.getAircraft(item1);
     const waypoint1 = WAYPOINTS.find(wp => wp.id === item1 || wp.name === item1);
-    
+
     if (aircraft1) {
       pos1 = { latitude: aircraft1.position.latitude, longitude: aircraft1.position.longitude };
     } else if (waypoint1) {
       pos1 = { latitude: waypoint1.latitude, longitude: waypoint1.longitude };
     }
-    
+
     // Try to find item2 as aircraft or waypoint
     const aircraft2 = exerciseRunner.getAircraft(item2);
     const waypoint2 = WAYPOINTS.find(wp => wp.id === item2 || wp.name === item2);
-    
+
     if (aircraft2) {
       pos2 = { latitude: aircraft2.position.latitude, longitude: aircraft2.position.longitude };
     } else if (waypoint2) {
       pos2 = { latitude: waypoint2.latitude, longitude: waypoint2.longitude };
     }
-    
+
     if (!pos1 || !pos2) {
       return { handled: false, error: `Could not find ${!pos1 ? item1 : item2}` };
     }
-    
+
     // Calculate distance and heading
     const distance = calculateDistance(pos1, pos2);
     const heading = calculateBearing(pos1, pos2);
-    
+
     return {
       handled: true,
       distanceResult: `Distance from ${item1} to ${item2}: ${distance.toFixed(1)} NM, Heading: ${Math.round(heading).toString().padStart(3, '0')}°`,
     };
   }
-  
+
   // For all other commands, we need an aircraft
   if (!aircraft) {
     return { handled: false, error: `Aircraft ${parsed.callsign} not found` };
   }
-  
+
   // Apply command based on type
   switch (parsed.type) {
     case 'DESCEND':
@@ -176,7 +176,7 @@ function applyCommandToAircraft(
         aircraft.targetFlightLevel = parsed.value;
       }
       break;
-    
+
     case 'TURN_LEFT':
     case 'TURN_RIGHT':
     case 'DIRECT':
@@ -184,7 +184,7 @@ function applyCommandToAircraft(
         aircraft.assignedHeading = parsed.value;
       }
       break;
-    
+
     case 'DIRECT_WAYPOINT':
       if (typeof parsed.value === 'string') {
         const waypoint = WAYPOINTS.find(wp => wp.id === parsed.value || wp.name === parsed.value);
@@ -200,60 +200,60 @@ function applyCommandToAircraft(
         }
       }
       break;
-    
+
     case 'INCREASE_SPEED':
     case 'REDUCE_SPEED':
       if (typeof parsed.value === 'number') {
         // Validate: Cannot change speed by more than 20 knots
         const currentSpeed = aircraft.speed;
         const speedDiff = Math.abs(parsed.value - currentSpeed);
-        
+
         if (speedDiff > 20) {
-          return { 
-            handled: false, 
-            error: `Unable ${parsed.type === 'INCREASE_SPEED' ? 'Increase' : 'Reduce'}: Speed change cannot exceed 20 knots (requested: ${speedDiff} knots)` 
+          return {
+            handled: false,
+            error: `Unable ${parsed.type === 'INCREASE_SPEED' ? 'Increase' : 'Reduce'}: Speed change cannot exceed 20 knots (requested: ${speedDiff} knots)`
           };
         }
-        
+
         aircraft.assignedSpeed = parsed.value;
         aircraft.speed = parsed.value; // Update displayed speed immediately
       }
       break;
-    
+
     case 'INCREASE_MACH':
     case 'REDUCE_MACH':
       if (typeof parsed.value === 'number') {
         // Validate: Cannot change Mach by more than 0.3
         const currentMach = aircraft.machNumber || 0.78;
         const machDiff = Math.abs(parsed.value - currentMach);
-        
+
         if (machDiff > 0.3) {
-          return { 
-            handled: false, 
-            error: `Unable ${parsed.type === 'INCREASE_MACH' ? 'Increase' : 'Reduce'}: Mach change cannot exceed 0.3 (requested: ${machDiff.toFixed(2)})` 
+          return {
+            handled: false,
+            error: `Unable ${parsed.type === 'INCREASE_MACH' ? 'Increase' : 'Reduce'}: Mach change cannot exceed 0.3 (requested: ${machDiff.toFixed(2)})`
           };
         }
-        
+
         aircraft.assignedMach = parsed.value;
         aircraft.machNumber = parsed.value; // Update displayed mach immediately
         aircraft.assignedSpeed = Math.round(parsed.value * 575);
         aircraft.speed = Math.round(parsed.value * 575); // Update displayed speed immediately
       }
       break;
-    
+
     case 'IDENTIFY':
       aircraft.state = 'IDENTIFIED';
       aircraft.identified = true;
       break;
-    
+
     case 'CONTACT':
       exerciseRunner.removeAircraft(aircraft.id);
       break;
   }
-  
+
   // Update aircraft
   exerciseRunner.updateAircraft(aircraft);
-  
+
   return { handled: true };
 }
 
@@ -263,27 +263,27 @@ export function setupSocketHandlers(
 ) {
   io.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents>) => {
     console.log(`Client connected: ${socket.id}`);
-    
+
     // Send current aircraft state to new client
     const aircraft = exerciseRunner.getAllAircraft();
     socket.emit('aircraft:batch', aircraft);
-    
+
     // Handle session join
     socket.on('session:join', (sessionId: string) => {
       socket.join(`session-${sessionId}`);
       console.log(`Client ${socket.id} joined session ${sessionId}`);
     });
-    
+
     // Handle session leave
     socket.on('session:leave', (sessionId: string) => {
       socket.leave(`session-${sessionId}`);
       console.log(`Client ${socket.id} left session ${sessionId}`);
     });
-    
+
     // Handle command input (text)
     socket.on('command:text', (text: string) => {
       const parsed = parseCommand(text);
-      
+
       if (!parsed.valid) {
         socket.emit('command:error', {
           command: text,
@@ -292,12 +292,12 @@ export function setupSocketHandlers(
         });
         return;
       }
-      
+
       // Execute command
       try {
         const aircraft = parsed.callsign ? exerciseRunner.getAircraft(parsed.callsign) : undefined;
         const result = applyCommandToAircraft(parsed, aircraft, exerciseRunner);
-        
+
         if (!result.handled) {
           socket.emit('command:error', {
             command: text,
@@ -306,7 +306,7 @@ export function setupSocketHandlers(
           });
           return;
         }
-        
+
         // If it's a distance result, emit as session event
         if (result.distanceResult) {
           socket.emit('session:event', {
@@ -336,11 +336,11 @@ export function setupSocketHandlers(
         });
       }
     });
-    
+
     // Handle manual command (callsign + clearance)
     socket.on('command:manual', (data) => {
       const parsed = parseManualCommand(data.callsign, data.clearance);
-      
+
       if (!parsed.valid) {
         socket.emit('command:error', {
           command: `${data.callsign} ${data.clearance}`,
@@ -349,12 +349,12 @@ export function setupSocketHandlers(
         });
         return;
       }
-      
+
       // Execute command
       try {
         const aircraft = parsed.callsign ? exerciseRunner.getAircraft(parsed.callsign) : undefined;
         const result = applyCommandToAircraft(parsed, aircraft, exerciseRunner);
-        
+
         if (!result.handled) {
           socket.emit('command:error', {
             command: `${data.callsign} ${data.clearance}`,
@@ -363,7 +363,7 @@ export function setupSocketHandlers(
           });
           return;
         }
-        
+
         // If it's a distance result, emit as session event
         if (result.distanceResult) {
           socket.emit('session:event', {
@@ -393,7 +393,7 @@ export function setupSocketHandlers(
         });
       }
     });
-    
+
     // Handle direct command issue
     socket.on('command:issue', (command) => {
       try {
@@ -406,7 +406,7 @@ export function setupSocketHandlers(
           });
           return;
         }
-        
+
         socket.emit('command:acknowledged', {
           ...command,
           timestamp: new Date(),
@@ -420,20 +420,20 @@ export function setupSocketHandlers(
         });
       }
     });
-    
+
     // Handle aircraft data requests
     socket.on('aircraft:request', () => {
       const aircraft = exerciseRunner.getAllAircraft();
       socket.emit('aircraft:batch', aircraft);
     });
-    
+
     socket.on('aircraft:requestById', (aircraftId: string) => {
       const aircraft = exerciseRunner.getAircraft(aircraftId);
       if (aircraft) {
         socket.emit('aircraft:update', aircraft);
       }
     });
-    
+
     // Handle exercise control
     socket.on('exercise:load', (exerciseId: number) => {
       console.log(`Loading exercise ${exerciseId} for client ${socket.id}`);
@@ -443,37 +443,37 @@ export function setupSocketHandlers(
         socket.emit('exercise:loaded', { exerciseId, name: exercise.name });
       }
     });
-    
+
     socket.on('exercise:start', () => {
       console.log(`Starting exercise for client ${socket.id}`);
       exerciseRunner.start();
     });
-    
+
     socket.on('exercise:pause', () => {
       console.log(`Pausing exercise for client ${socket.id}`);
       exerciseRunner.pause();
     });
-    
+
     socket.on('exercise:resume', () => {
       console.log(`Resuming exercise for client ${socket.id}`);
       exerciseRunner.resume();
     });
-    
+
     socket.on('exercise:stop', () => {
       console.log(`Stopping exercise for client ${socket.id}`);
       exerciseRunner.stop();
     });
-    
+
     socket.on('exercise:setSpeed', (speed: number) => {
       console.log(`Setting speed to ${speed}x for client ${socket.id}`);
       exerciseRunner.setSpeed(speed);
     });
-    
+
     socket.on('exercise:seekTo', (minutes: number) => {
       console.log(`Seeking to ${minutes} minutes for client ${socket.id}`);
       exerciseRunner.seekTo(minutes);
     });
-    
+
     // Handle session control (legacy)
     socket.on('session:start', (exerciseId: number) => {
       console.log(`Starting exercise ${exerciseId} (legacy) for client ${socket.id}`);
@@ -483,19 +483,19 @@ export function setupSocketHandlers(
         exerciseRunner.start();
       }
     });
-    
+
     socket.on('session:pause', () => {
       exerciseRunner.pause();
     });
-    
+
     socket.on('session:resume', () => {
       exerciseRunner.resume();
     });
-    
+
     socket.on('session:end', () => {
       exerciseRunner.stop();
     });
-    
+
     // Handle disconnect
     socket.on('disconnect', (reason) => {
       console.log(`Client disconnected: ${socket.id} (${reason})`);

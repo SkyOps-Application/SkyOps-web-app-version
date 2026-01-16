@@ -1,10 +1,12 @@
 import logging
 from flask import Flask
 
-
+from .queue_consumer import start_consumer
 from .database import init_db
 from .routes import user_bp, auth_bp
 import os
+import sys
+sys.stdout.reconfigure(line_buffering=True)
 
 # Configure logging
 logging.basicConfig(
@@ -13,13 +15,10 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
-# Create Flask app
+# Flask app
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
 
-# Force stdout to be unbuffered
-import sys
-sys.stdout.reconfigure(line_buffering=True)
 
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/')
@@ -30,10 +29,16 @@ app.register_blueprint(auth_bp, url_prefix='/')
 def health():
     return {"status": "UP"}
 
+
 def run_app():
     """Entry point for the application script"""
-    # Initialize the database before starting the app
+    # Initialize the database before
     init_db()
+
+    # Start the Redis consumer
+    # Only start in the main process (not reloader) to avoid double workers
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+        start_consumer(app)
 
     app.run(host="0.0.0.0", port=5000, debug=True)
 

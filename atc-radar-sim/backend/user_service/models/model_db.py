@@ -17,7 +17,6 @@ class UserModel(Base):
     # relations
     history = relationship('UserHistoryModel', backref='user', lazy=True)
 
-
     def __repr__(self):
         return f"<User(email='{self.email}', name='{self.name}', role='{self.role}', plan='{self.plan}')>"
     

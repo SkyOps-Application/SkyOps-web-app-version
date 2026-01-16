@@ -7,6 +7,7 @@ from ..services.user_service import (
     get_user_history,
 )
 from ..services.auth_service import jwt_required
+from ..services.redis_service import RedisService
 import os
 
 user_bp = Blueprint('user', __name__)
@@ -20,6 +21,16 @@ def register_user():
         new_user = create_user_service(register_schema)
         
         current_app.logger.info(f"Registered new user: {register_schema.email}")
+        
+        # Welcome Email via Redis Queue hehe
+        redis_service = RedisService()
+        email_task = {
+            "type": "WELCOME",
+            "email": register_schema.email,
+            "first_name": register_schema.first_name
+        }
+        redis_service.add_to_queue("notification_queue", email_task)
+
         
         return jsonify(new_user.model_dump()), 201
 
@@ -53,7 +64,7 @@ def get_history():
         user_id = g.user_id
         current_app.logger.debug(f"Retrieving history")
         
-        # Get the user's history
+        # user's history
         history = get_user_history(user_id)
         if not history:
             current_app.logger.warning(f"No history found")
