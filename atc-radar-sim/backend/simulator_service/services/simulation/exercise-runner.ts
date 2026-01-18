@@ -124,11 +124,11 @@ export class ExerciseRunner {
   /**
    * Stop the exercise
    */
-  stop() {
+  stop(userId?: string) {
     if (this.isRunning && this.exercise) {
       // Push session stats to Redis before clearing
       const sessionData = {
-        userId: 'current-user', // TODO: Pass real user ID from context/socket
+        userId: userId || 'anonymous',
         timestamp: new Date().toISOString(),
         duration: Math.floor(this.currentTime * 60), // Convert minutes to seconds
         violations: this.violationCount,

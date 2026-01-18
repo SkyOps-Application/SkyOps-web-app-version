@@ -66,11 +66,11 @@ def get_history():
         
         # user's history
         history = get_user_history(user_id)
-        if not history:
-            current_app.logger.warning(f"No history found")
-            return jsonify({"error": "History not found for this user"}), 404
+        if history is None:
+             current_app.logger.warning(f"User not found")
+             return jsonify({"error": "User not found"}), 404
             
-        return jsonify(history.model_dump()), 200
+        return jsonify(history), 200
         
     except Exception as e:
         current_app.logger.error(f"Error retrieving history: {str(e)}")

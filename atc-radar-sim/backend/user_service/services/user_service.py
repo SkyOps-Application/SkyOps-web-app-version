@@ -108,11 +108,37 @@ def get_user_history(id: str) -> List:
         history = []
         for record in user.history:
             history.append({
-                "timestamp": record.timestamp,
-                "duration": record.duration,
-                "violations": record.violations,
-                "traffic_count": record.traffic_count
+                "id": record.id,
+                "timestamp": record.timestamp.isoformat() if record.timestamp else None,
+                "duration_seconds": record.duration,
+                "violations_count": record.violations,
+                "traffic_count": record.traffic_count,
+                "score": max(0, 100 - (record.violations * 10)) # content score
             })
         return history
+    finally:
+        db.close()
+
+def get_user_by_email(email: str) -> Optional[UserModel]:
+    """Retrieve user model by email (internal use)"""
+    db = db_session()
+    try:
+        return db.query(UserModel).filter(UserModel.email == email).first()
+    finally:
+        db.close()
+
+def update_password(user_id: str, new_password: str):
+    """Update user's password"""
+    db = db_session()
+    try:
+        user = db.query(UserModel).filter(UserModel.id == user_id).first()
+        if not user:
+            raise ValueError("User not found")
+            
+        user.password_hash = hash_password(new_password)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise e
     finally:
         db.close()
