@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./effects.css";
 
 :root {
   --background: #0a0e1a;
@@ -52,6 +53,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

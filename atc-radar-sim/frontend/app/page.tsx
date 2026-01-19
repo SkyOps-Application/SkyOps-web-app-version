@@ -1,79 +1,169 @@
 /**
  * Landing page / Homepage
+ * Updated with iPadOS-style UI effects
  */
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Navbar } from '@/components/Navbar';
+import { MaterialIcon } from '@/components/MaterialIcon';
+import {
+  StaticGlassBackground,
+  LogoGlow,
+  DashboardCard,
+  LiquidGlass,
+  GradientPairs,
+  ThemeColors
+} from '@/components/Effects';
 
 export default function HomePage() {
+  const [logoScale, setLogoScale] = useState(0.8);
+  const [logoOpacity, setLogoOpacity] = useState(0);
+  const [cardsOpacity, setCardsOpacity] = useState(0);
+
+  // Entrance animations
+  useEffect(() => {
+    // Logo animation
+    const timer1 = setTimeout(() => {
+      setLogoScale(1);
+      setLogoOpacity(1);
+    }, 200);
+
+    // Cards animation
+    const timer2 = setTimeout(() => {
+      setCardsOpacity(1);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Background Image */}
-      <div className="fixed inset-0 z-0">
-        <Image
-          src="/background-web.png"
-          alt="ATC Tower Background"
-          fill
-          className="object-cover"
-          priority
-          quality={100}
-        />
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/30 via-blue-800/20 to-blue-900/40" />
-      </div>
+      {/* Static Glass Background */}
+      <StaticGlassBackground />
 
       {/* Navigation */}
       <Navbar />
 
       {/* Main Content */}
-      <main className="relative z-10 flex items-center min-h-screen px-8 md:px-16 lg:px-24">
-        <div className="max-w-4xl space-y-10">
-          {/* Main Title */}
-          <div>
-            <h1 className="text-7xl md:text-8xl lg:text-9xl font-black text-white drop-shadow-2xl tracking-tight leading-none">
-              EXERCISE 1
+      <main className="relative z-10 flex flex-col items-center min-h-screen pt-32 px-8">
+        {/* Hero Section */}
+        <div className="flex flex-col items-center gap-5 mb-16">
+          {/* Logo with Glow */}
+          <LogoGlow>
+            <div
+              style={{
+                transform: `scale(${logoScale})`,
+                opacity: logoOpacity,
+                transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease',
+              }}
+            >
+              <Image
+                src="/mainlogo.png"
+                alt="SkyOps Logo"
+                width={140}
+                height={140}
+                className="drop-shadow-2xl"
+                priority
+              />
+            </div>
+          </LogoGlow>
+
+          {/* Title Text */}
+          <div
+            className="flex flex-col items-center gap-2"
+            style={{
+              opacity: logoOpacity,
+              transition: 'opacity 0.8s ease 0.2s',
+            }}
+          >
+            <h1
+              className="text-5xl md:text-6xl font-bold text-white tracking-tight"
+              style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+            >
+              SkyOps
             </h1>
+            <p
+              className="text-xl font-medium"
+              style={{ color: ThemeColors.secondary, opacity: 0.9 }}
+            >
+              Air Traffic Control Simulator
+            </p>
           </div>
+        </div>
 
-          {/* Secondary Buttons */}
-          <div className="flex flex-wrap items-center gap-4">
-            <Link
-              href="/exercise/1/flight-plan"
-              className="bg-white/15 backdrop-blur-md text-white font-semibold px-8 py-3.5 rounded-full hover:bg-white/25 transition-all duration-300 border border-white/20 shadow-xl hover:shadow-2xl hover:scale-105"
-            >
-              Flight Plan
-            </Link>
-            <Link
-              href="/exercise/1/practice-history"
-              className="bg-white/15 backdrop-blur-md text-white font-semibold px-8 py-3.5 rounded-full hover:bg-white/25 transition-all duration-300 border border-white/20 shadow-xl hover:shadow-2xl hover:scale-105"
-            >
-              Practice History
-            </Link>
-          </div>
+        {/* Dashboard Cards */}
+        <div
+          className="flex flex-wrap justify-center gap-5 max-w-4xl w-full px-4"
+          style={{
+            opacity: cardsOpacity,
+            transform: cardsOpacity === 1 ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'all 0.6s ease',
+          }}
+        >
+          {/* Start Training Card */}
+          <Link href="/exercise-selection" className="w-full sm:w-[280px]">
+            <DashboardCard
+              icon={<MaterialIcon name="flight_takeoff" size={32} />}
+              title="Start Training"
+              subtitle="Begin your journey"
+              gradientColors={GradientPairs.purple as [string, string]}
+            />
+          </Link>
 
-          {/* Practice Now Button */}
-          <div className="pt-6">
-            <Link
-              href="/radar"
-              className="group inline-flex items-center gap-4 bg-gradient-to-r from-[#ffde59] to-[#ffd700] hover:from-[#ffd700] hover:to-[#ffde59] text-[#0d2d52] font-bold text-2xl px-8 py-4 rounded-full transition-all duration-300 shadow-2xl hover:shadow-[0_20px_60px_rgba(255,222,89,0.4)] hover:scale-105 transform"
-            >
+          {/* Tutorial Notebook Card */}
+          <Link href="/instructions" className="w-full sm:w-[280px]">
+            <DashboardCard
+              icon={<MaterialIcon name="menu_book" size={32} />}
+              title="Tutorial Notebook"
+              subtitle="Learn ATC basics"
+              gradientColors={GradientPairs.teal as [string, string]}
+            />
+          </Link>
+
+          {/* About Card */}
+          <Link href="/data" className="w-full sm:w-[280px]">
+            <DashboardCard
+              icon={<MaterialIcon name="info" size={32} />}
+              title="About SkyOps"
+              subtitle="Learn more"
+              gradientColors={GradientPairs.pink as [string, string]}
+            />
+          </Link>
+        </div>
+
+        {/* Practice Now Button */}
+        <div className="mt-16" style={{ opacity: cardsOpacity, transition: 'opacity 0.6s ease 0.2s' }}>
+          <Link
+            href="/exercise-selection"
+            className="group inline-flex items-center gap-4 btn-scale"
+          >
+            <LiquidGlass className="flex items-center gap-4 px-8 py-4 rounded-full hover:bg-white/10 transition-all">
               {/* Play Icon */}
-              <div className="w-14 h-14 bg-[#0d2d52] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <svg
-                  className="w-7 h-7 text-[#ffde59] ml-0.5"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300"
+                style={{ background: `linear-gradient(135deg, ${GradientPairs.purple[0]}, ${GradientPairs.purple[1]})` }}
+              >
+                <MaterialIcon name="play_arrow" size={32} className="text-white ml-0.5" />
               </div>
-              <span className="pr-2">Practice now</span>
-            </Link>
-          </div>
+              <span className="text-white font-bold text-2xl pr-2">Practice now</span>
+            </LiquidGlass>
+          </Link>
+        </div>
+
+        {/* Footer */}
+        <div
+          className="absolute bottom-6 flex items-center gap-1.5 text-gray-500 text-xs"
+          style={{ opacity: cardsOpacity * 0.6, transition: 'opacity 0.6s ease 0.3s' }}
+        >
+          <span>©</span>
+          <span>2026 SkyOps Simulation. All rights reserved.</span>
         </div>
       </main>
     </div>
