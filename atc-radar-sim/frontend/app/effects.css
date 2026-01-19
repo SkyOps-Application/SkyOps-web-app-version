@@ -1,0 +1,728 @@
+/* ============================================
+   SkyOps Web - Effects CSS
+   Ported from iPadOS Swift Effects.swift
+   ============================================ */
+
+:root {
+    /* Theme Colors from Swift ThemeColors struct */
+    --theme-primary: #BC82F3;
+    --theme-secondary: #8D9FFF;
+    --theme-accent: #F5B9EA;
+    --theme-warning: #FFBA71;
+    --theme-danger: #FF6778;
+
+    /* Aurora Colors for border effects */
+    --aurora-1: #5e879e;
+    --aurora-2: #8abdd3;
+    --aurora-3: #18c3e8;
+    --aurora-4: #e5b14b;
+    --aurora-5: #e8a473;
+    --aurora-6: #e88599;
+    --aurora-7: #d34f98;
+    --aurora-8: #d97ce7;
+    --aurora-9: #bd95ed;
+
+    /* Glass Effect Variables */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-hover: rgba(255, 255, 255, 0.2);
+    --glass-blur: 20px;
+
+    /* Gradient Color Pairs (from Swift colorPairs) */
+    --gradient-1-start: #667eea;
+    --gradient-1-end: #764ba2;
+    --gradient-2-start: #f093fb;
+    --gradient-2-end: #f5576c;
+    --gradient-3-start: #4facfe;
+    --gradient-3-end: #00f2fe;
+    --gradient-4-start: #43e97b;
+    --gradient-4-end: #38f9d7;
+    --gradient-5-start: #fa709a;
+    --gradient-5-end: #fee140;
+    --gradient-6-start: #11998e;
+    --gradient-6-end: #38ef7d;
+
+    /* Animation durations */
+    --transition-fast: 0.15s;
+    --transition-normal: 0.3s;
+    --transition-slow: 0.6s;
+}
+
+/* ============================================
+   Aurora Border Effect
+   Rotating angular gradient border
+   ============================================ */
+@property --aurora-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes aurora-rotate {
+    from {
+        --aurora-angle: 0deg;
+    }
+
+    to {
+        --aurora-angle: 360deg;
+    }
+}
+
+.aurora-border {
+    position: relative;
+    isolation: isolate;
+}
+
+.aurora-border::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: conic-gradient(from var(--aurora-angle),
+            var(--aurora-1),
+            var(--aurora-2),
+            var(--aurora-3),
+            var(--aurora-4),
+            var(--aurora-5),
+            var(--aurora-6),
+            var(--aurora-7),
+            var(--aurora-8),
+            var(--aurora-9),
+            var(--aurora-1));
+    border-radius: inherit;
+    animation: aurora-rotate 3s linear infinite;
+    z-index: -1;
+    filter: blur(8px);
+    opacity: 0.8;
+}
+
+.aurora-border::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: conic-gradient(from var(--aurora-angle),
+            var(--aurora-1),
+            var(--aurora-2),
+            var(--aurora-3),
+            var(--aurora-4),
+            var(--aurora-5),
+            var(--aurora-6),
+            var(--aurora-7),
+            var(--aurora-8),
+            var(--aurora-9),
+            var(--aurora-1));
+    border-radius: inherit;
+    animation: aurora-rotate 3s linear infinite;
+    z-index: -1;
+    opacity: 1;
+}
+
+/* Full screen aurora border */
+.aurora-border-fullscreen {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.aurora-border-fullscreen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(from var(--aurora-angle),
+            var(--aurora-1),
+            var(--aurora-2),
+            var(--aurora-3),
+            var(--aurora-4),
+            var(--aurora-5),
+            var(--aurora-6),
+            var(--aurora-7),
+            var(--aurora-8),
+            var(--aurora-9),
+            var(--aurora-1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 4px;
+    animation: aurora-rotate 3s linear infinite;
+    filter: blur(8px);
+    opacity: 0.8;
+}
+
+.aurora-border-fullscreen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: conic-gradient(from var(--aurora-angle),
+            var(--aurora-1),
+            var(--aurora-2),
+            var(--aurora-3),
+            var(--aurora-4),
+            var(--aurora-5),
+            var(--aurora-6),
+            var(--aurora-7),
+            var(--aurora-8),
+            var(--aurora-9),
+            var(--aurora-1));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 2px;
+    animation: aurora-rotate 3s linear infinite;
+}
+
+/* ============================================
+   Liquid Glass Effect (Glassmorphism)
+   ============================================ */
+.liquid-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    transition: all var(--transition-normal) ease;
+}
+
+.liquid-glass:hover {
+    background: var(--glass-bg-hover);
+    border-color: var(--glass-border-hover);
+}
+
+.liquid-glass-tinted {
+    background: linear-gradient(135deg,
+            rgba(188, 130, 243, 0.15),
+            rgba(141, 159, 255, 0.08));
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid rgba(188, 130, 243, 0.3);
+    border-radius: 20px;
+}
+
+.liquid-glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    transition: all var(--transition-normal) ease;
+}
+
+.liquid-glass-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   Static Glass Background
+   Matching Swift StaticGlassBackground
+   ============================================ */
+.static-glass-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    background: rgb(5, 5, 13);
+    overflow: hidden;
+}
+
+.static-glass-bg::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: -200px;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle at center,
+            rgba(188, 130, 243, 0.15) 0%,
+            rgba(141, 159, 255, 0.08) 40%,
+            transparent 70%);
+    pointer-events: none;
+}
+
+.static-glass-bg::after {
+    content: '';
+    position: absolute;
+    bottom: -150px;
+    right: -150px;
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle at center,
+            rgba(141, 159, 255, 0.12) 0%,
+            rgba(188, 130, 243, 0.05) 40%,
+            transparent 70%);
+    pointer-events: none;
+}
+
+/* ============================================
+   Grid Overlay
+   Matching Swift GridOverlay
+   ============================================ */
+.grid-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.8;
+}
+
+/* ============================================
+   Logo Glow Effect
+   ============================================ */
+.logo-glow {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-glow::before {
+    content: '';
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    background: radial-gradient(circle at center,
+            rgba(188, 130, 243, 0.3) 0%,
+            rgba(188, 130, 243, 0.1) 40%,
+            transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: logo-pulse 3s ease-in-out infinite;
+}
+
+@keyframes logo-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   Button Styles
+   ============================================ */
+.btn-scale {
+    transition: transform var(--transition-fast) ease;
+}
+
+.btn-scale:active {
+    transform: scale(0.97);
+}
+
+.btn-primary-gradient {
+    background: linear-gradient(135deg, var(--gradient-1-start), var(--gradient-1-end));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-normal) ease;
+}
+
+.btn-primary-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.btn-glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 999px;
+    padding: 12px 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-normal) ease;
+}
+
+.btn-glass:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.02);
+}
+
+/* ============================================
+   Dashboard Card
+   ============================================ */
+.dashboard-card {
+    background: rgba(26, 26, 26, 0.8);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    transition: all var(--transition-normal) ease;
+    cursor: pointer;
+}
+
+.dashboard-card:hover {
+    transform: scale(1.02);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-card-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+}
+
+/* ============================================
+   Particle System
+   ============================================ */
+@keyframes float-particle {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(10px, -10px);
+    }
+
+    50% {
+        transform: translate(-5px, 15px);
+    }
+
+    75% {
+        transform: translate(-15px, -5px);
+    }
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float-particle 20s linear infinite;
+}
+
+/* ============================================
+   Processing View / Loading Screen
+   ============================================ */
+.processing-view {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgb(2, 2, 5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.mosaic-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 4px;
+    transition: transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mosaic-cell {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mosaic-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Cell flash effect */
+@keyframes cell-flash {
+    0% {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+
+    15% {
+        filter: brightness(2.5);
+        transform: scale(0.95);
+    }
+
+    30% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        filter: brightness(1);
+        transform: scale(1);
+    }
+}
+
+.mosaic-cell.flashing {
+    animation: cell-flash 0.8s ease-out;
+}
+
+/* Border runner effect */
+@keyframes border-runner {
+    from {
+        background-position: 0% 50%;
+    }
+
+    to {
+        background-position: 100% 50%;
+    }
+}
+
+.mosaic-cell.border-rainbow::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(90deg,
+            #ff0000, #ffa500, #ffff00, #00ff00, #00ffff, #0000ff, #8000ff, #ff0000);
+    background-size: 400% 100%;
+    border-radius: 14px;
+    z-index: -1;
+    animation: border-runner 1.5s linear infinite;
+    filter: blur(2px);
+}
+
+/* Ripple effect */
+@keyframes ripple-out {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0.7;
+    }
+}
+
+.mosaic-cell.rippling {
+    animation: ripple-out 0.8s ease-out forwards;
+}
+
+/* ============================================
+   Quick Tips Section
+   ============================================ */
+.quick-tip {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    transition: all 0.5s ease;
+}
+
+.quick-tip-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gradient-1-start), var(--gradient-1-end));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: white;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   Progress Bar
+   ============================================ */
+.progress-bar {
+    width: 250px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gradient-1-start), var(--gradient-1-end));
+    border-radius: 4px;
+    transition: width 0.1s linear;
+}
+
+/* ============================================
+   Entrance Animations
+   ============================================ */
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-scale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in-scale {
+    animation: fade-in-scale 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-right {
+    animation: slide-in-right 0.5s ease-out forwards;
+}
+
+/* Stagger delays */
+.delay-100 {
+    animation-delay: 0.1s;
+}
+
+.delay-200 {
+    animation-delay: 0.2s;
+}
+
+.delay-300 {
+    animation-delay: 0.3s;
+}
+
+.delay-400 {
+    animation-delay: 0.4s;
+}
+
+.delay-500 {
+    animation-delay: 0.5s;
+}
+
+/* ============================================
+   Soul Effect (Flying Orb)
+   ============================================ */
+@keyframes soul-fly-in {
+    0% {
+        transform: translate(var(--soul-start-x), var(--soul-start-y)) scale(2.5) rotate(var(--soul-rotation));
+        opacity: 0;
+    }
+
+    80% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 0;
+    }
+}
+
+.soul-orb {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #3b82f6, #ec4899);
+    border-radius: 12px;
+    filter: blur(30px);
+    opacity: 0;
+}
+
+.soul-orb.active {
+    animation: soul-fly-in 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ============================================
+   Exercise Card
+   ============================================ */
+.exercise-card {
+    display: flex;
+    height: 160px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all var(--transition-normal) ease;
+    cursor: pointer;
+}
+
+.exercise-card:hover {
+    transform: scale(1.02);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.exercise-card-left {
+    width: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.exercise-card-right {
+    flex: 1;
+    padding: 20px;
+    background: rgba(20, 20, 20, 0.9);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================================
+   Notebook Card
+   ============================================ */
+.notebook-card {
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all var(--transition-normal) ease;
+}
+
+.notebook-card:hover {
+    transform: translateY(-4px);
+}
+
+.notebook-card-visual {
+    height: 180px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notebook-card-info {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+}
