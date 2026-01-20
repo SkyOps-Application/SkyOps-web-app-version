@@ -90,6 +90,9 @@ def get_user(id: str) -> Optional[UserResponseSchema]:
         if user:
             return UserResponseSchema(
                 email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                age=user.age
             )
         return None
     finally:

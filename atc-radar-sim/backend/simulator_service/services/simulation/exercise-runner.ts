@@ -19,7 +19,7 @@ export class ExerciseRunner {
   private currentTime: number = 0; // Minutes since exercise start
   private isRunning: boolean = false;
   private isPaused: boolean = false;
-  private playbackSpeed: number = 1; // 1x, 2x, 3x, 4x
+  private playbackSpeed: number = 1; 
   private updateInterval: NodeJS.Timeout | null = null;
   private spawnedAircraft: Set<string> = new Set();
   private aircraftData: Map<string, AircraftData> = new Map();
@@ -27,6 +27,10 @@ export class ExerciseRunner {
   private tickCounter: number = 0; // Count ticks for position updates
   private boundaryPolygon: LatLng[] = []; // Boundary polygon for out-of-boundary checks
   private violationCount: number = 0; // Track total violations in session
+  private score: number = 1000; // Starting score
+  private activeViolations: Set<string> = new Set(); // Track active separation violations (id1-id2)
+  private penalizedBoundaryAircraft: Set<string> = new Set(); // Track aircraft penalized for boundary exit
+  private arrivedAircraft: Set<string> = new Set(); // Track aircraft that have reached destination
 
   constructor(io: Server<ClientToServerEvents, ServerToClientEvents>) {
     this.io = io;
@@ -71,6 +75,10 @@ export class ExerciseRunner {
     this.exercise = exercise;
     this.currentTime = 0;
     this.violationCount = 0;
+    this.score = 1000;
+    this.activeViolations.clear();
+    this.penalizedBoundaryAircraft.clear();
+    this.arrivedAircraft.clear();
 
     console.log(`Loaded exercise: ${exercise.name}`);
   }
@@ -132,7 +140,8 @@ export class ExerciseRunner {
         timestamp: new Date().toISOString(),
         duration: Math.floor(this.currentTime * 60), // Convert minutes to seconds
         violations: this.violationCount,
-        traffic_count: this.spawnedAircraft.size
+        traffic_count: this.spawnedAircraft.size,
+        score: this.score
       };
 
       console.log('Session ended, saving history:', sessionData);
@@ -523,6 +532,22 @@ export class ExerciseRunner {
 
     aircraft.position.timestamp = new Date();
     aircraft.lastUpdate = new Date();
+
+    // Check for destination arrival
+    if (aircraft.destination && !this.arrivedAircraft.has(aircraft.id)) {
+      const destWaypoint = WAYPOINTS.find(wp => wp.id === aircraft.destination);
+      if (destWaypoint) {
+        const distToDest = calculateDistance(
+          { latitude: aircraft.position.latitude, longitude: aircraft.position.longitude },
+          { latitude: destWaypoint.latitude, longitude: destWaypoint.longitude }
+        );
+
+        if (distToDest < 5) {
+          this.arrivedAircraft.add(aircraft.id);
+          this.addScore(50, `Destination Reached: ${aircraft.callsign}`);
+        }
+      }
+    }
   }
 
   /**
@@ -537,40 +562,56 @@ export class ExerciseRunner {
     // Clear all conflict flags first
     aircraftArray.forEach(ac => ac.conflict = false);
 
+    // Check for violations and handle scoring
+    const currentViolations = new Set<string>();
+
     // Check all pairs of aircraft
     for (let i = 0; i < aircraftArray.length; i++) {
       for (let j = i + 1; j < aircraftArray.length; j++) {
         const ac1 = aircraftArray[i];
         const ac2 = aircraftArray[j];
 
-        // Calculate horizontal distance using Haversine formula (in NM)
+        // Calculate horizontal distance (NM) and vertical (ft)
         const horizontalDistance = calculateDistance(
           { latitude: ac1.position.latitude, longitude: ac1.position.longitude },
           { latitude: ac2.position.latitude, longitude: ac2.position.longitude }
         );
-
-        // Calculate vertical separation (in feet)
         const verticalSeparation = Math.abs(ac2.position.altitude - ac1.position.altitude);
 
-        // Check if separation is lost (BOTH conditions must be true)
+        // Check if separation is lost
         if (horizontalDistance < 10 && verticalSeparation < 1000) {
           // Mark both aircraft as in conflict
           ac1.conflict = true;
           ac2.conflict = true;
 
-          // Emit separation violation event
-          // Emit separation violation event
-          this.io.emit('separation:violation', {
-            aircraft1: ac1.callsign,
-            aircraft2: ac2.callsign,
-            horizontalDistance,
-            verticalDistance: verticalSeparation,
-            timestamp: new Date(),
-            severity: horizontalDistance < 5 ? 'CRITICAL' : 'WARNING',
-          });
+          // Track violation
+          const violationId = [ac1.id, ac2.id].sort().join('-');
+          currentViolations.add(violationId);
 
-          this.violationCount++;
+          // If this is a NEW violation, penalize
+          if (!this.activeViolations.has(violationId)) {
+            this.activeViolations.add(violationId);
+            this.violationCount++;
+            this.addScore(-50, `Separation Violation: ${ac1.callsign} and ${ac2.callsign}`);
+
+            // Emit violation event
+            this.io.emit('separation:violation', {
+              aircraft1: ac1.callsign,
+              aircraft2: ac2.callsign,
+              horizontalDistance,
+              verticalDistance: verticalSeparation,
+              timestamp: new Date(),
+              severity: 'CRITICAL',
+            });
+          }
         }
+      }
+    }
+
+    // Remove resolved violations from active set
+    for (const violationId of this.activeViolations) {
+      if (!currentViolations.has(violationId)) {
+        this.activeViolations.delete(violationId);
       }
     }
   }
@@ -590,6 +631,12 @@ export class ExerciseRunner {
       // Check if aircraft is outside the boundary
       const isInside = isPointInPolygon(position, this.boundaryPolygon);
       aircraft.outOfBoundary = !isInside;
+
+      // Check for uncontrolled exit
+      if (aircraft.outOfBoundary && !this.penalizedBoundaryAircraft.has(aircraft.id)) {
+        this.penalizedBoundaryAircraft.add(aircraft.id);
+        this.addScore(-25, `Uncontrolled Exit: ${aircraft.callsign}`);
+      }
     });
   }
 
@@ -622,6 +669,27 @@ export class ExerciseRunner {
     this.aircraftData.delete(id);
     this.spawnedAircraft.delete(id);
     this.io.emit('aircraft:remove', id);
+  }
+
+  /**
+   * Add or subtract score
+   */
+  public addScore(points: number, reason: string) {
+    this.score += points;
+    console.log(`Score update: ${points > 0 ? '+' : ''}${points} (${reason}). New Score: ${this.score}`);
+
+    // Emit score update
+    this.io.emit('session:event', {
+      id: `score-${Date.now()}`,
+      sessionId: 'current',
+      type: 'SCORE_UPDATE',
+      data: {
+        score: this.score,
+        delta: points,
+        reason
+      },
+      timestamp: new Date()
+    });
   }
 }
 
