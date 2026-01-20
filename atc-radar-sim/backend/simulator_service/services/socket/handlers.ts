@@ -244,9 +244,11 @@ function applyCommandToAircraft(
     case 'IDENTIFY':
       aircraft.state = 'IDENTIFIED';
       aircraft.identified = true;
+      exerciseRunner.addScore(10, `Aircraft Identified: ${aircraft.callsign}`);
       break;
 
     case 'CONTACT':
+      exerciseRunner.addScore(20, `Transfer Contact: ${aircraft.callsign}`);
       exerciseRunner.removeAircraft(aircraft.id);
       break;
   }
@@ -461,7 +463,7 @@ export function setupSocketHandlers(
 
     socket.on('exercise:stop', () => {
       console.log(`Stopping exercise for client ${socket.id}`);
-      exerciseRunner.stop();
+      exerciseRunner.stop(socket.userId);
     });
 
     socket.on('exercise:setSpeed', (speed: number) => {

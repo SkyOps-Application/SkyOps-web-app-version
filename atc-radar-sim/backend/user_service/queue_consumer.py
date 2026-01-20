@@ -44,7 +44,8 @@ def process_history_log(data):
             timestamp=datetime.fromisoformat(data['timestamp'].replace('Z', '+00:00')),
             duration=data.get('duration', 0),
             violations=data.get('violations', 0),
-            traffic_count=data.get('traffic_count', 0)
+            traffic_count=data.get('traffic_count', 0),
+            score=data.get('score', 0)
         )
         
         db.add(history_entry)

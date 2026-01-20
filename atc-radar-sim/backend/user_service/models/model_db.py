@@ -31,6 +31,7 @@ class UserHistoryModel(Base):
     duration = Column(Integer, nullable=False, default=0) # in seconds
     violations = Column(Integer, nullable=False, default=0) # safety incidents
     traffic_count = Column(Integer, nullable=False, default=0) # total aircraft handled
+    score = Column(Integer, nullable=False, default=0) # simulation score
 
     def __repr__(self):
         return f'<History {self.id} User={self.user_id}>'

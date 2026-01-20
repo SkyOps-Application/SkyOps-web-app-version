@@ -55,7 +55,22 @@ def register_user():
         current_app.logger.error(f"Error registering user: {str(e)}")
         return jsonify({"error": "Error registering user", "details": str(e)}), 500
 
+@user_bp.route("/me", methods=["GET"])
+@jwt_required
+def get_current_user():
+    try:
+        user_id = g.user_id
+        from ..services.user_service import get_user
+        user = get_user(user_id)
+        
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+            
+        return jsonify(user.model_dump()), 200
 
+    except Exception as e:
+        current_app.logger.error(f"Error retrieving profile: {str(e)}")
+        return jsonify({"error": "Error retrieving profile"}), 500
 @user_bp.route("/history", methods=["GET"])
 @jwt_required
 def get_history():

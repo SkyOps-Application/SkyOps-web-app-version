@@ -90,6 +90,9 @@ def get_user(id: str) -> Optional[UserResponseSchema]:
         if user:
             return UserResponseSchema(
                 email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                age=user.age
             )
         return None
     finally:
@@ -113,7 +116,7 @@ def get_user_history(id: str) -> List:
                 "duration_seconds": record.duration,
                 "violations_count": record.violations,
                 "traffic_count": record.traffic_count,
-                "score": max(0, 100 - (record.violations * 10)) # content score
+                "score": record.score
             })
         return history
     finally:

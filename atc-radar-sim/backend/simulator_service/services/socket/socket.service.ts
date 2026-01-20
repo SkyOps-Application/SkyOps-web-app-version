@@ -37,11 +37,7 @@ class SocketService {
             const token = socket.handshake.auth.token;
 
             if (!token) {
-                // Allow anonymous for now if needed, or error out
                 console.log('No token provided, treating as guest/anonymous');
-                // socket.userId = 'guest-' + socket.id; 
-                // Alternatively, error out: 
-                // return next(new Error('Authentication failed'));
                 return next();
             }
 
@@ -51,10 +47,6 @@ class SocketService {
                     return next(new Error('Authentication error'));
                 }
 
-                // Assuming payload has 'sub' as userId or similar. 
-                // Check user_service/routes/auth_route.py for payload structure.
-                // Usually Flask-JWT-Extended uses 'sub' (subject) or custom claims.
-                // Let's assume 'sub' is the user ID.
                 socket.userId = decoded.sub;
                 console.log(`Socket Auth Success: User ${socket.userId} connected`);
                 next();

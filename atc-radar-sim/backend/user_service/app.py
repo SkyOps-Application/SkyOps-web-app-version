@@ -6,6 +6,8 @@ from .database import init_db
 from .routes import user_bp, auth_bp
 import os
 import sys
+from flask_cors import CORS
+
 sys.stdout.reconfigure(line_buffering=True)
 
 # Configure logging
@@ -15,8 +17,10 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
+
 # Flask app
 app = Flask(__name__)
+CORS(app) # Enable CORS for all routes
 app.logger.setLevel(logging.DEBUG)
 
 
