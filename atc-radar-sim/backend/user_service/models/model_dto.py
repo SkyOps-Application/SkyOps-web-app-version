@@ -36,6 +36,7 @@ class LoginSchema(BaseModel):
 
 class UserHistorySchema(BaseModel):
     email: str
+    score: int = 0
     history: List[dict] = []
 
 class ForgotPasswordSchema(BaseModel):

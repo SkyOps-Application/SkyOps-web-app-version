@@ -63,7 +63,8 @@ export default function ProfilePage() {
                 // For now, I'll put placeholders and likely fix this in next turn if endpoints are missing.
                 
                 // TEMPORARY: Just try to fetch history assuming authentication works on /users/history
-                const historyRes = await fetch('http://localhost:8000/users/history', {
+                // Corrected endpoint based on user_service routes
+                const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/history`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (historyRes.ok) {

@@ -113,7 +113,7 @@ def get_user_history(id: str) -> List:
                 "duration_seconds": record.duration,
                 "violations_count": record.violations,
                 "traffic_count": record.traffic_count,
-                "score": max(0, 100 - (record.violations * 10)) # content score
+                "score": record.score
             })
         return history
     finally:
