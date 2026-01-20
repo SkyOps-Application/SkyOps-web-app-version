@@ -37,4 +37,24 @@ class LoginSchema(BaseModel):
 class UserHistorySchema(BaseModel):
     email: str
     history: List[dict] = []
+
+class ForgotPasswordSchema(BaseModel):
+    email: str
+
+class ResetPasswordSchema(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+    new_password: str
+
+    @field_validator('new_password')
+    @classmethod
+    def validate_password(cls, v):
+        if len(v) <= 8:
+            raise ValueError(f'Password must be longer than 8 characters (received {len(v)})')
+        if not any(char.isdigit() for char in v):
+            raise ValueError('Password must contain at least one number')
+        if not any(char.isalpha() for char in v):
+            raise ValueError('Password must contain at least one letter')
+        return v
     

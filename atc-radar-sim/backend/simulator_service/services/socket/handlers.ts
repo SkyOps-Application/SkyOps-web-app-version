@@ -493,12 +493,14 @@ export function setupSocketHandlers(
     });
 
     socket.on('session:end', () => {
-      exerciseRunner.stop();
+      exerciseRunner.stop(socket.userId);
     });
 
     // Handle disconnect
     socket.on('disconnect', (reason) => {
       console.log(`Client disconnected: ${socket.id} (${reason})`);
+      // Optional: Stop exercise on disconnect if single-player
+      exerciseRunner.stop(socket.userId);
     });
   });
 }

@@ -3,6 +3,7 @@ import { sendEmail } from './services/email.service';
 
 import { render } from '@react-email/render';
 import { WelcomeEmail } from './templates/welcome';
+import { ResetPasswordEmail } from './templates/reset_password';
 
 
 const QUEUE_NAME = 'notification_queue';
@@ -20,6 +21,11 @@ async function processQueue() {
         if (data.type === 'WELCOME') {
           const emailHtml = await render(WelcomeEmail({ first_name: data.first_name || 'Pilot' }));
           await sendEmail(data.email, 'Welcome to SkyOps!', emailHtml);
+        } else if (data.type === 'PASSWORD_RESET') {
+          const emailHtml = await render(ResetPasswordEmail({
+            first_name: data.first_name || 'Pilot'
+          }));
+          await sendEmail(data.email, 'Reset your SkyOps Password', emailHtml);
         }
       }
     } catch (error) {

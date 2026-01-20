@@ -1,8 +1,11 @@
 
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
-from ..models.model_dto import LoginSchema, TokenSchema
+from ..models.model_dto import LoginSchema, TokenSchema, ForgotPasswordSchema, ResetPasswordSchema
 from ..services.auth_service import authenticate_user, create_access_token
+from ..services.user_service import get_user_by_email, update_password
+from ..services.redis_service import RedisService
+
 import datetime
 
 auth_bp = Blueprint('auth', __name__)
@@ -10,7 +13,6 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route("/oauth/token", methods=["POST"])
 def login():
     try:
-        # Check if content type is application/x-www-form-urlencoded (OAuth standard)
         content_type = request.headers.get('Content-Type', '')
         if 'application/x-www-form-urlencoded' in content_type:
             login_data = {
@@ -51,3 +53,51 @@ def login():
         return jsonify({"error": "Invalid login data", "details": e.errors()}), 400
     except Exception as e:
         return jsonify({"error": "Error logging in", "details": str(e)}), 500
+
+@auth_bp.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    try:
+        data = request.get_json()
+        schema = ForgotPasswordSchema(**data)
+        
+        user = get_user_by_email(schema.email)
+        if not user:
+            return jsonify({"message": "If this email is registered, a password reset link has been sent."}), 200
+
+        redis_service = RedisService()
+        email_task = {
+            "type": "PASSWORD_RESET",
+            "email": user.email,
+            "first_name": user.first_name
+        }
+        redis_service.add_to_queue("notification_queue", email_task)
+        
+        return jsonify({"message": "If this email is registered, a password reset link has been sent."}), 200
+        
+    except ValidationError as e:
+        return jsonify({"error": "Invalid data", "details": e.errors()}), 400
+    except Exception as e:
+        return jsonify({"error": "Error processing request", "details": str(e)}), 500
+
+@auth_bp.route("/reset-password", methods=["POST"])
+def reset_password():
+    try:
+        data = request.get_json()
+        schema = ResetPasswordSchema(**data)
+        
+        user = get_user_by_email(schema.email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+             
+        if (user.first_name.strip().lower() != schema.first_name.strip().lower() or 
+            user.last_name.strip().lower() != schema.last_name.strip().lower()):
+            return jsonify({"error": "Identity verification failed. Name does not match records."}), 403
+            
+        update_password(user.id, schema.new_password)
+        
+        return jsonify({"message": "Password updated successfully"}), 200
+
+    except ValidationError as e:
+        return jsonify({"error": "Invalid data", "details": e.errors()}), 400
+    except Exception as e:
+        return jsonify({"error": "Error resetting password", "details": str(e)}), 500
