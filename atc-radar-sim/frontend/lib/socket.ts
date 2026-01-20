@@ -10,36 +10,41 @@ let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 export function getSocket(): Socket<ServerToClientEvents, ClientToServerEvents> {
   if (!socket) {
     const url = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:4000';
-    
+
     console.log('Creating socket connection to:', url);
-    
+
     socket = io(url, {
       autoConnect: false,
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
       reconnectionAttempts: Infinity,
+      auth: (cb) => {
+        // Retrieve token from localStorage on every connection attempt
+        const token = localStorage.getItem('access_token');
+        cb({ token });
+      }
     });
-    
+
     // Connection event handlers
     socket.on('connect', () => {
       console.log('Connected to server - Socket ID:', socket?.id);
     });
-    
+
     socket.on('disconnect', (reason) => {
       console.log('Disconnected from server:', reason);
     });
-    
+
     socket.on('connect_error', (error) => {
       console.error('Connection error:', error.message);
       console.error('Make sure backend is running on http://localhost:4000');
     });
-    
+
     socket.on('error', (error) => {
       console.error('Socket error:', error);
     });
   }
-  
+
   return socket;
 }
 
