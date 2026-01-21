@@ -1,9 +1,9 @@
 import logging
 from flask import Flask
 
-from .queue_consumer import start_consumer
-from .database import init_db
-from .routes import user_bp, auth_bp
+from queue_consumer import start_consumer
+from database import init_db
+from routes import user_bp, auth_bp
 import os
 import sys
 from flask_cors import CORS

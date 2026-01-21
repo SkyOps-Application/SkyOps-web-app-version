@@ -75,7 +75,7 @@ export default function LandingPage() {
         </div>
       </main>
 
-      {/* Copyright Footer */}
+      {/* Copyright */}
       <footer className="relative z-10 pb-6 text-center">
         <p className="text-white text-sm drop-shadow-lg">
           Copyright by Tien Quoc Bui and Phuong Khanh Pham

@@ -10,7 +10,7 @@ export class ExerciseController {
     }
 
     static getById(req: Request, res: Response) {
-        const id = parseInt(req.params.id);
+        const id = parseInt(req.params.id as string);
         const exercise = id === 1 ? EXERCISE_1 : id === 2 ? EXERCISE_2 : null;
 
         if (exercise) {

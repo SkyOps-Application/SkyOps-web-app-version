@@ -1,0 +1,15 @@
+node_modules
+dist
+.next
+.git
+.DS_Store
+.env
+.venv
+__pycache__
+*.pyc
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+coverage
+.vscode
+.idea

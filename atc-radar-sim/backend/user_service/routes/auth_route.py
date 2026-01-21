@@ -1,12 +1,12 @@
 
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
-from ..models.model_dto import LoginSchema, TokenSchema, ForgotPasswordSchema, ResetPasswordSchema
-from ..services.auth_service import authenticate_user, create_access_token
-from ..services.user_service import get_user_by_email, update_password
-from ..services.redis_service import RedisService
+from models.model_dto import LoginSchema, TokenSchema, ForgotPasswordSchema, ResetPasswordSchema
+from services.auth_service import authenticate_user, create_access_token
+from services.user_service import get_user_by_email, update_password
+from services.redis_service import RedisService
 
-import datetime
+from datetime import datetime, timezone
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -33,7 +33,7 @@ def login():
             "sub": user.id,
             "name": user.last_name,
             "iss": "skyops-api", 
-            "iat": datetime.datetime.now(datetime.UTC), 
+            "iat": datetime.now(timezone.utc), 
         }
         
         access_token = create_access_token(
@@ -52,6 +52,9 @@ def login():
     except ValidationError as e:
         return jsonify({"error": "Invalid login data", "details": e.errors()}), 400
     except Exception as e:
+        import traceback
+        print(f"Login failed: {str(e)}")
+        traceback.print_exc()
         return jsonify({"error": "Error logging in", "details": str(e)}), 500
 
 @auth_bp.route("/forgot-password", methods=["POST"])
