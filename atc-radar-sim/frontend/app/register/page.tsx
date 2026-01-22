@@ -4,6 +4,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { AuroraInput } from '@/components/AuroraInput';
+import { GlassBackground } from '@/components/GlassBackground';
+import { GridOverlay } from '@/components/GridOverlay';
+import Image from 'next/image';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -63,132 +67,169 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0C2D57] px-4 py-8">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl">
-        <h1 className="text-3xl font-bold text-center text-[#0C2D57] mb-6">Create Account</h1>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-            <span className="block sm:inline">{error}</span>
+    <GlassBackground>
+      <GridOverlay opacity={0.04} />
+      
+      <div className="min-h-screen flex items-center justify-center px-6 py-16">
+        <div className="w-full max-w-2xl space-y-12">
+          {/* Logo and Title */}
+          <div className="text-center space-y-10 animate-fadeIn">
+            <div className="flex justify-center">
+              <div className="relative">
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-2xl opacity-60 animate-pulse" />
+                <div className="relative w-36 h-36 flex items-center justify-center">
+                  <Image
+                    src="/mainlogo.png"
+                    alt="SkyOps Logo"
+                    width={140}
+                    height={140}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h1 className="text-6xl font-bold text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
+                Create Account
+              </h1>
+              <p className="text-xl text-gray-400 font-medium">Join SkyOps today</p>
+            </div>
           </div>
-        )}
 
-        <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-           {/* Left Column */}
-           <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="first_name">
-                  First Name
-                </label>
-                <input
-                  id="first_name"
-                  type="text"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder="John"
-                  required
-                />
+          {/* Register Card */}
+          <div className="glass-strong rounded-3xl px-10 py-12 shadow-2xl animate-fadeIn">
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-5 py-4 rounded-xl backdrop-blur-sm mb-10" role="alert">
+                <span className="block sm:inline text-sm">{error}</span>
               </div>
-              
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="last_name">
-                  Last Name
-                </label>
-                <input
-                  id="last_name"
-                  type="text"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder="Doe"
-                  required
-                />
-              </div>
+            )}
 
-               <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="age">
-                  Age
-                </label>
-                <input
-                  id="age"
-                  type="number"
-                  value={formData.age}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder="25"
-                />
-              </div>
-           </div>
+            <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+              {/* Left Column */}
+              <div className="flex flex-col gap-8">
+                <div>
+                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="first_name">
+                    First Name
+                  </label>
+                  <AuroraInput
+                    id="first_name"
+                    type="text"
+                    value={formData.first_name}
+                    onChange={handleChange}
+                    placeholder="John"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="last_name">
+                    Last Name
+                  </label>
+                  <AuroraInput
+                    id="last_name"
+                    type="text"
+                    value={formData.last_name}
+                    onChange={handleChange}
+                    placeholder="Doe"
+                    required
+                  />
+                </div>
 
-           {/* Right Column */}
-           <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder="pilot@skyops.com"
-                  required
-                />
+                <div>
+                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="age">
+                    Age
+                  </label>
+                  <AuroraInput
+                    id="age"
+                    type="number"
+                    value={formData.age}
+                    onChange={handleChange}
+                    placeholder="25"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder="******************"
-                  required
-                />
+              {/* Right Column */}
+              <div className="flex flex-col gap-8">
+                <div>
+                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="email">
+                    Email Address
+                  </label>
+                  <AuroraInput
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="pilot@skyops.com"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="password">
+                    Password
+                  </label>
+                  <AuroraInput
+                    id="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Enter your password"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="confirmPassword">
+                    Confirm Password
+                  </label>
+                  <AuroraInput
+                    id="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Confirm your password"
+                    required
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
-                  Confirm Password
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder="******************"
-                  required
-                />
+              {/* Full Width Button */}
+              <div className="md:col-span-2 mt-8">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`
+                    w-full h-14 rounded-full font-semibold text-lg
+                    bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
+                    hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
+                    text-white
+                    transition-all duration-300
+                    shadow-lg hover:shadow-xl hover:scale-[0.98]
+                    ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+                  `}
+                >
+                  {loading ? 'Creating Account...' : 'Register'}
+                </button>
               </div>
-           </div>
+            </form>
 
-           {/* Full Width Button */}
-           <div className="md:col-span-2 mt-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className={`w-full bg-[#0C2D57] hover:bg-[#1a3d6f] text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              {loading ? 'Creating Account...' : 'Register'}
-            </button>
-           </div>
-        </form>
-
-        <div className="mt-4 text-center">
-            <p className="text-gray-600 text-sm">
-                Already have an account? <Link href="/login" className="text-blue-500 hover:text-blue-700 font-bold">Login</Link>
-            </p>
+            <div className="mt-10 pt-8 text-center border-t border-white/10">
+              <p className="text-white/60 text-sm">
+                Already have an account?{' '}
+                <Link 
+                  href="/login" 
+                  className="text-[#18c3e8] hover:text-[#5e879e] font-semibold transition-colors"
+                >
+                  Login
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </GlassBackground>
   );
 }
