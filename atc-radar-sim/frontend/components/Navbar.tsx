@@ -1,12 +1,16 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { SFSymbol } from './SFSymbol';
 
 export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const pathname = usePathname();
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -19,66 +23,88 @@ export function Navbar() {
     return () => window.removeEventListener('storage', checkAuth);
   }, []);
 
+  useEffect(() => {
+    // Add nav item click handler for active state
+    const navItems = navRef.current?.querySelectorAll('.nav-item');
+    if (navItems) {
+      navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          // Update active state on click
+          const target = e.currentTarget as HTMLElement;
+          navItems.forEach(navItem => navItem.classList.remove('active'));
+          target.classList.add('active');
+        });
+      });
+      
+      return () => {
+        navItems.forEach(item => {
+          item.removeEventListener('click', () => {});
+        });
+      };
+    }
+  }, [pathname]);
+
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     setIsLoggedIn(false);
     window.location.href = '/login';
   };
 
-  if (!isLoggedIn) return null; // Only show Navbar if logged in (or handle differently on landing?)
-  // Actually, user might want Navbar on landing too but customized. 
-  // For now, based on request "home view thì sẽ có cái nav bar", implying it belongs to app pages.
-  // But landing page had navbar before. 
-  // Let's assume on Landing page we DON'T show this specific App Navbar, or we make it smart.
-  // The Landing Page I wrote doesn't use Navbar.
-  // So this Navbar is for the App (/home, /about, etc).
+  if (!isLoggedIn) return null;
 
   return (
-    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-7xl">
-      <div className="bg-white/10 backdrop-blur-lg rounded-3xl px-8 py-4 shadow-2xl border border-white/20 hover:bg-white/15 transition-colors duration-300">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/home" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <Image
-              src="/mainlogo.png"
-              alt="ATC Logo"
-              width={140}
-              height={56}
-              className="h-14 w-auto"
-            />
-          </Link>
-
-          {/* Navigation Items */}
-          <div className="flex items-center gap-8">
-            <Link
-              href="/about"
-              className="text-white font-semibold text-lg hover:text-[#ffde59] transition-colors"
-            >
-              About
+    <nav ref={navRef} className="fixed top-6 left-0 right-0 z-[100] flex justify-center px-6">
+      <div className="glass-nav">
+        <div className="glass-filter"></div>
+        <div className="glass-overlay"></div>
+        <div className="glass-specular"></div>
+        <div className="glass-content">
+          <div className="flex items-center justify-between w-full">
+            {/* Logo */}
+            <Link href="/home" className="flex items-center gap-3 hover:opacity-90 transition-opacity flex-shrink-0">
+              <Image
+                src="/SkyOps-logo-text.png"
+                alt="SkyOps Logo"
+                width={140}
+                height={35}
+                className="h-9 w-auto"
+              />
             </Link>
 
-            <Link
-              href="/profile"
-              className="text-white font-semibold text-lg hover:text-[#ffde59] transition-colors"
-            >
-              Profiles
-            </Link>
-
-            <Link
-              href="/exercises"
-              className="text-white font-semibold text-lg hover:text-[#ffde59] transition-colors"
-            >
-              Exercises
-            </Link>
+            {/* Navigation Items */}
+            <ul className="nav-list flex-1">
+              <li>
+                <Link
+                  href="/about"
+                  className={`nav-item ${pathname === '/about' ? 'active' : ''}`}
+                >
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/profile"
+                  className={`nav-item ${pathname === '/profile' ? 'active' : ''}`}
+                >
+                  Profiles
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/exercises"
+                  className={`nav-item ${pathname === '/exercises' ? 'active' : ''}`}
+                >
+                  Exercises
+                </Link>
+              </li>
+            </ul>
 
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="bg-[#ffde59] text-[#10396f] font-bold px-7 py-2.5 rounded-full hover:bg-[#ffd700] hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
+              className="bg-[#ffde59] text-[#10396f] font-bold px-6 py-2 rounded-full hover:bg-[#ffd700] hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2 flex-shrink-0 ml-6"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clipRule="evenodd" />
-              </svg>
+              <SFSymbol name="arrow.right" className="w-5 h-5" size={20} />
               Logout
             </button>
           </div>
