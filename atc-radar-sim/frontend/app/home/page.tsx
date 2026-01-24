@@ -3,7 +3,6 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { Navbar } from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
@@ -46,7 +45,7 @@ export default function HomePage() {
     <GlassBackground>
       <GridOverlay opacity={0.04} />
       
-      <Navbar position="bottom" />
+      
 
       <main className="relative z-10 w-full flex flex-col items-center min-h-screen px-6 pt-24 pb-40">
         <div className="w-full max-w-6xl mx-auto flex flex-col items-center">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "ATC Radar Simulation - Double Quebec Alpha",
@@ -24,6 +25,7 @@ export default function RootLayout({
             <feDisplacementMap in="SourceGraphic" in2="noise" scale="77" />
           </filter>
         </svg>
+        <Navbar />
         {children}
       </body>
     </html>

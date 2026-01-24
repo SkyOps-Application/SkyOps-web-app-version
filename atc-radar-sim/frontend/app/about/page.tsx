@@ -2,11 +2,11 @@
 'use client';
 
 import React from 'react';
-import { Navbar } from '@/components/Navbar';
 import Image from 'next/image';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
 import { SFSymbol } from '@/components/SFSymbol';
+import { Navbar } from '@/components/Navbar';
 
 export default function AboutPage() {
   return (
@@ -26,7 +26,7 @@ export default function AboutPage() {
 
       <Navbar />
 
-      <main className="relative z-10 w-full flex flex-col items-center min-h-screen pt-40 px-6 pb-24">
+      <main className="relative z-10 w-full flex flex-col items-center min-h-screen pt-24 px-6 pb-40">
         <div className="w-full max-w-5xl mx-auto space-y-16">
           {/* Header */}
           <div className="text-center space-y-12">

@@ -2,10 +2,10 @@
 'use client';
 
 import React from 'react';
-import { Navbar } from '@/components/Navbar';
 import Image from 'next/image';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
+import { Navbar } from '@/components/Navbar';
 
 export default function InstructionsPage() {
   return (
@@ -19,7 +19,7 @@ export default function InstructionsPage() {
 
       <Navbar />
 
-      <main className="relative z-10 w-full flex flex-col items-center min-h-screen pt-40 px-6 pb-24">
+      <main className="relative z-10 w-full flex flex-col items-center min-h-screen pt-24 px-6 pb-40">
         <div className="w-full max-w-5xl mx-auto">
         <h1 className="text-6xl md:text-7xl font-bold mb-20 text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
           Radar Instructions
