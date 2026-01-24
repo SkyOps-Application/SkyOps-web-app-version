@@ -11,19 +11,19 @@ export interface TrainingSession {
   startTime: Date;
   endTime?: Date;
   status: SessionStatus;
-  
+
   // Performance metrics
   commandsIssued: number;
   correctCommands: number;
   separationViolations: number;
   averageResponseTime: number; // milliseconds
-  
+
   // Recording
   events: SessionEvent[];
   score?: number;
 }
 
-export type SessionStatus = 
+export type SessionStatus =
   | 'ACTIVE'
   | 'PAUSED'
   | 'COMPLETED'
@@ -48,7 +48,8 @@ export type EventType =
   | 'HANDOFF_INITIATED'
   | 'HANDOFF_ACCEPTED'
   | 'TIME_UPDATE'
-  | 'DISTANCE_RESULT';
+  | 'DISTANCE_RESULT'
+  | 'SCORE_UPDATE';
 
 export interface Exercise {
   id: string;

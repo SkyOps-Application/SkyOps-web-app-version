@@ -4,12 +4,18 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { AuroraInput } from '@/components/AuroraInput';
+import { GlassBackground } from '@/components/GlassBackground';
+import { GridOverlay } from '@/components/GridOverlay';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [emailActive, setEmailActive] = useState(false);
+  const [passwordActive, setPasswordActive] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -43,70 +49,119 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0C2D57] px-4">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-[#0C2D57] mb-6">Login</h1>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="pilot@skyops.com"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="******************"
-              required
-            />
+    <GlassBackground>
+      <GridOverlay opacity={0.04} />
+      
+      <div className="min-h-screen flex items-center justify-center px-6 py-16">
+        <div className="w-full max-w-md space-y-12">
+          {/* Logo and Title */}
+          <div className="text-center space-y-10 animate-fadeIn">
+            <div className="flex justify-center">
+              <div className="relative">
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-2xl opacity-60 animate-pulse" />
+                <div className="relative w-36 h-36 flex items-center justify-center">
+                  <Image
+                    src="/mainlogo.png"
+                    alt="SkyOps Logo"
+                    width={140}
+                    height={140}
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h1 className="text-6xl font-bold text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
+                SkyOps
+              </h1>
+              <p className="text-xl text-gray-400 font-medium">Air Traffic Control Simulator</p>
+            </div>
           </div>
 
-          <div className="flex justify-end">
-             <Link href="#" className="text-sm text-blue-500 hover:text-blue-800">
-                Forgot Password?
-             </Link>
+          {/* Login Card */}
+          <div className="glass-strong rounded-3xl px-10 py-12 shadow-2xl animate-fadeIn">
+            <h2 className="text-3xl font-bold text-center text-white mb-10">Sign In</h2>
+            
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-5 py-4 rounded-xl backdrop-blur-sm mb-8" role="alert">
+                <span className="block sm:inline text-sm">{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="flex flex-col gap-8">
+              <div>
+                <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="email">
+                  Email Address
+                </label>
+                <AuroraInput
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="pilot@skyops.com"
+                  isActive={emailActive}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="password">
+                  Password
+                </label>
+                <AuroraInput
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  isActive={passwordActive}
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end">
+                <Link 
+                  href="/forgot-password" 
+                  className="text-sm text-white/70 hover:text-white/100 transition-colors font-medium"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={`
+                  w-full h-14 rounded-full font-semibold text-lg
+                  bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
+                  hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
+                  text-white
+                  transition-all duration-300
+                  shadow-lg hover:shadow-xl hover:scale-[0.98]
+                  mt-2
+                  ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                {loading ? 'Signing In...' : 'Sign In'}
+              </button>
+            </form>
+
+            <div className="mt-10 pt-8 text-center border-t border-white/10">
+              <p className="text-white/60 text-sm">
+                Don't have an account?{' '}
+                <Link 
+                  href="/register" 
+                  className="text-[#18c3e8] hover:text-[#5e879e] font-semibold transition-colors"
+                >
+                  Register
+                </Link>
+              </p>
+            </div>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full bg-[#0C2D57] hover:bg-[#1a3d6f] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {loading ? 'Signing In...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center">
-            <p className="text-gray-600 text-sm">
-                Don't have an account? <Link href="/register" className="text-blue-500 hover:text-blue-700 font-bold">Register</Link>
-            </p>
         </div>
       </div>
-    </div>
+    </GlassBackground>
   );
 }

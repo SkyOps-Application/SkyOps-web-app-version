@@ -1,13 +1,15 @@
 from flask import Blueprint, request, jsonify, g, current_app
 from pydantic import ValidationError
 
-from ..models.model_dto import UserSchema, UserResponseSchema
-from ..services.user_service import (
-    create_user as create_user_service,
-    get_user_history,
+from models.model_dto import UserSchema, UserResponseSchema
+from services.user_service import (
+    create_user,
+    get_user,
+    get_all_users,
+    get_user_history, # Kept this as it's used later
 )
-from ..services.auth_service import jwt_required
-from ..services.redis_service import RedisService
+from services.auth_service import jwt_required
+from services.redis_service import RedisService
 import os
 
 user_bp = Blueprint('user', __name__)
@@ -18,7 +20,7 @@ def register_user():
         data = request.get_json()
         
         register_schema = UserSchema(**data)
-        new_user = create_user_service(register_schema)
+        new_user = create_user(register_schema)
         
         current_app.logger.info(f"Registered new user: {register_schema.email}")
         
@@ -60,7 +62,7 @@ def register_user():
 def get_current_user():
     try:
         user_id = g.user_id
-        from ..services.user_service import get_user
+        from services.user_service import get_user
         user = get_user(user_id)
         
         if not user:

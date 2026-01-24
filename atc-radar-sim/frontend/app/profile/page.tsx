@@ -4,6 +4,8 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar } from '@/components/Navbar';
 import Image from 'next/image';
+import { GlassBackground } from '@/components/GlassBackground';
+import { GridOverlay } from '@/components/GridOverlay';
 
 interface UserProfile {
     id: string;
@@ -34,6 +36,7 @@ interface HistoryRecord {
     violation_details?: Violation[];
 }
 
+
 export default function ProfilePage() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [history, setHistory] = useState<HistoryRecord[]>([]);
@@ -42,28 +45,20 @@ export default function ProfilePage() {
     useEffect(() => {
         const fetchData = async () => {
             const token = localStorage.getItem('access_token');
-            if (!token) return; // Auth handled by Navbar/Home redirect usually, but safe to check
+            if (!token) return;
 
             try {
-                // Fetch Profile (Assume we have an endpoint or derive from me)
-                // For now, I'll mock observing there isn't a direct /me endpoint in my memory, 
-                // but usually OAuth/JWT has this. 
-                // I will try to fetch from a hypothetic /users/me or decode token?
-                // Actually, I'll use the user_service endpoints.
+                // Fetch Profile
+                const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
                 
-                // Oops, I didn't create a /users/me endpoint in user_service.
-                // I will assume for now we might fail at this step if the endpoint is missing.
-                // But let's check /history first which I was supposed to verify.
-                
+                if (profileRes.ok) {
+                    const pData = await profileRes.json();
+                    setProfile(pData);
+                }
+
                 // Fetch History
-                // The implementation plan for history was verify_user_service history retrieval.
-                // Let's assume GET /users/{id}/history or /history/me
-                
-                // I'll check user_service/routes/user_route.py carefully in next steps if needed.
-                // For now, I'll put placeholders and likely fix this in next turn if endpoints are missing.
-                
-                // TEMPORARY: Just try to fetch history assuming authentication works on /users/history
-                // Corrected endpoint based on user_service routes
                 const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/history`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -72,9 +67,6 @@ export default function ProfilePage() {
                     setHistory(hData);
                 }
 
-                // Temporary Profile Mock or Fetch
-                // I'll decode the token if possible or just use what I have.
-                // Since I can't decode easily without lib, I'll just show what I can or fetch list.
             } catch (e) {
                 console.error("Failed to fetch data", e);
             } finally {
@@ -86,57 +78,77 @@ export default function ProfilePage() {
     }, []);
 
   return (
-    <div className="min-h-screen relative bg-[#0C2D57]">
+    <GlassBackground>
+      <GridOverlay opacity={0.04} />
+      
       <div className="fixed inset-0 z-0">
-         <Image src="/background-web.png" alt="Background" fill className="object-cover opacity-20" priority />
+         <Image src="/background-web.png" alt="Background" fill className="object-cover opacity-15" priority />
       </div>
 
       <Navbar />
 
-      <main className="relative z-10 flex flex-col items-center min-h-screen pt-32 px-6 max-w-6xl mx-auto w-full">
-         <div className="w-full bg-white/10 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20">
+      <main className="relative z-20 w-full min-h-screen pt-40 px-6 pb-24">
+         <div className="max-w-6xl mx-auto">
+           <div className="w-full glass-strong rounded-3xl p-10 shadow-2xl mt-8 relative z-20">
              {/* Header */}
-             <div className="flex items-center gap-6 mb-10 border-b border-white/10 pb-8">
-                <div className="w-24 h-24 bg-[#ffde59] rounded-full flex items-center justify-center text-4xl font-bold text-[#0C2D57]">
-                    P
+             <div className="flex flex-col md:flex-row items-center md:items-start gap-12 mb-16 border-b border-white/10 pb-12">
+                <div className="w-36 h-36 bg-gradient-to-br from-[#ffde59] to-[#ffd200] rounded-full flex items-center justify-center text-6xl font-bold text-[#0C2D57] shadow-xl">
+                    {profile ? profile.first_name[0].toUpperCase() : 'P'}
                 </div>
-                <div>
-                    <h1 className="text-4xl font-bold text-white">Pilot Profile</h1>
-                    <p className="text-blue-200">View your stats and history</p>
+                <div className="flex-1 text-center md:text-left space-y-4">
+                    <h1 className="text-5xl font-bold text-white tracking-tight">
+                        {profile ? `${profile.first_name} ${profile.last_name}` : 'Pilot Profile'}
+                    </h1>
+                    <div className="flex flex-col md:flex-row gap-6 text-gray-300 justify-center md:justify-start text-lg">
+                        {profile && (
+                            <>
+                                <span className="flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                                    </svg>
+                                    {profile.email}
+                                </span>
+                                <span className="hidden md:inline">•</span>
+                                <span>Age: {profile.age}</span>
+                            </>
+                        )}
+                        {!profile && <span>View your stats and history</span>}
+                    </div>
                 </div>
              </div>
 
              {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-black/20 rounded-2xl p-6 text-center">
-                    <h3 className="text-blue-200 uppercase text-sm font-bold tracking-wider mb-2">Total Sessions</h3>
-                    <p className="text-4xl font-bold text-white">{history.length}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+                    <h3 className="text-gray-400 uppercase text-xs font-bold tracking-wider mb-6">Total Sessions</h3>
+                    <p className="text-5xl font-bold text-white">{history.length}</p>
                 </div>
-                 <div className="bg-black/20 rounded-2xl p-6 text-center">
-                    <h3 className="text-blue-200 uppercase text-sm font-bold tracking-wider mb-2">Total Flight Time</h3>
-                    <p className="text-4xl font-bold text-white">
+                 <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+                    <h3 className="text-gray-400 uppercase text-xs font-bold tracking-wider mb-6">Total Flight Time</h3>
+                    <p className="text-5xl font-bold text-white">
                         {Math.floor(history.reduce((acc, curr) => acc + curr.duration_seconds, 0) / 60)}m
                     </p>
                 </div>
-                 <div className="bg-black/20 rounded-2xl p-6 text-center">
-                    <h3 className="text-blue-200 uppercase text-sm font-bold tracking-wider mb-2">Avg Safety Score</h3>
-                    <p className="text-4xl font-bold text-white">
-                        {history.length > 0 ? Math.round(history.reduce((acc, curr) => acc + (curr.score || 0), 0) / history.length) : 'N/A'}
+                 <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
+                    <h3 className="text-gray-400 uppercase text-xs font-bold tracking-wider mb-6">Avg Safety Score</h3>
+                    <p className="text-5xl font-bold text-white">
+                        {history.length > 0 ? Math.round(history.reduce((acc, curr) => acc + (curr.score || 0), 0) / history.length) : '0'}
                     </p>
                 </div>
             </div>
 
             {/* History Table */}
-            <h2 className="text-2xl font-bold text-white mb-6">Simulation History</h2>
-            <div className="overflow-x-auto">
+            <h2 className="text-3xl font-bold text-white mb-10 tracking-tight">Simulation History</h2>
+            <div className="overflow-x-auto rounded-xl border border-white/10">
                 <table className="w-full text-left text-white/90">
                     <thead className="bg-white/5 uppercase text-sm font-bold text-blue-200">
                         <tr>
-                            <th className="px-6 py-4 rounded-tl-xl">Date</th>
+                            <th className="px-6 py-4">Date</th>
                             <th className="px-6 py-4">Duration</th>
                             <th className="px-6 py-4">Traffic</th>
                             <th className="px-6 py-4">Violations</th>
-                            <th className="px-6 py-4 rounded-tr-xl">Score</th>
+                            <th className="px-6 py-4">Score</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-white/10">
@@ -155,15 +167,16 @@ export default function ProfilePage() {
                                             {record.violations_count}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 font-bold">{record.score}</td>
+                                    <td className="px-6 py-4 font-bold text-[#ffde59]">{record.score}</td>
                                 </tr>
                             ))
                         )}
                     </tbody>
                 </table>
             </div>
+           </div>
          </div>
       </main>
-    </div>
+    </GlassBackground>
   );
 }

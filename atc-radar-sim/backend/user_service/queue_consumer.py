@@ -2,9 +2,9 @@ import logging
 import threading
 import time
 from flask import Flask
-from .services.redis_service import RedisService
-from .database import db_session
-from .models.model_db import UserHistoryModel, UserModel
+from services.redis_service import RedisService
+from database import db_session
+from models.model_db import UserHistoryModel, UserModel
 from datetime import datetime
 
 logger = logging.getLogger(__name__)

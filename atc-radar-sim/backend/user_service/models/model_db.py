@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime # type: ignore
 from sqlalchemy.orm import relationship # type: ignore
-from ..database import Base
+from database import Base
 import uuid
 from datetime import datetime
 
@@ -18,7 +18,7 @@ class UserModel(Base):
     history = relationship('UserHistoryModel', backref='user', lazy=True)
 
     def __repr__(self):
-        return f"<User(email='{self.email}', name='{self.name}', role='{self.role}', plan='{self.plan}')>"
+        return f"<User(email='{self.email}', name='{self.first_name} {self.last_name}')>"
     
 class UserHistoryModel(Base):
     __tablename__ = "user_history"

@@ -23,6 +23,6 @@ def get_db():
         db.close()
 
 def init_db():
-    from .models.model_db import UserHistoryModel, UserModel
+    from models.model_db import UserHistoryModel, UserModel
     
     Base.metadata.create_all(bind=engine) 

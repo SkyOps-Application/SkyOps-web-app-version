@@ -251,9 +251,10 @@ export function parseTime(timeStr: string): number {
  * Format minutes since midnight to HH:MM:SS
  */
 export function formatTime(minutes: number): string {
-  const hrs = Math.floor(minutes / 60);
-  const mins = Math.floor(minutes % 60);
-  const secs = Math.floor((minutes % 1) * 60);
+  const totalSeconds = Math.round(minutes * 60);
+  const hrs = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
   return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 

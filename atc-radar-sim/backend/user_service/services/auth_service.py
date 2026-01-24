@@ -4,9 +4,9 @@ import os
 from typing import Optional, Callable
 from functools import wraps
 from flask import request, jsonify, g # type: ignore
-from ..models.model_db import UserModel
-from ..database import db_session
-from .user_service import hash_password
+from models.model_db import UserModel
+from database import db_session
+from services.user_service import hash_password
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8

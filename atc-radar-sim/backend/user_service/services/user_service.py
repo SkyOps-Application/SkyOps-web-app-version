@@ -1,6 +1,6 @@
-from ..models.model_dto import UserSchema, UserResponseSchema
-from ..models.model_db import UserModel
-from ..database import db_session
+from models.model_dto import UserSchema, UserResponseSchema
+from models.model_db import UserModel
+from database import db_session
 from typing import List, Optional, Union
 
 import hashlib
@@ -143,5 +143,21 @@ def update_password(user_id: str, new_password: str):
     except Exception as e:
         db.rollback()
         raise e
+    finally:
+        db.close()
+
+def get_all_users() -> List[UserResponseSchema]:
+    """Retrieve all users"""
+    db = db_session()
+    try:
+        users = db.query(UserModel).all()
+        return [
+            UserResponseSchema(
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                age=user.age
+            ) for user in users
+        ]
     finally:
         db.close()
