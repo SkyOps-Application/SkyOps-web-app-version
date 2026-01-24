@@ -52,8 +52,8 @@ export default function LoginPage() {
     <GlassBackground>
       <GridOverlay opacity={0.04} />
       
-      <div className="min-h-screen flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-md space-y-12">
+      <div className="min-h-screen flex items-center justify-center px-6 py-20">
+        <div className="w-full max-w-lg space-y-12">
           {/* Logo and Title */}
           <div className="text-center space-y-10 animate-fadeIn">
             <div className="flex justify-center">
@@ -81,18 +81,18 @@ export default function LoginPage() {
           </div>
 
           {/* Login Card */}
-          <div className="glass-strong rounded-3xl px-10 py-12 shadow-2xl animate-fadeIn">
-            <h2 className="text-3xl font-bold text-center text-white mb-10">Sign In</h2>
+          <div className="glass-strong rounded-3xl p-12 shadow-2xl animate-fadeIn">
+            <h2 className="text-4xl font-bold text-center text-white mb-12">Sign In</h2>
             
             {error && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-5 py-4 rounded-xl backdrop-blur-sm mb-8" role="alert">
-                <span className="block sm:inline text-sm">{error}</span>
+              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm mb-10 text-base" role="alert">
+                <span className="block sm:inline">{error}</span>
               </div>
             )}
 
             <form onSubmit={handleLogin} className="flex flex-col gap-8">
               <div>
-                <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="email">
+                <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="email">
                   Email Address
                 </label>
                 <AuroraInput
@@ -107,7 +107,7 @@ export default function LoginPage() {
               </div>
 
               <div>
-                <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="password">
+                <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="password">
                   Password
                 </label>
                 <AuroraInput
@@ -124,7 +124,7 @@ export default function LoginPage() {
               <div className="flex justify-end">
                 <Link 
                   href="/forgot-password" 
-                  className="text-sm text-white/70 hover:text-white/100 transition-colors font-medium"
+                  className="text-sm text-white/70 hover:text-white transition-colors font-medium"
                 >
                   Forgot Password?
                 </Link>
@@ -134,13 +134,13 @@ export default function LoginPage() {
                 type="submit"
                 disabled={loading}
                 className={`
-                  w-full h-14 rounded-full font-semibold text-lg
+                  w-full h-16 rounded-full font-bold text-lg
                   bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
                   hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
                   text-white
                   transition-all duration-300
-                  shadow-lg hover:shadow-xl hover:scale-[0.98]
-                  mt-2
+                  shadow-xl hover:shadow-2xl hover:scale-[0.98]
+                  mt-4
                   ${loading ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
@@ -148,12 +148,12 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-10 pt-8 text-center border-t border-white/10">
-              <p className="text-white/60 text-sm">
+            <div className="mt-12 pt-8 text-center border-t border-white/10">
+              <p className="text-white/60 text-base">
                 Don't have an account?{' '}
                 <Link 
                   href="/register" 
-                  className="text-[#18c3e8] hover:text-[#5e879e] font-semibold transition-colors"
+                  className="text-[#18c3e8] hover:text-[#5e879e] font-bold transition-colors"
                 >
                   Register
                 </Link>

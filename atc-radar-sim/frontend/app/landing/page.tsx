@@ -7,7 +7,6 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Navbar } from '@/components/Navbar';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
 
@@ -30,11 +29,10 @@ export default function LandingPage() {
       </div>
 
       {/* Navigation */}
-      <Navbar />
 
       {/* Main Content */}
-      <main className="relative z-10 flex items-center justify-center min-h-screen px-6">
-        <div className="text-center space-y-16 max-w-5xl pt-28 animate-fadeIn">
+      <main className="relative z-10 flex items-center justify-center min-h-screen px-6 pb-40">
+        <div className="text-center space-y-16 max-w-5xl animate-fadeIn">
           {/* Logo */}
           <div className="flex justify-center">
             <div className="relative">

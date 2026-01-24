@@ -2,10 +2,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Navbar } from '@/components/Navbar';
 import Image from 'next/image';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
+import { Navbar } from '@/components/Navbar';
 
 interface UserProfile {
     id: string;
@@ -87,7 +87,7 @@ export default function ProfilePage() {
 
       <Navbar />
 
-      <main className="relative z-20 w-full min-h-screen pt-40 px-6 pb-24">
+      <main className="relative z-20 w-full min-h-screen pt-24 px-6 pb-40">
          <div className="max-w-6xl mx-auto">
            <div className="w-full glass-strong rounded-3xl p-10 shadow-2xl mt-8 relative z-20">
              {/* Header */}
