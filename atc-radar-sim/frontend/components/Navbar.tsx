@@ -22,6 +22,7 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
     };
 
     checkAuth();
+    
     // Listen for storage events (e.g. login/logout in another tab)
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
