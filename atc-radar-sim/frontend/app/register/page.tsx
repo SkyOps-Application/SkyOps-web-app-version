@@ -70,8 +70,8 @@ export default function RegisterPage() {
     <GlassBackground>
       <GridOverlay opacity={0.04} />
       
-      <div className="min-h-screen flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-2xl space-y-12">
+      <div className="min-h-screen flex items-center justify-center px-6 py-20">
+        <div className="w-full max-w-3xl space-y-12">
           {/* Logo and Title */}
           <div className="text-center space-y-10 animate-fadeIn">
             <div className="flex justify-center">
@@ -99,18 +99,18 @@ export default function RegisterPage() {
           </div>
 
           {/* Register Card */}
-          <div className="glass-strong rounded-3xl px-10 py-12 shadow-2xl animate-fadeIn">
+          <div className="glass-strong rounded-3xl p-12 shadow-2xl animate-fadeIn">
             {error && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-5 py-4 rounded-xl backdrop-blur-sm mb-10" role="alert">
-                <span className="block sm:inline text-sm">{error}</span>
+              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm mb-10 text-base" role="alert">
+                <span className="block sm:inline">{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
+            <form onSubmit={handleRegister} className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
               {/* Left Column */}
               <div className="flex flex-col gap-8">
                 <div>
-                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="first_name">
+                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="first_name">
                     First Name
                   </label>
                   <AuroraInput
@@ -124,7 +124,7 @@ export default function RegisterPage() {
                 </div>
                 
                 <div>
-                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="last_name">
+                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="last_name">
                     Last Name
                   </label>
                   <AuroraInput
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="age">
+                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="age">
                     Age
                   </label>
                   <AuroraInput
@@ -154,7 +154,7 @@ export default function RegisterPage() {
               {/* Right Column */}
               <div className="flex flex-col gap-8">
                 <div>
-                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="email">
+                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="email">
                     Email Address
                   </label>
                   <AuroraInput
@@ -168,7 +168,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="password">
+                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="password">
                     Password
                   </label>
                   <AuroraInput
@@ -182,7 +182,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label className="block text-white/90 text-sm font-semibold mb-4" htmlFor="confirmPassword">
+                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="confirmPassword">
                     Confirm Password
                   </label>
                   <AuroraInput
@@ -197,17 +197,17 @@ export default function RegisterPage() {
               </div>
 
               {/* Full Width Button */}
-              <div className="md:col-span-2 mt-8">
+              <div className="md:col-span-2 mt-10">
                 <button
                   type="submit"
                   disabled={loading}
                   className={`
-                    w-full h-14 rounded-full font-semibold text-lg
+                    w-full h-16 rounded-full font-bold text-lg
                     bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
                     hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
                     text-white
                     transition-all duration-300
-                    shadow-lg hover:shadow-xl hover:scale-[0.98]
+                    shadow-xl hover:shadow-2xl hover:scale-[0.98]
                     ${loading ? 'opacity-50 cursor-not-allowed' : ''}
                   `}
                 >
@@ -216,12 +216,12 @@ export default function RegisterPage() {
               </div>
             </form>
 
-            <div className="mt-10 pt-8 text-center border-t border-white/10">
-              <p className="text-white/60 text-sm">
+            <div className="mt-12 pt-8 text-center border-t border-white/10">
+              <p className="text-white/60 text-base">
                 Already have an account?{' '}
                 <Link 
                   href="/login" 
-                  className="text-[#18c3e8] hover:text-[#5e879e] font-semibold transition-colors"
+                  className="text-[#18c3e8] hover:text-[#5e879e] font-bold transition-colors"
                 >
                   Login
                 </Link>

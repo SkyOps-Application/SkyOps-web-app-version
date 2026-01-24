@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SFSymbol } from './SFSymbol';
 
-export function Navbar() {
+export function Navbar({ position = 'top' }: { position?: 'top' | 'bottom' }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
@@ -53,7 +53,7 @@ export function Navbar() {
   if (!isLoggedIn) return null;
 
   return (
-    <nav ref={navRef} className="fixed top-6 left-0 right-0 z-[100] flex justify-center px-6">
+    <nav ref={navRef} className={`fixed ${position === 'bottom' ? 'bottom-6' : 'top-6'} left-0 right-0 z-[100] flex justify-center px-6`}>
       <div className="glass-nav">
         <div className="glass-filter"></div>
         <div className="glass-overlay"></div>

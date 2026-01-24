@@ -85,7 +85,7 @@ export const AuroraInput: React.FC<AuroraInputProps> = ({
             onChange={onChange}
             placeholder={placeholder}
             required={required}
-            className="flex-1 bg-transparent border-none text-white px-6 text-lg font-light focus:outline-none placeholder-white/40"
+            className="flex-1 bg-transparent border-none text-white px-10 text-lg font-light focus:outline-none placeholder-white/40"
             onFocus={() => {
               if (externalIsActive === undefined) {
                 setInternalActive(true);

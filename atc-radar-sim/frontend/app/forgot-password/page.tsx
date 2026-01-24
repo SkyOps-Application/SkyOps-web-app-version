@@ -2,6 +2,9 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { AuroraInput } from '@/components/AuroraInput';
+import { GlassBackground } from '@/components/GlassBackground';
+import { GridOverlay } from '@/components/GridOverlay';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -37,55 +40,73 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0C2D57] px-4">
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center text-[#0C2D57] mb-6">Reset Password</h1>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-            <span className="block sm:inline">{error}</span>
-          </div>
-        )}
-
-        {message && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
-            <span className="block sm:inline">{message}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-              Enter your email address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="pilot@skyops.com"
-              required
-            />
+    <GlassBackground>
+      <GridOverlay opacity={0.04} />
+      
+      <div className="min-h-screen flex items-center justify-center px-6 py-16">
+        <div className="w-full max-w-md space-y-8">
+          {/* Header */}
+          <div className="text-center animate-fadeIn">
+            <h1 className="text-4xl font-bold text-white tracking-tight">
+              Forgot Password
+            </h1>
+            <p className="text-white/60 mt-2">Enter your email to receive a reset link</p>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full bg-[#0C2D57] hover:bg-[#1a3d6f] text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-          >
-            {loading ? 'Sending Request...' : 'Send Reset Link'}
-          </button>
-        </form>
+          <div className="glass-strong rounded-3xl px-8 py-10 shadow-2xl animate-fadeIn">
+            
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-5 py-3 rounded-xl backdrop-blur-sm mb-6 text-sm" role="alert">
+                {error}
+              </div>
+            )}
 
-        <div className="mt-4 text-center">
-             <Link href="/login" className="text-blue-500 hover:text-blue-700 text-sm font-bold">
-                Back to Login
-             </Link>
+            {message && (
+              <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-5 py-3 rounded-xl backdrop-blur-sm mb-6 text-sm" role="alert">
+                {message}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+              <div>
+                <label className="block text-white/90 text-xs font-semibold mb-2 uppercase tracking-wide" htmlFor="email">
+                  Email Address
+                </label>
+                <AuroraInput
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="pilot@skyops.com"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className={`
+                  w-full h-12 rounded-full font-bold text-base
+                  bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
+                  hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
+                  text-white mt-2
+                  transition-all duration-300
+                  shadow-lg hover:shadow-xl hover:scale-[0.98]
+                  ${loading ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                {loading ? 'Sending Request...' : 'Send Reset Link'}
+              </button>
+            </form>
+
+            <div className="mt-8 text-center">
+                 <Link href="/login" className="text-white/60 hover:text-white text-sm transition-colors">
+                    ← Back to Login
+                 </Link>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </GlassBackground>
   );
 }
