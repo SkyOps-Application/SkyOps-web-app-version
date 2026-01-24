@@ -1,0 +1,118 @@
+services:
+  # --------------------------------------------------------------------------------
+  # 1. USER SERVICE (Python/Flask)
+  # --------------------------------------------------------------------------------
+  - type: web
+    name: skyops-user-service
+    env: docker
+    # Context is the subdirectory because Dockerfile expects requirements.txt at root
+    dockerContext: backend/user_service 
+    plan: free
+    region: singapore # Optional: chose a region close to you if possible, or omit
+    numReplicas: 1
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: skyops-db
+          property: connectionString
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: skyops-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: skyops-redis
+          property: port
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_APP
+        value: app.py
+
+  # --------------------------------------------------------------------------------
+  # 2. SIMULATOR SERVICE (Node.js/Socket.io)
+  # --------------------------------------------------------------------------------
+  - type: web
+    name: skyops-simulator-service
+    env: docker
+    # Context is root because it needs to copy 'shared' folder
+    dockerContext: .
+    dockerfilePath: backend/simulator_service/Dockerfile
+    plan: free
+    region: singapore
+    numReplicas: 1
+    envVars:
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: skyops-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: skyops-redis
+          property: port
+      - key: PORT
+        value: 4000
+      # Sync Secret Key with User Service
+      - key: JWT_SECRET_KEY
+        fromService:
+          type: web
+          name: skyops-user-service
+          envVarKey: SECRET_KEY
+      # UPDATE THIS after deploying Frontend
+      - key: CORS_ORIGIN 
+        value: "*" 
+
+  # --------------------------------------------------------------------------------
+  # 3. NOTIFICATION SERVICE (Node.js Worker)
+  # --------------------------------------------------------------------------------
+  - type: worker
+    name: skyops-notification-service
+    env: docker
+    dockerContext: .
+    dockerfilePath: backend/notification_service/Dockerfile
+    plan: free
+    region: singapore
+    envVars:
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: skyops-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: skyops-redis
+          property: port
+      # SMTP Configuration (Manual input required in Dashboard for security)
+      - key: MAIL_SERVER
+        value: smtp.gmail.com
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 465
+      - key: SMTP_USER
+        sync: false # placeholder
+      - key: SMTP_PASS
+        sync: false # placeholder
+      - key: SMTP_FROM
+        value: SkyOps <skyops2026@gmail.com>
+
+databases:
+  # --------------------------------------------------------------------------------
+  # 4. MANAGED POSTGRESQL
+  # --------------------------------------------------------------------------------
+  - name: skyops-db
+    databaseName: skyops_db
+    user: skyops_user
+    plan: free
+    region: singapore
+
+  # --------------------------------------------------------------------------------
+  # 5. MANAGED REDIS
+  # --------------------------------------------------------------------------------
+  - name: skyops-redis
+    plan: free
+    region: singapore

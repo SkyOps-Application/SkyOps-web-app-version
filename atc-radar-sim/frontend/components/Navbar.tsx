@@ -39,13 +39,7 @@ export function Navbar() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/home" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <Image
-              src="/mainlogo.png"
-              alt="ATC Logo"
-              width={140}
-              height={56}
-              className="h-14 w-auto"
-            />
+            <span className="text-2xl font-bold text-white tracking-wider">SkyOps</span>
           </Link>
 
           {/* Navigation Items */}

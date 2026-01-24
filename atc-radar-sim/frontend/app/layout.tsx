@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ATC Radar Simulation - Double Quebec Alpha",
+  title: "SkyOps - ATC Radar Simulation",
   description: "Air Traffic Control Radar Simulation Training System",
   icons: {
     icon: '/favicon.png',

@@ -83,7 +83,7 @@ export default function ProfilePage() {
 
       <Navbar />
 
-      <main className="relative z-10 flex flex-col items-center min-h-screen pt-32 px-6 max-w-6xl mx-auto w-full">
+      <main className="relative z-10 flex flex-col items-center min-h-screen pt-44 px-6 max-w-6xl mx-auto w-full">
          <div className="w-full bg-white/10 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20">
              {/* Header */}
              <div className="flex flex-col md:flex-row items-center md:items-start gap-8 mb-10 border-b border-white/10 pb-8">

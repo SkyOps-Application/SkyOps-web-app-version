@@ -11,3 +11,4 @@ pydantic
 Flask-SQLAlchemy
 Flask-Migrate
 python-dotenv
+gunicorn
