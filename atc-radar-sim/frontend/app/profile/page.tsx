@@ -6,6 +6,9 @@ import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
 import { Navbar } from '@/components/Navbar';
 import { API_URL } from '@/lib/config';
+import { PageBackground } from '@/components/PageBackground';
+import { Card } from '@/components/Card';
+import { Icon } from '@/components/Icon';
 
 interface UserProfile {
   id: string;
@@ -57,9 +60,15 @@ export default function ProfilePage() {
                     const hData = await historyRes.json();
                     setHistory(hData);
                 }
+            } catch (error) {
+                console.error('Error fetching profile data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchData();
-  }, []);
+        fetchData();
+    }, []);
 
   const totalFlightTime = Math.floor(history.reduce((acc, curr) => acc + curr.duration_seconds, 0) / 60);
   const avgScore = history.length > 0 
