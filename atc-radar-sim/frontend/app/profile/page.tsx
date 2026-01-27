@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
 import { Navbar } from '@/components/Navbar';
+import { API_URL } from '@/lib/config';
 
 interface UserProfile {
     id: string;
@@ -49,7 +50,7 @@ export default function ProfilePage() {
 
             try {
                 // Fetch Profile
-                const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
+                const profileRes = await fetch(`${API_URL}/me`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 
@@ -59,7 +60,7 @@ export default function ProfilePage() {
                 }
 
                 // Fetch History
-                const historyRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/history`, {
+                const historyRes = await fetch(`${API_URL}/history`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (historyRes.ok) {
