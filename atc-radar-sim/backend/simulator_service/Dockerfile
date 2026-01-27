@@ -4,6 +4,11 @@ WORKDIR /app
 
 # Copy shared module
 COPY shared ./shared
+WORKDIR /app/shared
+# Install dependencies for shared (typescript) and build it
+RUN npm install
+RUN npm run build
+
 
 # Backend setup
 WORKDIR /app/backend
@@ -31,7 +36,15 @@ COPY backend/package.json backend/package-lock.json* ./
 # Setup shared module for runtime before install
 COPY shared ../shared
 RUN sed -i 's/"@atc-radar-sim\/shared": "[^"]*"/"@atc-radar-sim\/shared": "file:..\/shared"/g' package.json
+
 RUN npm install --omit=dev
+
+# Build shared module for runtime (to generate dist and bridge files)
+WORKDIR /app/shared
+RUN npm install
+RUN npm run build
+# Return to backend to finish setup
+WORKDIR /app/backend
 
 
 
