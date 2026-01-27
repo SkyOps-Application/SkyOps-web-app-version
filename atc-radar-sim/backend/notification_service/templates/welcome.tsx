@@ -22,7 +22,7 @@ export const WelcomeEmail = ({ first_name = 'Pilot' }: WelcomeEmailProps) => {
           radar simulator.
         </Text>
         <Section style={btnContainer}>
-          <Button style={button} href="#">
+          <Button style={button} href="http://localhost:3000/login">
             Start Simulation
           </Button>
         </Section>

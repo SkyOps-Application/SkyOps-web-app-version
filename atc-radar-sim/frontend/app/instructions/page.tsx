@@ -19,15 +19,15 @@ export default function InstructionsPage() {
 
       <Navbar />
 
-      <main className="relative z-10 w-full flex flex-col items-center min-h-screen pt-24 px-6 pb-40">
+      <main className="relative z-10 w-full flex flex-col items-center min-h-screen pt-40 px-6 pb-48">
         <div className="w-full max-w-5xl mx-auto">
         <h1 className="text-6xl md:text-7xl font-bold mb-20 text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
           Radar Instructions
         </h1>
 
-        <div className="grid gap-12 w-full">
+        <div className="grid gap-20 w-full">
             {/* Section 1: Basic Controls */}
-            <div className="glass-strong rounded-3xl p-10 shadow-2xl">
+            <div className="glass-strong rounded-3xl p-16 shadow-2xl">
                 <h2 className="text-3xl font-bold mb-10 flex items-center gap-6 text-white">
                     <span className="w-16 h-16 bg-gradient-to-br from-[#18c3e8] to-[#5e879e] rounded-xl flex items-center justify-center text-lg font-bold shadow-lg">1</span>
                      Basic Controls
@@ -49,7 +49,7 @@ export default function InstructionsPage() {
             </div>
 
             {/* Section 2: Commands */}
-            <div className="glass-strong rounded-3xl p-10 shadow-2xl">
+            <div className="glass-strong rounded-3xl p-16 shadow-2xl">
                 <h2 className="text-3xl font-bold mb-10 flex items-center gap-6 text-white">
                     <span className="w-16 h-16 bg-gradient-to-br from-[#11998e] to-[#38ef7d] rounded-xl flex items-center justify-center text-lg font-bold shadow-lg">2</span>
                      ATC Commands
@@ -75,7 +75,7 @@ export default function InstructionsPage() {
                 </div>
             </div>
              {/* Section 3: Safety Rules */}
-            <div className="glass-strong rounded-3xl p-10 shadow-2xl">
+            <div className="glass-strong rounded-3xl p-16 shadow-2xl">
                 <h2 className="text-3xl font-bold mb-10 flex items-center gap-6 text-white">
                     <span className="w-16 h-16 bg-gradient-to-br from-[#f093fb] to-[#f5576c] rounded-xl flex items-center justify-center text-lg font-bold shadow-lg">3</span>
                      Separation Rules

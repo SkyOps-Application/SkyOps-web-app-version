@@ -17,11 +17,11 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem('access_token');
-      // Simple check. Real app might verify expiry.
       setIsLoggedIn(!!token);
     };
 
     checkAuth();
+    
     // Listen for storage events (e.g. login/logout in another tab)
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
@@ -30,15 +30,12 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
   useEffect(() => {
     if (!listRef.current) return;
 
-    // Find the active link
-    // Logic: exact match OR starts with (for nested routes), excluding specific overlaps if any
     const links = Array.from(listRef.current.querySelectorAll('a'));
     
     const activeLink = links.find(link => {
         const href = link.getAttribute('href');
         if (!href) return false;
         if (href === pathname) return true;
-        // Handle nested routes (e.g. /exercise/1) - strictly if not root
         if (href !== '/home' && pathname.startsWith(href)) return true;
         return false;
     });
@@ -58,13 +55,15 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
     window.location.href = '/login';
   };
 
-  if (!isLoggedIn) return null;
+  const isAuthPage = ['/login', '/register', '/forgot-password'].includes(pathname) || pathname.startsWith('/reset-password');
+
+  if (!isLoggedIn || pathname.startsWith('/radar') || isAuthPage) return null;
 
   return (
     <nav className={`fixed ${position === 'bottom' ? 'bottom-6' : 'top-6'} left-0 right-0 z-[100] flex justify-center px-6 pointer-events-none`}>
-      <div className="glass-nav rounded-full px-4 py-2 pointer-events-auto shadow-2xl bg-black/40 backdrop-blur-xl border border-white/10 relative">
+      <div className="glass-nav rounded-full px-4 h-16 pointer-events-auto shadow-2xl bg-black/40 backdrop-blur-xl border border-white/10 relative flex items-center">
         {/* Glass Content */}
-        <div className="flex items-center justify-between gap-8 h-12 relative z-10">
+        <div className="flex items-center justify-between gap-8 h-full relative z-10 w-full">
             {/* Logo */}
             <Link href="/home" className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-shrink-0 pl-2">
               <Image
@@ -77,10 +76,10 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
             </Link>
 
             {/* Navigation Items Container with Bubble */}
-            <div className="relative">
+            <div className="relative h-full flex items-center">
                 {/* Sliding Bubble */}
                 <div 
-                    className="absolute top-0 bottom-0 my-auto h-10 bg-white/15 backdrop-blur-md rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-[inset_0_0_10px_rgba(255,255,255,0.1)] border border-white/20"
+                    className="absolute top-0 bottom-0 my-auto bg-white/15 backdrop-blur-md rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-[inset_0_0_10px_rgba(255,255,255,0.1)] border border-white/20"
                     style={{ 
                         left: bubbleProps.left, 
                         width: bubbleProps.width, 
@@ -89,31 +88,41 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
                     }}
                 />
 
-                <ul ref={listRef} className="flex items-center gap-2 relative z-20">
-                    <li>
+                <ul ref={listRef} className="flex items-center gap-8 relative z-20 h-full">
+                    <li className="h-full flex items-center">
+                        <Link
+                        href="/home"
+                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
+                            pathname === '/home' ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
+                        }`}
+                        >
+                        Home
+                        </Link>
+                    </li>
+                    <li className="h-full flex items-center">
                         <Link
                         href="/about"
-                        className={`block px-6 py-2 rounded-full text-sm font-bold transition-colors duration-300 ${
+                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
                             pathname === '/about' ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
                         }`}
                         >
                         About
                         </Link>
                     </li>
-                    <li>
+                    <li className="h-full flex items-center">
                         <Link
                         href="/profile"
-                        className={`block px-6 py-2 rounded-full text-sm font-bold transition-colors duration-300 ${
+                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
                             pathname === '/profile' ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
                         }`}
                         >
                         Profiles
                         </Link>
                     </li>
-                    <li>
+                    <li className="h-full flex items-center">
                         <Link
                         href="/exercises"
-                        className={`block px-6 py-2 rounded-full text-sm font-bold transition-colors duration-300 ${
+                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
                             pathname.startsWith('/exercises') ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
                         }`}
                         >

@@ -87,11 +87,11 @@ export default function ProfilePage() {
 
       <Navbar />
 
-      <main className="relative z-20 w-full min-h-screen pt-24 px-6 pb-40">
+      <main className="relative z-20 w-full min-h-screen pt-40 px-6 pb-48">
          <div className="max-w-6xl mx-auto">
-           <div className="w-full glass-strong rounded-3xl p-10 shadow-2xl mt-8 relative z-20">
+           <div className="w-full glass-strong rounded-3xl p-16 shadow-2xl mt-8 relative z-20">
              {/* Header */}
-             <div className="flex flex-col md:flex-row items-center md:items-start gap-12 mb-16 border-b border-white/10 pb-12">
+             <div className="flex flex-col md:flex-row items-center md:items-start gap-12 mb-24 border-b border-white/10 pb-16">
                 <div className="w-36 h-36 bg-gradient-to-br from-[#ffde59] to-[#ffd200] rounded-full flex items-center justify-center text-6xl font-bold text-[#0C2D57] shadow-xl">
                     {profile ? profile.first_name[0].toUpperCase() : 'P'}
                 </div>
@@ -119,7 +119,7 @@ export default function ProfilePage() {
              </div>
 
              {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
                 <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
                     <h3 className="text-gray-400 uppercase text-xs font-bold tracking-wider mb-6">Total Sessions</h3>
                     <p className="text-5xl font-bold text-white">{history.length}</p>

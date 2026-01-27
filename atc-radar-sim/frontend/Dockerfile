@@ -35,7 +35,7 @@ RUN rm -rf node_modules/@atc-radar-sim/shared && \
 # Disable Next.js telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 
-ARG NEXT_PUBLIC_API_URL=http://localhost:5000
+ARG NEXT_PUBLIC_API_URL=http://localhost:5001
 ARG NEXT_PUBLIC_SIMULATOR_URL=http://localhost:4000
 
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
