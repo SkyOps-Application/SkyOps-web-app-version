@@ -24,21 +24,26 @@ export const AuroraInput: React.FC<AuroraInputProps> = ({
   const [internalActive, setInternalActive] = useState(false);
   const isActive =
     externalIsActive !== undefined ? externalIsActive : internalActive;
-
-  // Removed aurora effect logic
   
   return (
-    <div className="relative w-full z-0">
-      {/* Input shell */}
+    <div style={{ position: 'relative', width: '100%', zIndex: 0 }}>
       <div
-        className={`
-          relative z-10 h-16 rounded-full overflow-hidden
-          bg-white/5 backdrop-blur-xl border
-          transition-all duration-300
-          ${isActive
-            ? 'border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.2)]'
-            : 'border-white/10'}
-        `}
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          height: '56px',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(24px)',
+          border: isActive 
+            ? '1px solid rgba(255, 255, 255, 0.3)' 
+            : '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: isActive 
+            ? '0 0 20px rgba(255, 255, 255, 0.2)' 
+            : 'none',
+          transition: 'all 0.3s ease',
+        }}
       >
         <input
           id={id}
@@ -49,16 +54,20 @@ export const AuroraInput: React.FC<AuroraInputProps> = ({
           required={required}
           onFocus={() => externalIsActive === undefined && setInternalActive(true)}
           onBlur={() => externalIsActive === undefined && setInternalActive(false)}
-          className="
-            w-full h-full
-            bg-transparent
-            text-white text-lg font-light
-            px-6 py-4
-            focus:outline-none
-            placeholder-white/40
-          "
+          style={{
+            width: '100%',
+            height: '100%',
+            background: 'transparent',
+            color: 'white',
+            fontSize: '16px',
+            fontWeight: 300,
+            padding: '0 24px',
+            border: 'none',
+            outline: 'none',
+          }}
         />
       </div>
     </div>
   );
 };
+

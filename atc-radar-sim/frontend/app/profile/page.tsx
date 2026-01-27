@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -9,44 +8,35 @@ import { Navbar } from '@/components/Navbar';
 import { API_URL } from '@/lib/config';
 
 interface UserProfile {
-    id: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-    age: number;
-    role: string;
-    email: string;
-}
-
-interface Violation {
-  type: string;
-  aircraft1: string;
-  aircraft2?: string;
-  timestamp: string;
+  id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  age: number;
+  role: string;
+  email: string;
 }
 
 interface HistoryRecord {
-    id: number;
-    duration_seconds: number;
-    violations_count: number;
-    traffic_count: number;
-    timestamp: string;
-    score: number;
-    start_time: string;
-    end_time: string;
-    violation_details?: Violation[];
+  id: number;
+  duration_seconds: number;
+  violations_count: number;
+  traffic_count: number;
+  timestamp: string;
+  score: number;
+  start_time: string;
+  end_time: string;
 }
 
-
 export default function ProfilePage() {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [history, setHistory] = useState<HistoryRecord[]>([]);
-    const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const token = localStorage.getItem('access_token');
-            if (!token) return;
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
 
             try {
                 // Fetch Profile
@@ -68,116 +58,228 @@ export default function ProfilePage() {
                     setHistory(hData);
                 }
 
-            } catch (e) {
-                console.error("Failed to fetch data", e);
-            } finally {
-               setLoading(false);
-            }
-        };
+    fetchData();
+  }, []);
 
-        fetchData();
-    }, []);
+  const totalFlightTime = Math.floor(history.reduce((acc, curr) => acc + curr.duration_seconds, 0) / 60);
+  const avgScore = history.length > 0 
+    ? Math.round(history.reduce((acc, curr) => acc + (curr.score || 0), 0) / history.length) 
+    : 0;
 
   return (
-    <GlassBackground>
-      <GridOverlay opacity={0.04} />
-      
-      <div className="fixed inset-0 z-0">
-         <Image src="/background-web.png" alt="Background" fill className="object-cover opacity-15" priority />
-      </div>
+    <PageBackground>
+      <div style={{ 
+        minHeight: '100vh', 
+        paddingTop: '100px', 
+        paddingBottom: '60px',
+        paddingLeft: '24px',
+        paddingRight: '24px',
+      }}>
+        <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
+          <Card variant="elevated" padding="lg">
+            {/* Profile Header */}
+            <div style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '24px',
+              marginBottom: '40px',
+              paddingBottom: '32px',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            }}>
+              {/* Avatar */}
+              <div style={{
+                width: '80px',
+                height: '80px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '32px',
+                fontWeight: 700,
+                color: 'white',
+                boxShadow: '0 8px 24px rgba(245, 158, 11, 0.3)',
+              }}>
+                {profile ? profile.first_name[0].toUpperCase() : 'P'}
+              </div>
+              
+              {/* Info */}
+              <div style={{ textAlign: 'center' }}>
+                <h1 style={{ 
+                  fontSize: '28px', 
+                  fontWeight: 700, 
+                  color: 'white',
+                  marginBottom: '12px',
+                }}>
+                  {profile ? `${profile.first_name} ${profile.last_name}` : 'Loading...'}
+                </h1>
+                {profile && (
+                  <div style={{ 
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '16px',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                    color: '#9ca3af',
+                  }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Icon name="mail" size={16} />
+                      {profile.email}
+                    </span>
+                    {profile.age > 0 && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Icon name="user" size={16} />
+                        {profile.age} years old
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
 
-      <Navbar />
-
-      <main className="relative z-20 w-full min-h-screen pt-40 px-6 pb-48">
-         <div className="max-w-6xl mx-auto">
-           <div className="w-full glass-strong rounded-3xl p-16 shadow-2xl mt-8 relative z-20">
-             {/* Header */}
-             <div className="flex flex-col md:flex-row items-center md:items-start gap-12 mb-24 border-b border-white/10 pb-16">
-                <div className="w-36 h-36 bg-gradient-to-br from-[#ffde59] to-[#ffd200] rounded-full flex items-center justify-center text-6xl font-bold text-[#0C2D57] shadow-xl">
-                    {profile ? profile.first_name[0].toUpperCase() : 'P'}
+            {/* Stats Grid */}
+            <div style={{ 
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '16px',
+              marginBottom: '40px',
+            }}>
+              {[
+                { label: 'Total Sessions', value: history.length },
+                { label: 'Total Flight Time', value: `${totalFlightTime}m` },
+                { label: 'Average Score', value: avgScore, highlight: true },
+              ].map((stat) => (
+                <div 
+                  key={stat.label}
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(31, 41, 55, 0.6), rgba(17, 24, 39, 0.8))',
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ 
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                    color: '#6b7280',
+                    marginBottom: '8px',
+                  }}>
+                    {stat.label}
+                  </div>
+                  <div style={{ 
+                    fontSize: '32px',
+                    fontWeight: 700,
+                    color: stat.highlight ? '#f59e0b' : 'white',
+                  }}>
+                    {stat.value}
+                  </div>
                 </div>
-                <div className="flex-1 text-center md:text-left space-y-4">
-                    <h1 className="text-5xl font-bold text-white tracking-tight">
-                        {profile ? `${profile.first_name} ${profile.last_name}` : 'Pilot Profile'}
-                    </h1>
-                    <div className="flex flex-col md:flex-row gap-6 text-gray-300 justify-center md:justify-start text-lg">
-                        {profile && (
-                            <>
-                                <span className="flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                                    </svg>
-                                    {profile.email}
-                                </span>
-                                <span className="hidden md:inline">•</span>
-                                <span>Age: {profile.age}</span>
-                            </>
-                        )}
-                        {!profile && <span>View your stats and history</span>}
-                    </div>
-                </div>
-             </div>
-
-             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-                <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-                    <h3 className="text-gray-400 uppercase text-xs font-bold tracking-wider mb-6">Total Sessions</h3>
-                    <p className="text-5xl font-bold text-white">{history.length}</p>
-                </div>
-                 <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-                    <h3 className="text-gray-400 uppercase text-xs font-bold tracking-wider mb-6">Total Flight Time</h3>
-                    <p className="text-5xl font-bold text-white">
-                        {Math.floor(history.reduce((acc, curr) => acc + curr.duration_seconds, 0) / 60)}m
-                    </p>
-                </div>
-                 <div className="glass rounded-2xl p-8 text-center hover:bg-white/10 transition-all">
-                    <h3 className="text-gray-400 uppercase text-xs font-bold tracking-wider mb-6">Avg Safety Score</h3>
-                    <p className="text-5xl font-bold text-white">
-                        {history.length > 0 ? Math.round(history.reduce((acc, curr) => acc + (curr.score || 0), 0) / history.length) : '0'}
-                    </p>
-                </div>
+              ))}
             </div>
 
             {/* History Table */}
-            <h2 className="text-3xl font-bold text-white mb-10 tracking-tight">Simulation History</h2>
-            <div className="overflow-x-auto rounded-xl border border-white/10">
-                <table className="w-full text-left text-white/90">
-                    <thead className="bg-white/5 uppercase text-sm font-bold text-blue-200">
-                        <tr>
-                            <th className="px-6 py-4">Date</th>
-                            <th className="px-6 py-4">Duration</th>
-                            <th className="px-6 py-4">Traffic</th>
-                            <th className="px-6 py-4">Violations</th>
-                            <th className="px-6 py-4">Score</th>
+            <div>
+              <h2 style={{ 
+                fontSize: '18px',
+                fontWeight: 600,
+                color: 'white',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}>
+                <Icon name="clock" size={20} />
+                Simulation History
+              </h2>
+              
+              <div style={{ 
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.06)',
+                overflow: 'hidden',
+              }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: 'rgba(31, 41, 55, 0.5)' }}>
+                      {['Date', 'Duration', 'Traffic', 'Violations', 'Score'].map((header) => (
+                        <th 
+                          key={header}
+                          style={{
+                            padding: '16px 20px',
+                            textAlign: 'left',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.05em',
+                            color: '#6b7280',
+                            borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+                          }}
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
+                          Loading...
+                        </td>
+                      </tr>
+                    ) : history.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} style={{ textAlign: 'center', padding: '32px', color: '#6b7280' }}>
+                          No history records found. Start practicing to see your progress!
+                        </td>
+                      </tr>
+                    ) : (
+                      history.map((record) => (
+                        <tr 
+                          key={record.id}
+                          style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)' }}
+                        >
+                          <td style={{ padding: '16px 20px', color: 'white', fontSize: '14px' }}>
+                            {new Date(record.timestamp).toLocaleDateString()}
+                            <span style={{ color: '#6b7280', marginLeft: '8px', fontSize: '12px' }}>
+                              {new Date(record.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 20px', color: '#9ca3af', fontSize: '14px' }}>
+                            {Math.floor(record.duration_seconds / 60)}m {record.duration_seconds % 60}s
+                          </td>
+                          <td style={{ padding: '16px 20px', color: '#9ca3af', fontSize: '14px' }}>
+                            {record.traffic_count}
+                          </td>
+                          <td style={{ padding: '16px 20px' }}>
+                            <span style={{
+                              display: 'inline-flex',
+                              padding: '4px 12px',
+                              borderRadius: '9999px',
+                              fontSize: '12px',
+                              fontWeight: 600,
+                              background: record.violations_count > 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+                              color: record.violations_count > 0 ? '#fca5a5' : '#6ee7b7',
+                            }}>
+                              {record.violations_count}
+                            </span>
+                          </td>
+                          <td style={{ padding: '16px 20px', fontWeight: 600, color: '#f59e0b', fontSize: '14px' }}>
+                            {record.score}
+                          </td>
                         </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/10">
-                        {history.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} className="px-6 py-8 text-center text-blue-300">No history records found.</td>
-                            </tr>
-                        ) : (
-                            history.map((record) => (
-                                <tr key={record.id} className="hover:bg-white/5 transition-colors">
-                                    <td className="px-6 py-4">{new Date(record.timestamp).toLocaleDateString()} {new Date(record.timestamp).toLocaleTimeString()}</td>
-                                    <td className="px-6 py-4">{Math.floor(record.duration_seconds / 60)}m {record.duration_seconds % 60}s</td>
-                                    <td className="px-6 py-4">{record.traffic_count}</td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded text-xs font-bold ${record.violations_count > 0 ? 'bg-red-500/20 text-red-300' : 'bg-green-500/20 text-green-300'}`}>
-                                            {record.violations_count}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 font-bold text-[#ffde59]">{record.score}</td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
+                      ))
+                    )}
+                  </tbody>
                 </table>
+              </div>
             </div>
-           </div>
-         </div>
-      </main>
-    </GlassBackground>
+          </Card>
+        </div>
+      </div>
+    </PageBackground>
   );
 }

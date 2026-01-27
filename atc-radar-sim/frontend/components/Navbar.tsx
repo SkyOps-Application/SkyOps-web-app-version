@@ -1,18 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SFSymbol } from './SFSymbol';
+import { Icon } from './Icon';
 
-export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' }) {
+const navItems = [
+  { href: '/home', label: 'Home', icon: 'home' as const },
+  { href: '/exercises', label: 'Exercises', icon: 'airplane' as const },
+  { href: '/profile', label: 'Profile', icon: 'user' as const },
+  { href: '/about', label: 'About', icon: 'info' as const },
+];
+
+export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const pathname = usePathname();
-  const listRef = useRef<HTMLUListElement>(null);
-  
-  // Animation state
-  const [bubbleProps, setBubbleProps] = useState({ left: 0, width: 0, opacity: 0 });
 
   useEffect(() => {
     const checkAuth = () => {
@@ -21,33 +24,9 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
     };
 
     checkAuth();
-    
-    // Listen for storage events (e.g. login/logout in another tab)
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
   }, []);
-
-  useEffect(() => {
-    if (!listRef.current) return;
-
-    const links = Array.from(listRef.current.querySelectorAll('a'));
-    
-    const activeLink = links.find(link => {
-        const href = link.getAttribute('href');
-        if (!href) return false;
-        if (href === pathname) return true;
-        if (href !== '/home' && pathname.startsWith(href)) return true;
-        return false;
-    });
-
-    if (activeLink) {
-        const { offsetLeft, offsetWidth } = activeLink as HTMLElement;
-        setBubbleProps({ left: offsetLeft, width: offsetWidth, opacity: 1 });
-    } else {
-        setBubbleProps(prev => ({ ...prev, opacity: 0 }));
-    }
-
-  }, [pathname, isLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -55,92 +34,104 @@ export function Navbar({ position = 'bottom' }: { position?: 'top' | 'bottom' })
     window.location.href = '/login';
   };
 
-  const isAuthPage = ['/login', '/register', '/forgot-password'].includes(pathname) || pathname.startsWith('/reset-password');
-
-  if (!isLoggedIn || pathname.startsWith('/radar') || isAuthPage) return null;
+  // Only hide navbar on auth pages, radar page, and landing page
+  const hiddenPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/radar'];
+  const shouldHide = hiddenPaths.some(path => pathname.startsWith(path)) || pathname === '/';
+  
+  if (!isLoggedIn || shouldHide) return null;
 
   return (
-    <nav className={`fixed ${position === 'bottom' ? 'bottom-6' : 'top-6'} left-0 right-0 z-[100] flex justify-center px-6 pointer-events-none`}>
-      <div className="glass-nav rounded-full px-4 h-16 pointer-events-auto shadow-2xl bg-black/40 backdrop-blur-xl border border-white/10 relative flex items-center">
-        {/* Glass Content */}
-        <div className="flex items-center justify-between gap-8 h-full relative z-10 w-full">
-            {/* Logo */}
-            <Link href="/home" className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-shrink-0 pl-2">
-              <Image
-                src="/SkyOps-logo-text.png"
-                alt="SkyOps Logo"
-                width={100}
-                height={25}
-                className="h-7 w-auto"
-              />
-            </Link>
+    <nav 
+      style={{
+        position: 'fixed',
+        top: '16px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 50,
+        width: 'calc(100% - 48px)',
+        maxWidth: '900px',
+      }}
+    >
+      <div 
+        style={{
+          display: 'flex',
+          height: '56px',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px',
+          backgroundColor: 'rgba(17, 24, 39, 0.75)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderRadius: '16px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+        }}
+      >
+        {/* Logo */}
+        <Link href="/home" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+          <Image
+            src="/mainlogo.png"
+            alt="SkyOps"
+            width={32}
+            height={32}
+          />
+          <span style={{ fontSize: '16px', fontWeight: 600, color: 'white' }}>
+            SkyOps
+          </span>
+        </Link>
 
-            {/* Navigation Items Container with Bubble */}
-            <div className="relative h-full flex items-center">
-                {/* Sliding Bubble */}
-                <div 
-                    className="absolute top-0 bottom-0 my-auto bg-white/15 backdrop-blur-md rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-[inset_0_0_10px_rgba(255,255,255,0.1)] border border-white/20"
-                    style={{ 
-                        left: bubbleProps.left, 
-                        width: bubbleProps.width, 
-                        opacity: bubbleProps.opacity,
-                        height: '100%' 
-                    }}
-                />
-
-                <ul ref={listRef} className="flex items-center gap-8 relative z-20 h-full">
-                    <li className="h-full flex items-center">
-                        <Link
-                        href="/home"
-                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
-                            pathname === '/home' ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
-                        }`}
-                        >
-                        Home
-                        </Link>
-                    </li>
-                    <li className="h-full flex items-center">
-                        <Link
-                        href="/about"
-                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
-                            pathname === '/about' ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
-                        }`}
-                        >
-                        About
-                        </Link>
-                    </li>
-                    <li className="h-full flex items-center">
-                        <Link
-                        href="/profile"
-                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
-                            pathname === '/profile' ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
-                        }`}
-                        >
-                        Profiles
-                        </Link>
-                    </li>
-                    <li className="h-full flex items-center">
-                        <Link
-                        href="/exercises"
-                        className={`flex items-center px-12 h-full rounded-full text-sm font-bold transition-colors duration-300 ${
-                            pathname.startsWith('/exercises') ? 'text-white text-shadow-glow' : 'text-gray-400 hover:text-white'
-                        }`}
-                        >
-                        Exercises
-                        </Link>
-                    </li>
-                </ul>
-            </div>
-
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="bg-[#ffde59] text-[#10396f] font-bold p-2 rounded-full hover:bg-[#ffd700] hover:scale-105 transition-all duration-300 shadow-lg flex items-center justify-center w-10 h-10"
-              title="Logout"
-            >
-              <SFSymbol name="arrow.right" className="w-5 h-5 -rotate-90 md:rotate-0" size={18} />
-            </button>
+        {/* Navigation Links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {navItems.map((item) => {
+            const isActive = pathname === item.href || 
+              (item.href !== '/home' && pathname.startsWith(item.href));
+            
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 14px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                  transition: 'all 0.2s',
+                  color: isActive ? '#f59e0b' : '#9ca3af',
+                  backgroundColor: isActive ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                }}
+              >
+                <Icon name={item.icon} size={16} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
         </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 14px',
+            borderRadius: '10px',
+            fontSize: '13px',
+            fontWeight: 500,
+            color: '#9ca3af',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+          }}
+        >
+          <Icon name="logout" size={16} />
+          <span>Logout</span>
+        </button>
       </div>
     </nav>
   );
