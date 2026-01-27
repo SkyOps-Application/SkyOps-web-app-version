@@ -3,10 +3,10 @@ databases:
     databaseName: skyops_db
     user: user
     plan: free
-    region: singapore # Change this to your preferred region if needed
+    region: singapore 
 
   - name: skyops-redis
-    plan: free # Note: Redis free tier is ephemeral
+    plan: free
     region: singapore
 
 services:
@@ -16,7 +16,7 @@ services:
   - type: web
     name: skyops-user-service
     env: docker
-    rootDir: backend/user_service
+    rootDir: atc-radar-sim/backend/user_service
     plan: free
     region: singapore
     envVars:
@@ -44,8 +44,8 @@ services:
     name: skyops-simulator-service
     env: docker
     # Root dir is project root because it needs 'shared' folder context
-    rootDir: .
-    dockerfilePath: backend/simulator_service/Dockerfile
+    rootDir: atc-radar-sim
+    dockerfilePath: atc-radar-sim/backend/simulator_service/Dockerfile
     plan: free
     region: singapore
     envVars:
@@ -70,8 +70,8 @@ services:
   - type: worker
     name: skyops-notification-service
     env: docker
-    rootDir: .
-    dockerfilePath: backend/notification_service/Dockerfile
+    rootDir: atc-radar-sim
+    dockerfilePath: atc-radar-sim/backend/notification_service/Dockerfile
     plan: free
     region: singapore
     envVars:
@@ -95,8 +95,8 @@ services:
   - type: web
     name: skyops-frontend
     env: docker
-    rootDir: .
-    dockerfilePath: frontend/Dockerfile
+    rootDir: atc-radar-sim
+    dockerfilePath: atc-radar-sim/frontend/Dockerfile
     plan: free
     region: singapore
     envVars:
