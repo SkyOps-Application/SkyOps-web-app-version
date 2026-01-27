@@ -104,9 +104,9 @@ services:
         fromService:
           type: web
           name: skyops-user-service
-          property: url
+          property: host
       - key: NEXT_PUBLIC_SIMULATOR_URL
         fromService:
           type: web
           name: skyops-simulator-service
-          property: url
+          property: host

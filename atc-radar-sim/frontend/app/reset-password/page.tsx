@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { AuroraInput } from '@/components/AuroraInput';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
+import { API_URL } from '@/lib/config';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -34,7 +35,7 @@ export default function ResetPasswordPage() {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/reset-password`,
+        `${API_URL}/reset-password`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

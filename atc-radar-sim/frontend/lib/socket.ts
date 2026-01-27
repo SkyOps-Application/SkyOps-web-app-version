@@ -5,11 +5,13 @@
 import { io, Socket } from 'socket.io-client';
 import { ServerToClientEvents, ClientToServerEvents } from '@atc-radar-sim/shared';
 
+import { SIMULATOR_URL } from './config';
+
 let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 
 export function getSocket(): Socket<ServerToClientEvents, ClientToServerEvents> {
   if (!socket) {
-    const url = process.env.NEXT_PUBLIC_SIMULATOR_URL || 'http://localhost:4000';
+    const url = SIMULATOR_URL;
 
     console.log('Creating socket connection to:', url);
 
