@@ -7,7 +7,7 @@ dotenv.config();
 
 const redisUrl = process.env.REDIS_URL;
 
-let connection;
+let connection: Redis;
 
 if (redisUrl) {
   connection = new Redis(redisUrl, {
