@@ -67,7 +67,7 @@ services:
   # -------------------------
   # NOTIFICATION SERVICE (Node)
   # -------------------------
-  - type: worker
+  - type: web
     name: skyops-notification-service
     env: docker
     rootDir: atc-radar-sim
@@ -75,6 +75,8 @@ services:
     plan: free
     region: singapore
     envVars:
+      - key: PORT
+        value: 8080
       - key: REDIS_HOST
         fromDatabase:
           name: skyops-redis

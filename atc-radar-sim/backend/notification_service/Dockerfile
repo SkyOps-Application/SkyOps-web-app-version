@@ -40,6 +40,7 @@ RUN npm install --omit=dev
 
 COPY --from=builder /app/backend/dist-noti ./dist-noti
 
-# No port exposed
+# Expose port for Render Web Service
+EXPOSE 8080
 
 CMD ["node", "dist-noti/notification_service/worker.js"]
