@@ -61,6 +61,8 @@ services:
           property: port
       - key: CORS_ORIGIN
         value: "*" # Set to * initially to avoid circular dependency. Secure this later.
+      - key: CACHE_BUSTER
+        value: "1" # Force blueprint update
       - key: JWT_SECRET_KEY
         generateValue: true
 
