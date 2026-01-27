@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -14,8 +13,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [emailActive, setEmailActive] = useState(false);
-  const [passwordActive, setPasswordActive] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -36,10 +33,7 @@ export default function LoginPage() {
         throw new Error(data.error || 'Login failed');
       }
 
-      // Store token and user info
       localStorage.setItem('access_token', data.access_token);
-      
-      // Redirect to home dashboard
       router.push('/home');
     } catch (err: any) {
       setError(err.message);
@@ -51,14 +45,15 @@ export default function LoginPage() {
   return (
     <GlassBackground>
       <GridOverlay opacity={0.04} />
-      
-      <div className="min-h-screen flex items-center justify-center px-6 py-20">
-        <div className="w-full max-w-lg space-y-12">
-          {/* Logo and Title */}
-          <div className="text-center space-y-10 animate-fadeIn">
+
+      <div className="min-h-screen flex items-center justify-center px-6 py-16">
+        <div className="w-full max-w-lg space-y-16">
+
+          {/* HERO */}
+          <div className="text-center space-y-16 animate-fadeIn">
+            {/* Logo */}
             <div className="flex justify-center">
               <div className="relative">
-                {/* Glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-2xl opacity-60 animate-pulse" />
                 <div className="relative w-36 h-36 flex items-center justify-center">
                   <Image
@@ -71,28 +66,45 @@ export default function LoginPage() {
                 </div>
               </div>
             </div>
-            
-            <div className="space-y-4">
-              <h1 className="text-6xl font-bold text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
+
+            {/* Title */}
+            <div className="space-y-6">
+              <h1
+                className="text-6xl font-bold text-white tracking-tight"
+                style={{ fontFamily: 'system-ui, -apple-system' }}
+              >
                 SkyOps
               </h1>
-              <p className="text-xl text-gray-400 font-medium">Air Traffic Control Simulator</p>
+
+              {/* ✅ pb-8 = ~30px như DevTools */}
+              <p className="text-xl text-gray-400 font-medium pb-8">
+                Air Traffic Control Simulator
+              </p>
             </div>
           </div>
 
-          {/* Login Card */}
-          <div className="glass-strong rounded-3xl p-12 shadow-2xl animate-fadeIn">
-            <h2 className="text-4xl font-bold text-center text-white mb-12">Sign In</h2>
-            
+          {/* LOGIN CARD */}
+          <div className="glass-strong rounded-3xl p-10 shadow-2xl animate-fadeIn">
+            {/* ✅ thêm padding cho title */}
+            <h2 className="text-4xl font-bold text-center text-white px-6 pt-8 pb-4 mb-12 leading-tight">
+              Sign In
+            </h2>
+
             {error && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm mb-10 text-base" role="alert">
-                <span className="block sm:inline">{error}</span>
+              <div
+                className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm mb-10 text-base"
+                role="alert"
+              >
+                {error}
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="flex flex-col gap-8">
+            <form onSubmit={handleLogin} className="flex flex-col gap-10">
               <div>
-                <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="email">
+                <label
+                  htmlFor="email"
+                  className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-2 ml-1"
+                >
                   Email Address
                 </label>
                 <AuroraInput
@@ -101,13 +113,15 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="pilot@skyops.com"
-                  isActive={emailActive}
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-3 ml-1" htmlFor="password">
+                <label
+                  htmlFor="password"
+                  className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-2 ml-1"
+                >
                   Password
                 </label>
                 <AuroraInput
@@ -116,14 +130,13 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  isActive={passwordActive}
                   required
                 />
               </div>
 
-              <div className="flex justify-end">
-                <Link 
-                  href="/forgot-password" 
+              <div className="flex justify-end pt-2">
+                <Link
+                  href="/forgot-password"
                   className="text-sm text-white/70 hover:text-white transition-colors font-medium"
                 >
                   Forgot Password?
@@ -140,7 +153,7 @@ export default function LoginPage() {
                   text-white
                   transition-all duration-300
                   shadow-xl hover:shadow-2xl hover:scale-[0.98]
-                  mt-4
+                  mt-6
                   ${loading ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
@@ -148,11 +161,11 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-12 pt-8 text-center border-t border-white/10">
+            <div className="mt-10 pt-6 text-center border-t border-white/10">
               <p className="text-white/60 text-base">
                 Don't have an account?{' '}
-                <Link 
-                  href="/register" 
+                <Link
+                  href="/register"
                   className="text-[#18c3e8] hover:text-[#5e879e] font-bold transition-colors"
                 >
                   Register
@@ -160,6 +173,7 @@ export default function LoginPage() {
               </p>
             </div>
           </div>
+
         </div>
       </div>
     </GlassBackground>

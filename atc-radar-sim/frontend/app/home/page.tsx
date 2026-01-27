@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -7,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
 import { DashboardCard } from '@/components/DashboardCard';
-import { SFSymbol } from '@/components/SFSymbol';
 
 export default function HomePage() {
   const router = useRouter();
@@ -44,38 +42,34 @@ export default function HomePage() {
   return (
     <GlassBackground>
       <GridOverlay opacity={0.04} />
-      
-      
 
-      <main className="relative z-10 w-full flex flex-col items-center min-h-screen px-6 pt-24 pb-40">
+      <main className="relative z-10 w-full flex flex-col items-center min-h-screen px-6 pt-40 pb-40">
         <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
+          
           {/* Hero Section */}
-          <div className="text-center mb-24">
+          <div className="text-center mb-40">
             {/* Logo */}
-            <div className="flex justify-center mb-12">
-              <div className="relative">
-                {/* Glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-3xl opacity-60" />
-                <div 
-                  className="relative w-44 h-44 flex items-center justify-center transition-all duration-700 ease-out"
-                  style={{ 
-                    transform: `scale(${logoScale})`,
-                    opacity: logoOpacity
-                  }}
-                >
-                  <Image
-                    src="/mainlogo.png"
-                    alt="SkyOps Logo"
-                    width={176}
-                    height={176}
-                    className="object-contain"
-                  />
-                </div>
+            <div className="flex justify-center mb-16 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-3xl opacity-60" />
+              <div 
+                className="relative w-44 h-44 flex items-center justify-center transition-all duration-700 ease-out"
+                style={{ 
+                  transform: `scale(${logoScale})`,
+                  opacity: logoOpacity
+                }}
+              >
+                <Image
+                  src="/mainlogo.png"
+                  alt="SkyOps Logo"
+                  width={175}
+                  height={175}
+                  className="object-contain"
+                />
               </div>
             </div>
 
             {/* Title */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               <h1 className="text-7xl md:text-8xl font-bold text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
                 SkyOps
               </h1>
@@ -87,7 +81,7 @@ export default function HomePage() {
 
           {/* Dashboard Cards */}
           <div 
-            className="flex flex-col md:flex-row gap-6 max-w-5xl w-full"
+            className="flex flex-col md:flex-row gap-10 max-w-5xl w-full mb-40 transition-opacity duration-700"
             style={{ opacity: cardsOpacity }}
           >
             <DashboardCard
@@ -116,9 +110,8 @@ export default function HomePage() {
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-16" style={{ opacity: cardsOpacity }}>
+          <div className="text-center mt-auto pt-12" style={{ opacity: cardsOpacity }}>
             <p className="text-gray-500 text-sm font-medium">
-              © 2026 SkyOps Simulation. All rights reserved.
             </p>
           </div>
         </div>

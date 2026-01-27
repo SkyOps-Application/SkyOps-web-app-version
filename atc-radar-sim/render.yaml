@@ -1,0 +1,112 @@
+databases:
+  - name: skyops-db
+    databaseName: skyops_db
+    user: user
+    plan: free
+    region: singapore # Change this to your preferred region if needed
+
+  - name: skyops-redis
+    plan: free # Note: Redis free tier is ephemeral
+    region: singapore
+
+services:
+  # -------------------------
+  # USER SERVICE (Python)
+  # -------------------------
+  - type: web
+    name: skyops-user-service
+    env: docker
+    rootDir: backend/user_service
+    plan: free
+    region: singapore
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: skyops-db
+          property: connectionString
+      - key: REDIS_HOST
+        fromDatabase:
+          name: skyops-redis
+          property: host
+      - key: REDIS_PORT
+        fromDatabase:
+          name: skyops-redis
+          property: port
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_ENV
+        value: production
+
+  # -------------------------
+  # SIMULATOR SERVICE (Node)
+  # -------------------------
+  - type: web
+    name: skyops-simulator-service
+    env: docker
+    # Root dir is project root because it needs 'shared' folder context
+    rootDir: .
+    dockerfilePath: backend/simulator_service/Dockerfile
+    plan: free
+    region: singapore
+    envVars:
+      - key: PORT
+        value: 4000
+      - key: REDIS_HOST
+        fromDatabase:
+          name: skyops-redis
+          property: host
+      - key: REDIS_PORT
+        fromDatabase:
+          name: skyops-redis
+          property: port
+      - key: CORS_ORIGIN
+        value: "*" # Set to * initially to avoid circular dependency. Secure this later.
+      - key: JWT_SECRET_KEY
+        generateValue: true
+
+  # -------------------------
+  # NOTIFICATION SERVICE (Node)
+  # -------------------------
+  - type: worker
+    name: skyops-notification-service
+    env: docker
+    rootDir: .
+    dockerfilePath: backend/notification_service/Dockerfile
+    plan: free
+    region: singapore
+    envVars:
+      - key: REDIS_HOST
+        fromDatabase:
+          name: skyops-redis
+          property: host
+      - key: REDIS_PORT
+        fromDatabase:
+          name: skyops-redis
+          property: port
+      # Add SMTP details in Render Dashboard manually for security
+      - key: MAIL_SERVER
+        value: smtp.example.com
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+
+  # -------------------------
+  # FRONTEND (Next.js)
+  # -------------------------
+  - type: web
+    name: skyops-frontend
+    env: docker
+    rootDir: .
+    dockerfilePath: frontend/Dockerfile
+    plan: free
+    region: singapore
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: skyops-user-service
+          property: url
+      - key: NEXT_PUBLIC_SIMULATOR_URL
+        fromService:
+          type: web
+          name: skyops-simulator-service
+          property: url

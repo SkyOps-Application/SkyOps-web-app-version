@@ -9,7 +9,7 @@ let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 
 export function getSocket(): Socket<ServerToClientEvents, ClientToServerEvents> {
   if (!socket) {
-    const url = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:4000';
+    const url = process.env.NEXT_PUBLIC_SIMULATOR_URL || 'http://localhost:4000';
 
     console.log('Creating socket connection to:', url);
 
