@@ -33,18 +33,12 @@ ENV NODE_ENV production
 
 COPY backend/package.json backend/package-lock.json* ./
 
-# Setup shared module for runtime before install
-COPY shared ../shared
+# Copy fully built shared module from builder (contains dist and bridge files)
+COPY --from=builder /app/shared /app/shared
+
+# Update shared dependency to local path
 RUN sed -i 's/"@atc-radar-sim\/shared": "[^"]*"/"@atc-radar-sim\/shared": "file:..\/shared"/g' package.json
-
 RUN npm install --omit=dev
-
-# Build shared module for runtime (to generate dist and bridge files)
-WORKDIR /app/shared
-RUN npm install
-RUN npm run build
-# Return to backend to finish setup
-WORKDIR /app/backend
 
 
 
