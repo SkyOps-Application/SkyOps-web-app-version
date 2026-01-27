@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { PageBackground } from '@/components/PageBackground';
-import { Card } from '@/components/Card';
-import { Icon } from '@/components/Icon';
+import Image from 'next/image';
+import { GlassBackground } from '@/components/GlassBackground';
+import { GridOverlay } from '@/components/GridOverlay';
+import { Navbar } from '@/components/Navbar';
+import { API_URL } from '@/lib/config';
 
 interface UserProfile {
   id: string;
@@ -36,31 +38,25 @@ export default function ProfilePage() {
       const token = localStorage.getItem('access_token');
       if (!token) return;
 
-      try {
-        const [profileRes, historyRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/history`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
-        ]);
-        
-        if (profileRes.ok) {
-          const pData = await profileRes.json();
-          setProfile(pData);
-        }
+            try {
+                // Fetch Profile
+                const profileRes = await fetch(`${API_URL}/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (profileRes.ok) {
+                    const pData = await profileRes.json();
+                    setProfile(pData);
+                }
 
-        if (historyRes.ok) {
-          const hData = await historyRes.json();
-          setHistory(hData);
-        }
-      } catch (e) {
-        console.error("Failed to fetch data", e);
-      } finally {
-        setLoading(false);
-      }
-    };
+                // Fetch History
+                const historyRes = await fetch(`${API_URL}/history`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (historyRes.ok) {
+                    const hData = await historyRes.json();
+                    setHistory(hData);
+                }
 
     fetchData();
   }, []);

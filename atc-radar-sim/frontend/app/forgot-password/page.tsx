@@ -2,12 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { PageBackground } from '@/components/PageBackground';
-import { Card } from '@/components/Card';
-import { Input } from '@/components/Input';
-import { Button } from '@/components/Button';
-import { Logo } from '@/components/Logo';
-import { Icon } from '@/components/Icon';
+import { AuroraInput } from '@/components/AuroraInput';
+import { GlassBackground } from '@/components/GlassBackground';
+import { GridOverlay } from '@/components/GridOverlay';
+import { API_URL } from '@/lib/config';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -22,7 +20,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/forgot-password`, {
+      const res = await fetch(`${API_URL}/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),

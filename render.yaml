@@ -3,10 +3,10 @@ databases:
     databaseName: skyops_db
     user: user
     plan: free
-    region: singapore # Change this to your preferred region if needed
+    region: singapore 
 
   - name: skyops-redis
-    plan: free # Note: Redis free tier is ephemeral
+    plan: free
     region: singapore
 
 services:
@@ -16,7 +16,7 @@ services:
   - type: web
     name: skyops-user-service
     env: docker
-    rootDir: backend/user_service
+    rootDir: atc-radar-sim/backend/user_service
     plan: free
     region: singapore
     envVars:
@@ -44,7 +44,7 @@ services:
     name: skyops-simulator-service
     env: docker
     # Root dir is project root because it needs 'shared' folder context
-    rootDir: .
+    rootDir: atc-radar-sim
     dockerfilePath: backend/simulator_service/Dockerfile
     plan: free
     region: singapore
@@ -61,20 +61,24 @@ services:
           property: port
       - key: CORS_ORIGIN
         value: "*" # Set to * initially to avoid circular dependency. Secure this later.
+      - key: CACHE_BUSTER
+        value: "1" # Force blueprint update
       - key: JWT_SECRET_KEY
         generateValue: true
 
   # -------------------------
   # NOTIFICATION SERVICE (Node)
   # -------------------------
-  - type: worker
+  - type: web
     name: skyops-notification-service
     env: docker
-    rootDir: .
+    rootDir: atc-radar-sim
     dockerfilePath: backend/notification_service/Dockerfile
     plan: free
     region: singapore
     envVars:
+      - key: PORT
+        value: 8080
       - key: REDIS_HOST
         fromDatabase:
           name: skyops-redis
@@ -95,7 +99,7 @@ services:
   - type: web
     name: skyops-frontend
     env: docker
-    rootDir: .
+    rootDir: atc-radar-sim
     dockerfilePath: frontend/Dockerfile
     plan: free
     region: singapore
@@ -104,9 +108,9 @@ services:
         fromService:
           type: web
           name: skyops-user-service
-          property: url
+          property: host
       - key: NEXT_PUBLIC_SIMULATOR_URL
         fromService:
           type: web
           name: skyops-simulator-service
-          property: url
+          property: host

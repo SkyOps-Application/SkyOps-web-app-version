@@ -9,6 +9,8 @@ import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { Logo } from '@/components/Logo';
 
+import { API_URL } from '@/lib/config';
+
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     email: '',
@@ -43,7 +45,8 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+      // Backend expects: email, password, first_name, last_name, age
+      const res = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
