@@ -5,11 +5,21 @@ databases:
     plan: free
     region: singapore 
 
-  - name: skyops-redis
+services:
+  # -------------------------
+  # CUSTOM REDIS (Web Service)
+  # -------------------------
+  - type: web
+    name: skyops-custom-redis
+    env: docker
+    rootDir: atc-radar-sim
+    dockerfilePath: redis-custom/Dockerfile
     plan: free
     region: singapore
+    envVars:
+      - key: PORT
+        value: 10000
 
-services:
   # -------------------------
   # USER SERVICE (Python)
   # -------------------------
@@ -25,9 +35,7 @@ services:
           name: skyops-db
           property: connectionString
       - key: REDIS_URL
-        fromDatabase:
-          name: skyops-redis
-          property: connectionString
+        value: redis://skyops-custom-redis:6379
       - key: SECRET_KEY
         generateValue: true
       - key: FLASK_ENV
@@ -48,13 +56,11 @@ services:
       - key: PORT
         value: 4000
       - key: REDIS_URL
-        fromDatabase:
-          name: skyops-redis
-          property: connectionString
+        value: redis://skyops-custom-redis:6379
       - key: CORS_ORIGIN
         value: "*" # Set to * initially to avoid circular dependency. Secure this later.
       - key: CACHE_BUSTER
-        value: "1" # Force blueprint update
+        value: "999" # Force blueprint update
       - key: JWT_SECRET_KEY
         generateValue: true
 
@@ -72,9 +78,7 @@ services:
       - key: PORT
         value: 8080
       - key: REDIS_URL
-        fromDatabase:
-          name: skyops-redis
-          property: connectionString
+        value: redis://skyops-custom-redis:6379
       # Add SMTP details in Render Dashboard manually for security
       - key: MAIL_SERVER
         value: smtp.example.com
