@@ -1,117 +1,171 @@
-
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
-import { GlassBackground } from '@/components/GlassBackground';
-import { GridOverlay } from '@/components/GridOverlay';
-import { SFSymbol } from '@/components/SFSymbol';
-import { Navbar } from '@/components/Navbar';
+import { PageBackground } from '@/components/PageBackground';
+import { Card } from '@/components/Card';
+import { Logo } from '@/components/Logo';
+import { Icon } from '@/components/Icon';
+
+const features = [
+  { icon: 'chart' as const, text: 'Realistic radar display with waypoints' },
+  { icon: 'airplane' as const, text: 'Real-time aircraft simulation' },
+  { icon: 'gear' as const, text: 'Command-based control system' },
+  { icon: 'alert' as const, text: 'Separation monitoring & alerts' },
+  { icon: 'book' as const, text: 'Step-by-step tutorial' },
+  { icon: 'trophy' as const, text: 'Score tracking & history' },
+];
 
 export default function AboutPage() {
   return (
-    <GlassBackground>
-      <GridOverlay opacity={0.04} />
-      
-      {/* Background */}
-      <div className="fixed inset-0 z-0">
-        <Image
-          src="/background-web.png"
-          alt="Background"
-          fill
-          className="object-cover opacity-15"
-          priority
-        />
-      </div>
-
-      <Navbar />
-
-      <main className="relative z-10 w-full flex flex-col items-center min-h-screen pt-40 px-6 pb-48">
-        <div className="w-full max-w-5xl mx-auto space-y-24">
+    <PageBackground>
+      <div style={{ 
+        minHeight: '100vh', 
+        paddingTop: '100px', 
+        paddingBottom: '60px',
+        paddingLeft: '24px',
+        paddingRight: '24px',
+      }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           {/* Header */}
-          <div className="text-center space-y-12">
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-3xl opacity-60" />
-                <div className="relative w-44 h-44 flex items-center justify-center">
-                  <Image
-                    src="/mainlogo.png"
-                    alt="SkyOps Logo"
-                    width={176}
-                    height={176}
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-6">
-              <h1 className="text-6xl md:text-7xl font-bold text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
-                SkyOps
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <Logo size="lg" />
+            <div style={{ marginTop: '24px' }}>
+              <h1 style={{ 
+                fontSize: '42px', 
+                fontWeight: 700, 
+                color: 'white',
+                marginBottom: '12px',
+              }}>
+                About{' '}
+                <span style={{ 
+                  background: 'linear-gradient(135deg, #f59e0b, #fcd34d)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>
+                  SkyOps
+                </span>
               </h1>
-              <p className="text-2xl text-gray-400 font-medium">Air Traffic Control Training Simulator</p>
+              <p style={{ fontSize: '18px', color: '#9ca3af' }}>
+                Air Traffic Control Training Simulator
+              </p>
             </div>
           </div>
-        
-          {/* Content Cards */}
-          <div className="space-y-10">
-            <div className="glass-strong rounded-3xl p-16 shadow-2xl">
-              <div className="flex items-center gap-6 mb-8">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#18c3e8] to-[#5e879e] flex items-center justify-center shadow-lg">
-                  <SFSymbol name="info" className="text-white" size={28} />
-                </div>
-                <h2 className="text-3xl font-bold text-white">About SkyOps</h2>
-              </div>
-              <div className="space-y-6 text-gray-300 text-lg leading-relaxed">
-                <p>
-                  SkyOps is a cutting-edge Air Traffic Control (ATC) radar simulation platform designed to bridge the gap between theoretical knowledge and practical application.
-                </p>
-                <p>
-                  Our mission is to provide aviation enthusiasts, students, and professionals with a highly realistic environment to practice radar monitoring, vectoring, and airspace management.
-                </p>
-                <p>
-                  Built with modern web technologies and real-time WebSocket communication, SkyOps delivers a seamless, high-fidelity experience right in your browser.
-                </p>
-              </div>
-            </div>
 
-            <div className="glass-strong rounded-3xl p-16 shadow-2xl">
-              <div className="flex items-center gap-6 mb-8">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#e5b14b] to-[#ffd200] flex items-center justify-center shadow-lg">
-                  <SFSymbol name="star" className="text-white" size={28} />
+          {/* Content */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* About Section */}
+            <Card variant="elevated" padding="lg">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Icon name="info" size={22} className="text-white" />
                 </div>
-                <h2 className="text-3xl font-bold text-white">Key Features</h2>
+                <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'white' }}>About SkyOps</h2>
               </div>
-              <ul className="space-y-5 text-gray-300 text-lg">
-                <li className="flex items-start gap-4">
-                  <SFSymbol name="chart" className="text-[#18c3e8] mt-1 flex-shrink-0" size={20} />
-                  <span>Realistic radar display with waypoints</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <SFSymbol name="airplane" className="text-[#18c3e8] mt-1 flex-shrink-0" size={20} />
-                  <span>Real-time aircraft simulation</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <SFSymbol name="gear" className="text-[#18c3e8] mt-1 flex-shrink-0" size={20} />
-                  <span>Command-based control system</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <SFSymbol name="chart" className="text-[#18c3e8] mt-1 flex-shrink-0" size={20} />
-                  <span>Separation monitoring</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <SFSymbol name="book" className="text-[#18c3e8] mt-1 flex-shrink-0" size={20} />
-                  <span>Step-by-step tutorial</span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <SFSymbol name="star" className="text-[#18c3e8] mt-1 flex-shrink-0" size={20} />
-                  <span>Score tracking</span>
-                </li>
-              </ul>
-            </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', color: '#9ca3af', lineHeight: 1.7 }}>
+                <p>
+                  SkyOps is a cutting-edge Air Traffic Control (ATC) radar simulation platform 
+                  designed to bridge the gap between theoretical knowledge and practical application.
+                </p>
+                <p>
+                  Our mission is to provide aviation enthusiasts, students, and professionals 
+                  with a highly realistic environment to practice radar monitoring, vectoring, 
+                  and airspace management.
+                </p>
+                <p>
+                  Built with modern web technologies and real-time WebSocket communication, 
+                  SkyOps delivers a seamless, high-fidelity experience right in your browser.
+                </p>
+              </div>
+            </Card>
+
+            {/* Features Section */}
+            <Card variant="elevated" padding="lg">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #10b981, #14b8a6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Icon name="star" size={22} className="text-white" />
+                </div>
+                <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'white' }}>Key Features</h2>
+              </div>
+              
+              <div style={{ 
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '12px',
+              }}>
+                {features.map((feature) => (
+                  <div 
+                    key={feature.text}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      background: '#111827',
+                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                    }}
+                  >
+                    <Icon name={feature.icon} size={18} className="text-amber-500" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <span style={{ fontSize: '14px', color: '#9ca3af' }}>{feature.text}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Technology Section */}
+            <Card variant="elevated" padding="lg">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Icon name="gear" size={22} className="text-white" />
+                </div>
+                <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'white' }}>Technology Stack</h2>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {['Next.js', 'React', 'TypeScript', 'Socket.IO', 'Node.js', 'Python', 'PostgreSQL', 'Redis'].map((tech) => (
+                  <span 
+                    key={tech}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '9999px',
+                      background: '#111827',
+                      border: '1px solid rgba(255, 255, 255, 0.06)',
+                      fontSize: '14px',
+                      color: '#9ca3af',
+                    }}
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </Card>
           </div>
         </div>
-      </main>
-    </GlassBackground>
+      </div>
+    </PageBackground>
   );
 }

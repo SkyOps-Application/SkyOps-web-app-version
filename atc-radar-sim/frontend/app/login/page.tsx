@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AuroraInput } from '@/components/AuroraInput';
-import { GlassBackground } from '@/components/GlassBackground';
-import { GridOverlay } from '@/components/GridOverlay';
-import Image from 'next/image';
+import { PageBackground } from '@/components/PageBackground';
+import { Card } from '@/components/Card';
+import { Input } from '@/components/Input';
+import { Button } from '@/components/Button';
+import { Logo } from '@/components/Logo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -35,147 +36,137 @@ export default function LoginPage() {
 
       localStorage.setItem('access_token', data.access_token);
       router.push('/home');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <GlassBackground>
-      <GridOverlay opacity={0.04} />
-
-      <div className="min-h-screen flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-lg space-y-16">
-
-          {/* HERO */}
-          <div className="text-center space-y-16 animate-fadeIn">
-            {/* Logo */}
-            <div className="flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-2xl opacity-60 animate-pulse" />
-                <div className="relative w-36 h-36 flex items-center justify-center">
-                  <Image
-                    src="/mainlogo.png"
-                    alt="SkyOps Logo"
-                    width={140}
-                    height={140}
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Title */}
-            <div className="space-y-6">
-              <h1
-                className="text-6xl font-bold text-white tracking-tight"
-                style={{ fontFamily: 'system-ui, -apple-system' }}
-              >
-                SkyOps
+    <PageBackground>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 24px',
+      }}>
+        <div style={{ width: '100%', maxWidth: '420px' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <Logo size="lg" />
+            <div style={{ marginTop: '24px' }}>
+              <h1 style={{ 
+                fontSize: '32px', 
+                fontWeight: 700, 
+                color: 'white',
+                marginBottom: '8px',
+              }}>
+                Welcome back
               </h1>
-
-              {/* ✅ pb-8 = ~30px như DevTools */}
-              <p className="text-xl text-gray-400 font-medium pb-8">
-                Air Traffic Control Simulator
+              <p style={{ fontSize: '16px', color: '#9ca3af' }}>
+                Sign in to continue your training
               </p>
             </div>
           </div>
 
-          {/* LOGIN CARD */}
-          <div className="glass-strong rounded-3xl p-10 shadow-2xl animate-fadeIn">
-            {/* ✅ thêm padding cho title */}
-            <h2 className="text-4xl font-bold text-center text-white px-6 pt-8 pb-4 mb-12 leading-tight">
-              Sign In
-            </h2>
-
+          {/* Form Card */}
+          <Card variant="elevated" padding="lg">
             {error && (
-              <div
-                className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm mb-10 text-base"
-                role="alert"
-              >
+              <div style={{
+                padding: '16px',
+                borderRadius: '10px',
+                marginBottom: '24px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                color: '#fca5a5',
+                fontSize: '14px',
+                fontWeight: 500,
+              }}>
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="flex flex-col gap-10">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-2 ml-1"
-                >
-                  Email Address
-                </label>
-                <AuroraInput
+            <form onSubmit={handleLogin}>
+              <div style={{ marginBottom: '20px' }}>
+                <Input
                   id="email"
                   type="email"
+                  label="Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="pilot@skyops.com"
                   required
+                  autoComplete="email"
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-white/90 text-sm font-bold uppercase tracking-wider mb-2 ml-1"
-                >
-                  Password
-                </label>
-                <AuroraInput
+              <div style={{ marginBottom: '16px' }}>
+                <Input
                   id="password"
                   type="password"
+                  label="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
+                  autoComplete="current-password"
                 />
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div style={{ textAlign: 'right', marginBottom: '24px' }}>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-white/70 hover:text-white transition-colors font-medium"
+                  style={{ 
+                    fontSize: '14px', 
+                    color: '#6b7280',
+                    textDecoration: 'none',
+                  }}
                 >
-                  Forgot Password?
+                  Forgot password?
                 </Link>
               </div>
 
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className={`
-                  w-full h-16 rounded-full font-bold text-lg
-                  bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
-                  hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
-                  text-white
-                  transition-all duration-300
-                  shadow-xl hover:shadow-2xl hover:scale-[0.98]
-                  mt-6
-                  ${loading ? 'opacity-50 cursor-not-allowed' : ''}
-                `}
+                loading={loading}
+                size="lg"
               >
-                {loading ? 'Signing In...' : 'Sign In'}
-              </button>
+                Sign In
+              </Button>
             </form>
 
-            <div className="mt-10 pt-6 text-center border-t border-white/10">
-              <p className="text-white/60 text-base">
-                Don't have an account?{' '}
+            <div style={{ 
+              marginTop: '24px',
+              paddingTop: '24px',
+              textAlign: 'center',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            }}>
+              <p style={{ fontSize: '14px', color: '#9ca3af' }}>
+                Don&apos;t have an account?{' '}
                 <Link
                   href="/register"
-                  className="text-[#18c3e8] hover:text-[#5e879e] font-bold transition-colors"
+                  style={{ color: '#f59e0b', fontWeight: 500, textDecoration: 'none' }}
                 >
-                  Register
+                  Create one
                 </Link>
               </p>
             </div>
-          </div>
+          </Card>
 
+          {/* Footer */}
+          <p style={{ 
+            textAlign: 'center',
+            marginTop: '32px',
+            fontSize: '12px',
+            color: '#6b7280',
+          }}>
+            © 2026 SkyOps. All rights reserved.
+          </p>
         </div>
       </div>
-    </GlassBackground>
+    </PageBackground>
   );
 }

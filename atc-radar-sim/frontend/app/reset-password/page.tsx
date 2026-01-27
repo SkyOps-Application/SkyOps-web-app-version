@@ -3,9 +3,12 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AuroraInput } from '@/components/AuroraInput';
-import { GlassBackground } from '@/components/GlassBackground';
-import { GridOverlay } from '@/components/GridOverlay';
+import { PageBackground } from '@/components/PageBackground';
+import { Card } from '@/components/Card';
+import { Input } from '@/components/Input';
+import { Button } from '@/components/Button';
+import { Logo } from '@/components/Logo';
+import { Icon } from '@/components/Icon';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -32,6 +35,12 @@ export default function ResetPasswordPage() {
       return;
     }
 
+    if (newPassword.length < 8) {
+      setError('Password must be at least 8 characters');
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/reset-password`,
@@ -53,151 +62,142 @@ export default function ResetPasswordPage() {
         throw new Error(data.error || 'Reset failed');
       }
 
-      setSuccess('Password updated successfully! Redirecting to login...');
+      setSuccess('Password updated successfully! Redirecting...');
       setTimeout(() => {
         router.push('/login');
       }, 2000);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <GlassBackground>
-      <GridOverlay opacity={0.04} />
-
-      <div className="min-h-screen flex items-center justify-center px-6 py-20">
-        <div className="w-full max-w-lg space-y-12">
+    <PageBackground>
+      <div className="min-h-screen flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md space-y-8 animate-fadeIn">
           {/* Header */}
-          <div className="text-center space-y-4 animate-fadeIn">
-            <h1 className="text-5xl font-bold text-white tracking-tight">
-              Reset Password
-            </h1>
-            <p className="text-lg text-white/70">
-              Verify your identity to set a new password
-            </p>
+          <div className="text-center space-y-4">
+            <Logo size="md" />
+            <div>
+              <h1 className="text-3xl font-bold text-white">
+                Reset password
+              </h1>
+              <p className="mt-2 text-[var(--text-secondary)]">
+                Verify your identity to set a new password
+              </p>
+            </div>
           </div>
 
-          {/* Card */}
-          <div className="glass-strong rounded-3xl p-12 shadow-2xl animate-fadeIn space-y-10">
+          {/* Form Card */}
+          <Card variant="elevated" padding="lg">
             {error && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-2xl backdrop-blur-sm text-base">
+              <div className="alert alert-error mb-6">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-6 py-4 rounded-2xl backdrop-blur-sm text-base">
-                {success}
+              <div className="alert alert-success mb-6 flex items-start gap-3">
+                <Icon name="check" size={20} className="flex-shrink-0 mt-0.5" />
+                <span>{success}</span>
               </div>
             )}
 
-            <form onSubmit={handleReset} className="space-y-12">
-              {/* Identity section */}
-              <section className="space-y-8">
-                <div className="space-y-4">
-                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider ml-1">
-                    Email Address
-                  </label>
-                  <AuroraInput
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="pilot@skyops.com"
+            <form onSubmit={handleReset} className="space-y-5">
+              {/* Identity Section */}
+              <div className="space-y-4">
+                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">
+                  Verify Identity
+                </p>
+                
+                <Input
+                  type="email"
+                  label="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="pilot@skyops.com"
+                  required
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    type="text"
+                    label="First Name"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="John"
+                    required
+                  />
+
+                  <Input
+                    type="text"
+                    label="Last Name"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Doe"
                     required
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <label className="block text-white/90 text-sm font-bold uppercase tracking-wider ml-1">
-                      First Name
-                    </label>
-                    <AuroraInput
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      placeholder="John"
-                      required
-                    />
-                  </div>
+              <div className="divider" />
 
-                  <div className="space-y-4">
-                    <label className="block text-white/90 text-sm font-bold uppercase tracking-wider ml-1">
-                      Last Name
-                    </label>
-                    <AuroraInput
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      placeholder="Doe"
-                      required
-                    />
-                  </div>
-                </div>
-              </section>
-
-              <div className="h-px bg-white/10 my-10" />
-
-              {/* Password section */}
-              <section className="space-y-8">
-                <div className="space-y-4">
-                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider ml-1">
-                    New Password
-                  </label>
-                  <AuroraInput
+              {/* Password Section */}
+              <div className="space-y-4">
+                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">
+                  New Password
+                </p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
                     type="password"
+                    label="Password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Min 8 characters"
+                    placeholder="Min. 8 characters"
                     required
                   />
-                </div>
 
-                <div className="space-y-4">
-                  <label className="block text-white/90 text-sm font-bold uppercase tracking-wider ml-1">
-                    Confirm Password
-                  </label>
-                  <AuroraInput
+                  <Input
                     type="password"
+                    label="Confirm"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter password"
+                    placeholder="Re-enter"
                     required
                   />
                 </div>
-              </section>
+              </div>
 
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className={`
-                  w-full h-16 rounded-full font-bold text-lg
-                  bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
-                  hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
-                  text-white mt-8
-                  transition-all duration-300
-                  shadow-xl hover:shadow-2xl hover:scale-[0.98]
-                  ${loading ? 'opacity-50 cursor-not-allowed' : ''}
-                `}
+                loading={loading}
+                size="lg"
               >
-                {loading ? 'Verifying & Updating...' : 'Set New Password'}
-              </button>
+                Reset Password
+              </Button>
             </form>
 
-            <div className="pt-6 text-center">
+            <div className="mt-6 pt-6 text-center border-t border-[var(--border-subtle)]">
               <Link
                 href="/login"
-                className="text-white/60 hover:text-white text-base font-medium transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-white transition-colors"
               >
-                ← Back to Sign In
+                <Icon name="chevron-left" size={16} />
+                Back to sign in
               </Link>
             </div>
-          </div>
+          </Card>
+
+          {/* Footer */}
+          <p className="text-center text-xs text-[var(--text-muted)]">
+            © 2026 SkyOps. All rights reserved.
+          </p>
         </div>
       </div>
-    </GlassBackground>
+    </PageBackground>
   );
 }
