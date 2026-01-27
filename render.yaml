@@ -105,10 +105,12 @@ services:
     region: singapore
     envVars:
       - key: NEXT_PUBLIC_API_URL
+        value: "/api" # Use relative path to trigger Next.js rewrite
+      - key: INTERNAL_API_URL
         fromService:
           type: web
           name: skyops-user-service
-          property: host
+          property: hostport # Internal host:port for server-side proxy
       - key: NEXT_PUBLIC_SIMULATOR_URL
         fromService:
           type: web
