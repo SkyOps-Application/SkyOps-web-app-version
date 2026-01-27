@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { API_URL } from '@/lib/config';
 
 export default function RegisterPage() {
+  console.log('Current API_URL:', API_URL); // Debugging Render config
   const [formData, setFormData] = useState({
     email: '',
     password: '',
