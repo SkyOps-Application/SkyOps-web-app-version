@@ -5,10 +5,19 @@ class RedisService {
     private client: Redis;
 
     private constructor() {
-        this.client = new Redis({
-            host: process.env.REDIS_HOST || 'localhost',
-            port: parseInt(process.env.REDIS_PORT || '6379'),
-        });
+        const redisUrl = process.env.REDIS_URL;
+        if (redisUrl) {
+            console.log(`Connecting to Redis via URL (TLS: ${redisUrl.startsWith('rediss://')})`);
+            this.client = new Redis(redisUrl, {
+                tls: redisUrl.startsWith('rediss://') ? { rejectUnauthorized: false } : undefined
+            });
+        } else {
+            console.log('Connecting to Redis via Host/Port');
+            this.client = new Redis({
+                host: process.env.REDIS_HOST || 'localhost',
+                port: parseInt(process.env.REDIS_PORT || '6379'),
+            });
+        }
 
         this.client.on('error', (err) => {
             console.error('Redis Client Error:', err);

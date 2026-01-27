@@ -24,14 +24,10 @@ services:
         fromDatabase:
           name: skyops-db
           property: connectionString
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromDatabase:
           name: skyops-redis
-          property: host
-      - key: REDIS_PORT
-        fromDatabase:
-          name: skyops-redis
-          property: port
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: FLASK_ENV
@@ -51,14 +47,10 @@ services:
     envVars:
       - key: PORT
         value: 4000
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromDatabase:
           name: skyops-redis
-          property: host
-      - key: REDIS_PORT
-        fromDatabase:
-          name: skyops-redis
-          property: port
+          property: connectionString
       - key: CORS_ORIGIN
         value: "*" # Set to * initially to avoid circular dependency. Secure this later.
       - key: CACHE_BUSTER
@@ -79,14 +71,10 @@ services:
     envVars:
       - key: PORT
         value: 8080
-      - key: REDIS_HOST
+      - key: REDIS_URL
         fromDatabase:
           name: skyops-redis
-          property: host
-      - key: REDIS_PORT
-        fromDatabase:
-          name: skyops-redis
-          property: port
+          property: connectionString
       # Add SMTP details in Render Dashboard manually for security
       - key: MAIL_SERVER
         value: smtp.example.com

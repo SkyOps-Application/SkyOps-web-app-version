@@ -13,20 +13,34 @@ class RedisService:
         return cls._instance
 
     def _init_redis(self):
-        redis_host = os.getenv('REDIS_HOST', 'localhost')
-        redis_port = int(os.getenv('REDIS_PORT', 6379))
+        redis_url = os.getenv('REDIS_URL')
+        
         try:
-            ssl_enabled = os.getenv('REDIS_SSL', 'true').lower() == 'true'
-            
-            self.client = redis.Redis(
-                host=redis_host, 
-                port=redis_port, 
-                decode_responses=True,
-                ssl=ssl_enabled,
-                ssl_cert_reqs=None 
-            )
+            if redis_url:
+                # Use connection string (handles password, host, port, ssl)
+                # Render's internal REDIS_URL might be redis:// (no SSL) or rediss:// (SSL)
+                self.client = redis.from_url(
+                    redis_url, 
+                    decode_responses=True, 
+                    ssl_cert_reqs=None # Trust self-signed certs if SSL is used
+                )
+                logging.info(f"Connected to Redis using REDIS_URL (SSL: {'rediss' in redis_url})")
+            else:
+                # Fallback to Host/Port (legacy)
+                redis_host = os.getenv('REDIS_HOST', 'localhost')
+                redis_port = int(os.getenv('REDIS_PORT', 6379))
+                ssl_enabled = os.getenv('REDIS_SSL', 'false').lower() == 'true'
+                
+                self.client = redis.Redis(
+                    host=redis_host, 
+                    port=redis_port, 
+                    decode_responses=True,
+                    ssl=ssl_enabled,
+                    ssl_cert_reqs=None
+                )
+                logging.info(f"Connected to Redis at {redis_host}:{redis_port}")
+
             self.client.ping()
-            logging.info(f"Connected to Redis at {redis_host}:{redis_port}")
         except redis.ConnectionError as e:
             logging.error(f"Failed to connect to Redis: {e}")
             self.client = None
