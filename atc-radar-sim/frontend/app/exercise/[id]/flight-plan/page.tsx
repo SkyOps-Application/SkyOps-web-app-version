@@ -1,98 +1,97 @@
-/**
- * Flight Plan page for exercises
- */
-
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { PageBackground } from '@/components/PageBackground';
+import { Card } from '@/components/Card';
+import { Icon } from '@/components/Icon';
+import { Button } from '@/components/Button';
+
+const exercises = [
+  { id: 1, name: 'Exercise 1', hasFlightPlan: true },
+  { id: 2, name: 'Exercise 2', hasFlightPlan: true },
+  { id: 3, name: 'Exercise 3', hasFlightPlan: true },
+];
 
 export default function FlightPlanPage() {
-  const params = useParams();
-  const [exercises, setExercises] = useState([
-    { id: 1, name: 'EXERCISE 1', hasFlightPlan: true },
-    { id: 2, name: 'EXERCISE 2', hasFlightPlan: true },
-    { id: 3, name: 'EXERCISE 3', hasFlightPlan: true },
-  ]);
-
   return (
-    <div className="min-h-screen bg-[#1e3a5f] text-white">
-      {/* Header */}
-      <div className="bg-[#2d5282] px-8 py-6 border-b-4 border-[#1a2d4d]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <h1 className="text-5xl font-black tracking-wider">FLIGHT PLAN</h1>
-          
-          <Link
-            href="/"
-            className="bg-[#1a2d4d] hover:bg-[#14233a] px-6 py-3 rounded-lg font-bold transition-colors"
-          >
-            ← BACK TO HOME
-          </Link>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Section - Exercise List */}
-          <div className="lg:col-span-2 space-y-8">
-            {exercises.map((exercise) => (
-              <div
-                key={exercise.id}
-                className="bg-[#2d5282] rounded-xl p-8 shadow-2xl border-2 border-[#3d6ba8]"
-              >
-                <h2 className="text-3xl font-black mb-6 tracking-wide">
-                  {exercise.name}
-                </h2>
-                
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <span className="text-2xl mr-4">•</span>
-                    <Link
-                      href={`/exercise/${exercise.id}/flight-plan/view`}
-                      className="text-xl font-medium italic hover:text-[#ffde59] transition-colors underline"
-                    >
-                      FLIGHT PLAN
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            ))}
+    <PageBackground>
+      <div className="min-h-screen pt-24 pb-32 px-4">
+        <div className="max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-10 animate-fadeIn">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                Flight Plans
+              </h1>
+              <p className="text-[var(--text-secondary)]">
+                View and manage exercise flight plans
+              </p>
+            </div>
+            <Link href="/home">
+              <Button variant="secondary" size="sm">
+                <Icon name="chevron-left" size={16} />
+                Back to Home
+              </Button>
+            </Link>
           </div>
 
-          {/* Right Section - Add Exercises */}
-          <div className="lg:col-span-1">
-            <div className="bg-[#2d5282] rounded-xl p-8 shadow-2xl border-2 border-[#3d6ba8] sticky top-8">
-              <h2 className="text-3xl font-black mb-6 tracking-wide text-center">
-                ADD EXERCISES
-              </h2>
-              
-              <button className="w-full bg-[#5a7ba6] hover:bg-[#6a8bb6] text-white font-bold text-xl py-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
-                <svg
-                  className="w-8 h-8"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+          {/* Content Grid */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Exercise List */}
+            <div className="lg:col-span-2 space-y-4">
+              {exercises.map((exercise, index) => (
+                <Card 
+                  key={exercise.id}
+                  variant="elevated" 
+                  padding="md"
+                  className="animate-slideUp"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={3}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                ADD
-              </button>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                        <span className="text-white font-bold">{exercise.id}</span>
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-semibold text-white">{exercise.name}</h2>
+                        <p className="text-sm text-[var(--text-muted)]">Flight plan available</p>
+                      </div>
+                    </div>
+                    <Link 
+                      href={`/exercise/${exercise.id}/flight-plan/view`}
+                      className="btn-ghost flex items-center gap-2"
+                    >
+                      <span>View Plan</span>
+                      <Icon name="chevron-right" size={16} />
+                    </Link>
+                  </div>
+                </Card>
+              ))}
+            </div>
 
-              <p className="text-sm text-gray-300 mt-4 text-center italic">
-                Click to create a new exercise with custom flight plans
-              </p>
+            {/* Add Exercise Sidebar */}
+            <div className="lg:col-span-1">
+              <Card 
+                variant="elevated" 
+                padding="lg" 
+                className="sticky top-24 animate-fadeIn animate-delay-200"
+              >
+                <h2 className="text-xl font-bold text-white mb-4 text-center">
+                  Add Exercise
+                </h2>
+                <p className="text-sm text-[var(--text-muted)] text-center mb-6">
+                  Create a new exercise with custom flight plans
+                </p>
+                <Button variant="secondary" className="w-full">
+                  <Icon name="chart" size={18} />
+                  Add New Exercise
+                </Button>
+              </Card>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageBackground>
   );
 }
-

@@ -1,121 +1,198 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
+import React, { useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { GlassBackground } from '@/components/GlassBackground';
-import { GridOverlay } from '@/components/GridOverlay';
-import { DashboardCard } from '@/components/DashboardCard';
+import { PageBackground } from '@/components/PageBackground';
+import { Card } from '@/components/Card';
+import { Icon } from '@/components/Icon';
+import { Logo } from '@/components/Logo';
+
+const features = [
+  {
+    icon: 'airplane' as const,
+    title: 'Start Training',
+    description: 'Begin your ATC simulation exercises',
+    href: '/exercises',
+    gradient: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+  },
+  {
+    icon: 'book' as const,
+    title: 'Instructions',
+    description: 'Learn commands and controls',
+    href: '/instructions',
+    gradient: 'linear-gradient(135deg, #10b981, #14b8a6)',
+  },
+  {
+    icon: 'info' as const,
+    title: 'About SkyOps',
+    description: 'Learn about our platform',
+    href: '/about',
+    gradient: 'linear-gradient(135deg, #3b82f6, #6366f1)',
+  },
+];
 
 export default function HomePage() {
   const router = useRouter();
-  const [logoScale, setLogoScale] = useState(0.8);
-  const [logoOpacity, setLogoOpacity] = useState(0);
-  const [cardsOpacity, setCardsOpacity] = useState(0);
 
   useEffect(() => {
-    // Protect route
     const token = localStorage.getItem('access_token');
     if (!token) {
       router.push('/login');
     }
   }, [router]);
 
-  useEffect(() => {
-    // Animate logo
-    const timer1 = setTimeout(() => {
-      setLogoScale(1.0);
-      setLogoOpacity(1.0);
-    }, 200);
-
-    // Animate cards
-    const timer2 = setTimeout(() => {
-      setCardsOpacity(1.0);
-    }, 500);
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-    };
-  }, []);
-
   return (
-    <GlassBackground>
-      <GridOverlay opacity={0.04} />
-
-      <main className="relative z-10 w-full flex flex-col items-center min-h-screen px-6 pt-40 pb-40">
-        <div className="w-full max-w-6xl mx-auto flex flex-col items-center">
-          
+    <PageBackground>
+      <div style={{ 
+        minHeight: '100vh', 
+        paddingTop: '100px', 
+        paddingBottom: '60px',
+        paddingLeft: '24px',
+        paddingRight: '24px',
+      }}>
+        <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
           {/* Hero Section */}
-          <div className="text-center mb-40">
-            {/* Logo */}
-            <div className="flex justify-center mb-16 relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-3xl opacity-60" />
-              <div 
-                className="relative w-44 h-44 flex items-center justify-center transition-all duration-700 ease-out"
-                style={{ 
-                  transform: `scale(${logoScale})`,
-                  opacity: logoOpacity
-                }}
-              >
-                <Image
-                  src="/mainlogo.png"
-                  alt="SkyOps Logo"
-                  width={175}
-                  height={175}
-                  className="object-contain"
-                />
-              </div>
-            </div>
-
-            {/* Title */}
-            <div className="space-y-6">
-              <h1 className="text-7xl md:text-8xl font-bold text-white tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
-                SkyOps
+          <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+            <Logo size="xl" />
+            <div style={{ marginTop: '24px' }}>
+              <h1 style={{ 
+                fontSize: '48px', 
+                fontWeight: 700, 
+                color: 'white',
+                marginBottom: '16px',
+                lineHeight: 1.2,
+              }}>
+                Welcome to{' '}
+                <span style={{ 
+                  background: 'linear-gradient(135deg, #f59e0b, #fcd34d)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>
+                  SkyOps
+                </span>
               </h1>
-              <p className="text-2xl md:text-3xl text-gray-400 font-medium">
-                Air Traffic Control Simulator
+              <p style={{ 
+                fontSize: '18px', 
+                color: '#9ca3af',
+                maxWidth: '512px',
+                margin: '0 auto',
+                lineHeight: 1.6,
+              }}>
+                Your professional air traffic control training platform. 
+                Practice radar operations and master ATC procedures.
               </p>
             </div>
           </div>
 
-          {/* Dashboard Cards */}
-          <div 
-            className="flex flex-col md:flex-row gap-10 max-w-5xl w-full mb-40 transition-opacity duration-700"
-            style={{ opacity: cardsOpacity }}
-          >
-            <DashboardCard
-              icon="airplane"
-              title="Start Training"
-              subtitle="Begin your journey"
-              gradientColors={['#667eea', '#764ba2']}
-              href="/exercises"
-            />
-            
-            <DashboardCard
-              icon="book"
-              title="Tutorial Notebook"
-              subtitle="Learn ATC basics"
-              gradientColors={['#11998e', '#38ef7d']}
-              href="/instructions"
-            />
-            
-            <DashboardCard
-              icon="info"
-              title="About SkyOps"
-              subtitle="Learn more"
-              gradientColors={['#f093fb', '#f5576c']}
-              href="/about"
-            />
+          {/* Feature Cards */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '24px',
+            marginBottom: '48px',
+          }}>
+            {features.map((feature) => (
+              <Link 
+                key={feature.href} 
+                href={feature.href}
+                style={{ textDecoration: 'none' }}
+              >
+                <Card 
+                  variant="elevated" 
+                  padding="lg"
+                  style={{ 
+                    height: '100%',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '12px',
+                    background: feature.gradient,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '20px',
+                  }}>
+                    <Icon name={feature.icon} size={24} className="text-white" />
+                  </div>
+                  <h3 style={{ 
+                    fontSize: '20px', 
+                    fontWeight: 600, 
+                    color: 'white',
+                    marginBottom: '8px',
+                  }}>
+                    {feature.title}
+                  </h3>
+                  <p style={{ 
+                    fontSize: '14px', 
+                    color: '#9ca3af',
+                    lineHeight: 1.5,
+                  }}>
+                    {feature.description}
+                  </p>
+                  <div style={{ 
+                    marginTop: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: '#f59e0b',
+                    fontSize: '14px',
+                    fontWeight: 500,
+                  }}>
+                    <span>Get started</span>
+                    <Icon name="chevron-right" size={16} />
+                  </div>
+                </Card>
+              </Link>
+            ))}
           </div>
 
-          {/* Footer */}
-          <div className="text-center mt-auto pt-12" style={{ opacity: cardsOpacity }}>
-            <p className="text-gray-500 text-sm font-medium">
+          {/* Quick Start Section */}
+          <Card variant="elevated" padding="lg" style={{ textAlign: 'center' }}>
+            <h2 style={{ 
+              fontSize: '24px', 
+              fontWeight: 700, 
+              color: 'white',
+              marginBottom: '12px',
+            }}>
+              Ready to practice?
+            </h2>
+            <p style={{ 
+              color: '#9ca3af',
+              marginBottom: '24px',
+              maxWidth: '400px',
+              margin: '0 auto 24px',
+            }}>
+              Jump straight into the radar simulator and start your training session now.
             </p>
-          </div>
+            <Link 
+              href="/radar"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '16px 32px',
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#0a0f1a',
+                background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Icon name="play" size={20} />
+              Launch Simulator
+            </Link>
+          </Card>
         </div>
-      </main>
-    </GlassBackground>
+      </div>
+    </PageBackground>
   );
 }

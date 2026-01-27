@@ -33,81 +33,135 @@ export default function ForgotPasswordPage() {
       }
 
       setMessage(data.message || 'If an account exists for this email, you will receive a reset link shortly.');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <GlassBackground>
-      <GridOverlay opacity={0.04} />
-      
-      <div className="min-h-screen flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-md space-y-8">
+    <PageBackground>
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '48px 24px',
+      }}>
+        <div style={{ width: '100%', maxWidth: '420px' }}>
           {/* Header */}
-          <div className="text-center animate-fadeIn">
-            <h1 className="text-4xl font-bold text-white tracking-tight">
-              Forgot Password
-            </h1>
-            <p className="text-white/60 mt-2">Enter your email to receive a reset link</p>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <Logo size="md" />
+            <div style={{ marginTop: '24px' }}>
+              <h1 style={{ 
+                fontSize: '32px', 
+                fontWeight: 700, 
+                color: 'white',
+                marginBottom: '8px',
+              }}>
+                Forgot password?
+              </h1>
+              <p style={{ fontSize: '16px', color: '#9ca3af' }}>
+                No worries, we&apos;ll send you reset instructions
+              </p>
+            </div>
           </div>
 
-          <div className="glass-strong rounded-3xl px-8 py-10 shadow-2xl animate-fadeIn">
-            
+          {/* Form Card */}
+          <Card variant="elevated" padding="lg">
             {error && (
-              <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-5 py-3 rounded-xl backdrop-blur-sm mb-6 text-sm" role="alert">
+              <div style={{
+                padding: '16px',
+                borderRadius: '10px',
+                marginBottom: '24px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                color: '#fca5a5',
+                fontSize: '14px',
+                fontWeight: 500,
+              }}>
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-5 py-3 rounded-xl backdrop-blur-sm mb-6 text-sm" role="alert">
-                {message}
+              <div style={{
+                padding: '16px',
+                borderRadius: '10px',
+                marginBottom: '24px',
+                background: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.2)',
+                color: '#6ee7b7',
+                fontSize: '14px',
+                fontWeight: 500,
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px',
+              }}>
+                <Icon name="check" size={20} style={{ flexShrink: 0, marginTop: '2px' }} />
+                <span>{message}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              <div>
-                <label className="block text-white/90 text-xs font-semibold mb-2 uppercase tracking-wide" htmlFor="email">
-                  Email Address
-                </label>
-                <AuroraInput
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: '24px' }}>
+                <Input
                   id="email"
                   type="email"
+                  label="Email Address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="pilot@skyops.com"
                   required
+                  autoComplete="email"
                 />
               </div>
 
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className={`
-                  w-full h-12 rounded-full font-bold text-base
-                  bg-gradient-to-r from-[#18c3e8] to-[#5e879e]
-                  hover:from-[#18c3e8]/90 hover:to-[#5e879e]/90
-                  text-white mt-2
-                  transition-all duration-300
-                  shadow-lg hover:shadow-xl hover:scale-[0.98]
-                  ${loading ? 'opacity-50 cursor-not-allowed' : ''}
-                `}
+                loading={loading}
+                size="lg"
               >
-                {loading ? 'Sending Request...' : 'Send Reset Link'}
-              </button>
+                Send Reset Link
+              </Button>
             </form>
 
-            <div className="mt-8 text-center">
-                 <Link href="/login" className="text-white/60 hover:text-white text-sm transition-colors">
-                    ← Back to Login
-                 </Link>
+            <div style={{ 
+              marginTop: '24px',
+              paddingTop: '24px',
+              textAlign: 'center',
+              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            }}>
+              <Link 
+                href="/login" 
+                style={{ 
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '14px', 
+                  color: '#9ca3af',
+                  textDecoration: 'none',
+                }}
+              >
+                <Icon name="chevron-left" size={16} />
+                Back to sign in
+              </Link>
             </div>
-          </div>
+          </Card>
+
+          {/* Footer */}
+          <p style={{ 
+            textAlign: 'center',
+            marginTop: '32px',
+            fontSize: '12px',
+            color: '#6b7280',
+          }}>
+            © 2026 SkyOps. All rights reserved.
+          </p>
         </div>
       </div>
-    </GlassBackground>
+    </PageBackground>
   );
 }

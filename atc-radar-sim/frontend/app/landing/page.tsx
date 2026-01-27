@@ -1,107 +1,83 @@
-/**
- * Landing page / Homepage
- */
-
 'use client';
 
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { GlassBackground } from '@/components/GlassBackground';
-import { GridOverlay } from '@/components/GridOverlay';
+import { PageBackground } from '@/components/PageBackground';
+import { Card } from '@/components/Card';
+import { Icon } from '@/components/Icon';
+import { Button } from '@/components/Button';
 
 export default function LandingPage() {
   return (
-    <GlassBackground>
-      <GridOverlay opacity={0.04} />
-      
-      {/* Background Image with overlay */}
-      <div className="fixed inset-0 z-0">
-        <Image
-          src="/background-web.png"
-          alt="ATC Tower Background"
-          fill
-          className="object-cover opacity-30"
-          priority
-          quality={100}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#020408]/80 via-[#0a0e1a]/60 to-[#050810]/80" />
-      </div>
-
-      {/* Navigation */}
-
-      {/* Main Content */}
-      <main className="relative z-10 flex items-center justify-center min-h-screen px-6 pb-40">
-        <div className="text-center space-y-16 max-w-5xl animate-fadeIn">
-          {/* Logo */}
-          <div className="flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#18c3e8]/30 via-[#e5b14b]/30 to-[#d34f98]/30 rounded-full blur-3xl opacity-60 animate-pulse" />
-              <div className="relative w-52 h-52 flex items-center justify-center">
-                <Image
-                  src="/mainlogo.png"
-                  alt="SkyOps Logo"
-                  width={208}
-                  height={208}
-                  className="object-contain"
-                />
-              </div>
-            </div>
+    <PageBackground showGlow={true}>
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+        <div className="text-center space-y-10 max-w-3xl animate-slideUp">
+          {/* Logo with glow */}
+          <div className="relative inline-block">
+            <div 
+              className="absolute inset-0 rounded-full blur-3xl opacity-50"
+              style={{ 
+                background: 'radial-gradient(circle, var(--accent-primary) 0%, transparent 70%)',
+                transform: 'scale(2)'
+              }} 
+            />
+            <Image
+              src="/mainlogo.png"
+              alt="SkyOps Logo"
+              width={140}
+              height={140}
+              className="relative"
+              priority
+            />
           </div>
 
-          {/* Main Title */}
-          <div className="space-y-6">
-            <h1 className="text-8xl md:text-9xl font-bold text-white drop-shadow-2xl tracking-tight" style={{ fontFamily: 'system-ui, -apple-system' }}>
-              EXERCISE 1
+          {/* Title */}
+          <div className="space-y-3">
+            <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight">
+              Exercise 1
             </h1>
-            <p className="text-2xl text-gray-400 font-medium">Air Traffic Control Training</p>
+            <p className="text-xl text-[var(--text-secondary)]">
+              Air Traffic Control Training
+            </p>
           </div>
 
-          {/* Secondary Buttons */}
-          <div className="flex items-center justify-center gap-6 flex-wrap pt-8">
-            <Link
-              href="/exercise/1/flight-plan"
-              className="glass-strong text-white font-semibold px-10 py-5 rounded-full hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-base"
-            >
-              Flight Plan
+          {/* Quick Actions */}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Link href="/exercise/1/flight-plan">
+              <Card padding="sm" className="hover:border-[var(--border-default)] transition-colors cursor-pointer">
+                <div className="flex items-center gap-3 px-4 py-2">
+                  <Icon name="chart" size={18} className="text-[var(--accent-primary)]" />
+                  <span className="text-sm font-medium text-white">Flight Plan</span>
+                </div>
+              </Card>
             </Link>
-            <Link
-              href="/exercise/1/practice-history"
-              className="glass-strong text-white font-semibold px-10 py-5 rounded-full hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 text-base"
-            >
-              Practice History
+            <Link href="/exercise/1/practice-history">
+              <Card padding="sm" className="hover:border-[var(--border-default)] transition-colors cursor-pointer">
+                <div className="flex items-center gap-3 px-4 py-2">
+                  <Icon name="clock" size={18} className="text-[var(--accent-primary)]" />
+                  <span className="text-sm font-medium text-white">Practice History</span>
+                </div>
+              </Card>
             </Link>
           </div>
 
           {/* Practice Now Button */}
-          <div className="pt-8">
-            <Link
-              href="/radar"
-              className="inline-flex items-center gap-5 bg-gradient-to-r from-[#ffde59] to-[#ffd200] text-[#10396f] font-bold text-2xl px-14 py-7 rounded-full hover:from-[#ffd200] hover:to-[#ffde59] transition-all shadow-2xl hover:scale-105 transform duration-300"
-            >
-              {/* Play Icon */}
-              <div className="w-18 h-18 bg-[#10396f] rounded-full flex items-center justify-center shadow-lg">
-                <svg
-                  className="w-9 h-9 text-[#ffde59] ml-1"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                </svg>
-              </div>
-              <span>Practice Now</span>
-            </Link>
-          </div>
+          <Link href="/radar">
+            <Button size="lg" className="min-w-[240px] text-lg py-5">
+              <Icon name="play" size={22} />
+              Practice Now
+            </Button>
+          </Link>
         </div>
-      </main>
 
-      {/* Copyright */}
-      <footer className="relative z-10 pb-8 text-center">
-        <p className="text-white/60 text-sm">
-          © 2026 SkyOps Simulation. All rights reserved.
-        </p>
-      </footer>
-    </GlassBackground>
+        {/* Footer */}
+        <div className="absolute bottom-8 text-center">
+          <p className="text-xs text-[var(--text-muted)]">
+            © 2026 SkyOps Simulation. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </PageBackground>
   );
 }
-
