@@ -41,7 +41,7 @@ class RedisService:
                 logging.info(f"Connected to Redis at {redis_host}:{redis_port}")
 
             self.client.ping()
-        except redis.ConnectionError as e:
+        except Exception as e:
             logging.error(f"Failed to connect to Redis: {e}")
             self.client = None
 
