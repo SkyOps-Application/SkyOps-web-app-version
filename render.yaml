@@ -45,7 +45,7 @@ services:
     env: docker
     # Root dir is project root because it needs 'shared' folder context
     rootDir: atc-radar-sim
-    dockerfilePath: atc-radar-sim/backend/simulator_service/Dockerfile
+    dockerfilePath: backend/simulator_service/Dockerfile
     plan: free
     region: singapore
     envVars:
@@ -71,7 +71,7 @@ services:
     name: skyops-notification-service
     env: docker
     rootDir: atc-radar-sim
-    dockerfilePath: atc-radar-sim/backend/notification_service/Dockerfile
+    dockerfilePath: backend/notification_service/Dockerfile
     plan: free
     region: singapore
     envVars:
@@ -98,7 +98,7 @@ services:
     name: skyops-frontend
     env: docker
     rootDir: atc-radar-sim
-    dockerfilePath: atc-radar-sim/frontend/Dockerfile
+    dockerfilePath: frontend/Dockerfile
     plan: free
     region: singapore
     envVars:
