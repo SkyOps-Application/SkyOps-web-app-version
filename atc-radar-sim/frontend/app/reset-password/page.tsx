@@ -7,6 +7,12 @@ import { AuroraInput } from '@/components/AuroraInput';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
 import { API_URL } from '@/lib/config';
+import { PageBackground } from '@/components/PageBackground';
+import { Logo } from '@/components/Logo';
+import { Card } from '@/components/Card';
+import { Icon } from '@/components/Icon';
+import { Input } from '@/components/Input';
+import { Button } from '@/components/Button';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');

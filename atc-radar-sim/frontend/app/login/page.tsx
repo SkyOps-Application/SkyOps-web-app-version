@@ -3,11 +3,16 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AuroraInput } from '@/components/AuroraInput';
+import { Button } from '@/components/Button';
 import { GlassBackground } from '@/components/GlassBackground';
 import { GridOverlay } from '@/components/GridOverlay';
 import Image from 'next/image';
 import { API_URL } from '@/lib/config';
+import { PageBackground } from '@/components/PageBackground';
+import { Logo } from '@/components/Logo';
+import { Input } from '@/components/Input';
+import { Card } from '@/components/Card';
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
