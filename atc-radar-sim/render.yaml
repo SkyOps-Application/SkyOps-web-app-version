@@ -3,10 +3,10 @@ databases:
     databaseName: skyops_db
     user: user
     plan: free
-    region: singapore # Change this to your preferred region if needed
+    region: singapore 
 
   - name: skyops-redis
-    plan: free # Note: Redis free tier is ephemeral
+    plan: free
     region: singapore
 
 services:
