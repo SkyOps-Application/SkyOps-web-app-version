@@ -16,7 +16,15 @@ class RedisService:
         redis_host = os.getenv('REDIS_HOST', 'localhost')
         redis_port = int(os.getenv('REDIS_PORT', 6379))
         try:
-            self.client = redis.Redis(host=redis_host, port=redis_port, decode_responses=True)
+            ssl_enabled = os.getenv('REDIS_SSL', 'true').lower() == 'true'
+            
+            self.client = redis.Redis(
+                host=redis_host, 
+                port=redis_port, 
+                decode_responses=True,
+                ssl=ssl_enabled,
+                ssl_cert_reqs=None 
+            )
             self.client.ping()
             logging.info(f"Connected to Redis at {redis_host}:{redis_port}")
         except redis.ConnectionError as e:
@@ -32,7 +40,6 @@ class RedisService:
             return None
         
         try:
-            # blpop returns (key, value) tuple
             result = self.client.blpop('history_logs', timeout=timeout)
             if result:
                 _, message = result

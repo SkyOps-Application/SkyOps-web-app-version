@@ -24,6 +24,11 @@ CORS(app) # Enable CORS for all routes
 app.logger.setLevel(logging.DEBUG)
 
 
+@app.route("/")
+def index():
+    return {"status": "SkyOps User Service Running"}
+
+
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/')
 app.register_blueprint(auth_bp, url_prefix='/')
