@@ -1,6 +1,6 @@
 export const getUrlWithProtocol = (url: string | undefined, defaultUrl: string) => {
     if (!url) return defaultUrl;
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/')) {
         return url;
     }
     return `https://${url}`;
