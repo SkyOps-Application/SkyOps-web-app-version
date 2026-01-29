@@ -1,107 +1,269 @@
-# ATC Radar Simulation Training System
+# SkyOps - Air Traffic Control Radar Simulation Training System
 
-A comprehensive Air Traffic Control radar simulation system for training purposes.
+A comprehensive Air Traffic Control (ATC) radar simulation platform designed for professional training purposes. This system provides real-time radar display, voice command recognition, and performance analytics for ATC training.
+
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Technology Stack](#technology-stack)
+- [Getting Started](#getting-started)
+- [Testing](#testing)
+- [CI/CD Pipeline](#cicd-pipeline)
+- [Project Structure](#project-structure)
+- [License](#license)
+
+---
 
 ## Features
 
 - Real-time radar display with aircraft tracking
-- Voice recognition for ATC commands
+- Voice recognition for ATC commands using Web Speech API
 - Separation monitoring and conflict detection
 - Session replay and training history
 - Command parsing (D120, C90, IS250, RM0.78, etc.)
 - Audio feedback system
-- Multi-user support with authentication
+- Multi-user support with JWT authentication
 - Training performance analytics
 
-## Tech Stack
+---
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Client["Frontend Application"]
+        UI["Next.js + React"]
+        Canvas["Konva.js Radar Display"]
+        Voice["Web Speech API"]
+    end
+
+    subgraph Backend["Backend Services"]
+        Simulator["Simulator Service\n(Node.js + Express)"]
+        UserService["User Service\n(Python Flask)"]
+        Notification["Notification Service"]
+    end
+
+    subgraph Data["Data Layer"]
+        PostgreSQL[(PostgreSQL)]
+        Redis[(Redis)]
+    end
+
+    UI <--> |WebSocket| Simulator
+    UI <--> |REST API| UserService
+    Voice --> UI
+    Canvas --> UI
+    
+    Simulator <--> Redis
+    UserService <--> PostgreSQL
+    Notification <--> Redis
+```
+
+### Microservices Overview
+
+| Service | Technology | Responsibilities |
+|---------|------------|------------------|
+| **Simulator Service** | Node.js, Express, Socket.io | Core ATC simulation logic, real-time aircraft tracking, command parsing, collision detection |
+| **User Service** | Python, Flask | User registration, JWT authentication, profile management, training history |
+| **Notification Service** | Node.js | Asynchronous events, alerts, email notifications |
+
+---
+
+## Technology Stack
 
 ### Frontend
-- Next.js 14+ with TypeScript
-- React 18
-- Tailwind CSS
-- Konva.js for canvas rendering
-- Zustand for state management
-- Web Speech API for voice recognition
+| Technology | Purpose |
+|------------|---------|
+| Next.js 16+ | React framework with SSR |
+| React 19 | UI component library |
+| TypeScript | Type-safe development |
+| Tailwind CSS | Utility-first styling |
+| Konva.js | Canvas-based radar rendering |
+| Zustand | State management |
+| Socket.io Client | Real-time communication |
 
 ### Backend
-- **Core Simulator**: Node.js with Express, Socket.io (Real-time simulation)
-- **User Service**: Python Flask (Authentication, User Management)
-- **Notification Service**: (Planned) System notifications and alerts
-- PostgreSQL & Redis (Message Queue & Caching)
+| Technology | Purpose |
+|------------|---------|
+| Node.js + Express | Simulator service runtime |
+| Python Flask | User service runtime |
+| Socket.io | WebSocket communication |
+| PostgreSQL | Primary database |
+| Redis | Message queue and caching |
+| JWT | Authentication tokens |
 
-## Microservices Architecture
-
-The backend is composed of three main microservices:
-
-1. **User Service**: 
-   - Built with **Python (Flask)**.
-   - Responsibilities: User registration, authentication (JWT), profile management, and training history tracking.
-   - Enforces security policies (password complexity, email uniqueness).
-
-2. **Simulator Service**: 
-   - Built with **Node.js (Express)**.
-   - Responsibilities: Core ATC simulation logic, real-time aircraft tracking, command parsing, and Socket.io communication.
-   - Handles the state of the airspace and collision detection.
-
-3. **Notification Service**:
-   - Responsibilities: Handling asynchronous events, sending alerts, emails, and system notifications.
-   - Decoupled via Redis message queue.
-
-## Project Structure
-
-```
-atc-radar-sim/
-├── frontend/               # Next.js application
-├── backend/                
-│   ├── simulator_service/  # Node.js: Radar logic & Socket.io
-│   ├── user_service/       # Python: Auth & Users
-│   ├── notification_service/ # Notifications
-├── shared/                 # Shared types and utilities
-└── package.json            # Root workspace config
-```
+---
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- PostgreSQL 14+
-- npm 9+
+
+> [!IMPORTANT]
+> Ensure the following dependencies are installed before proceeding.
+
+- Node.js 18.0 or higher
+- Python 3.9 or higher
+- PostgreSQL 14 or higher
+- Redis 6 or higher
+- npm 9 or higher
 
 ### Installation
 
-1. Install dependencies:
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/SkyOps-Application/SkyOps-web-app-version
+   cd SkyOps-web-app-version
+   ```
+
+2. **Install dependencies**
+   ```bash
+   cd atc-radar-sim
+   npm install
+   ```
+
+3. **Build the shared package**
+   ```bash
+   npm run build --workspace=shared
+   ```
+
+4. **Configure environment variables**
+   ```bash
+   cp frontend/env.example frontend/.env.local
+   cp backend/env.example backend/.env
+   ```
+
+5. **Start development servers**
+   ```bash
+   npm run dev
+   ```
+
+> [!TIP]
+> The frontend runs on `http://localhost:3000` and the simulator backend on `http://localhost:4000`.
+
+### Running the User Service
+
 ```bash
-npm install
+cd atc-radar-sim/backend/user_service
+pip install -r requirements.txt
+python app.py
 ```
 
-2. Build shared package:
+> [!NOTE]
+> The User Service runs on `http://localhost:5001` by default.
+
+---
+
+## Testing
+
+This project includes comprehensive unit tests across all services.
+
+### Shared Package Tests
+
 ```bash
-cd shared
-npm run build
-cd ..
+cd atc-radar-sim/shared
+npm test
 ```
 
-3. Run the development servers:
+Tests cover coordinate calculations, distance algorithms, and aviation validation utilities.
+
+### Frontend Tests
+
 ```bash
-npm run dev
+cd atc-radar-sim/frontend
+npm test
 ```
 
-Frontend: http://localhost:3000
-Backend: http://localhost:4000
+### Python User Service Tests
 
-## Quick Start
+```bash
+cd atc-radar-sim/backend/user_service
+pip install -r requirements.txt
+pytest tests/ -v
+```
 
-See QUICKSTART.md for a 5-minute setup guide.
+> [!TIP]
+> Run `npm test -- --coverage` to generate code coverage reports.
 
-## Documentation
+---
 
-- START_HERE.md - Quick overview and first steps
-- QUICKSTART.md - 5-minute setup guide
-- SETUP.md - Detailed setup instructions
-- FEATURES.md - Complete feature list
-- ARCHITECTURE.md - System architecture
-- COMMANDS_REFERENCE.md - Command reference guide
+## CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment.
+
+```mermaid
+flowchart LR
+    subgraph Trigger["Triggers"]
+        Push["Push to main/develop"]
+        PR["Pull Request"]
+    end
+
+    subgraph Jobs["CI Jobs"]
+        Lint["Lint & Type Check"]
+        TestShared["Test Shared"]
+        TestFrontend["Test Frontend"]
+        TestPython["Test Python"]
+    end
+
+    subgraph Build["Build"]
+        BuildAll["Build Verification"]
+    end
+
+    Push --> Lint
+    PR --> Lint
+    Lint --> TestShared
+    Lint --> TestFrontend
+    Lint --> TestPython
+    TestShared --> BuildAll
+    TestFrontend --> BuildAll
+    TestPython --> BuildAll
+```
+
+### Pipeline Jobs
+
+| Job | Description |
+|-----|-------------|
+| **Lint** | ESLint and TypeScript type checking |
+| **Test Shared** | Jest tests for shared utilities |
+| **Test Frontend** | Jest tests with React Testing Library |
+| **Test Python** | Pytest for User Service |
+| **Build** | Production build verification |
+
+> [!CAUTION]
+> All tests must pass before merging to the `main` branch.
+
+---
+
+## Project Structure
+
+```
+SkyOps-web-app-version/
+├── .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI/CD
+├── atc-radar-sim/
+│   ├── frontend/               # Next.js application
+│   │   ├── app/                # Next.js app router pages
+│   │   ├── components/         # React components
+│   │   ├── lib/                # Utilities and store
+│   │   ├── hooks/              # Custom React hooks
+│   │   └── __tests__/          # Frontend tests
+│   ├── backend/
+│   │   ├── simulator_service/  # Node.js radar simulation
+│   │   ├── user_service/       # Python Flask authentication
+│   │   │   └── tests/          # Python tests
+│   │   └── notification_service/
+│   ├── shared/                 # Shared types and utilities
+│   │   ├── src/
+│   │   │   ├── types/          # TypeScript interfaces
+│   │   │   ├── utils/          # Coordinate and validation utils
+│   │   │   └── data/           # Static data (waypoints, exercises)
+│   │   └── __tests__/          # Shared package tests
+│   └── package.json            # Root workspace configuration
+└── README.md
+```
+
+---
 
 ## License
 
-MIT
+This project is licensed under the MIT License. See the LICENSE file for details.
