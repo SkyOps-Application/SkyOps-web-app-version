@@ -8,7 +8,10 @@
     "prebuild": "mkdir -p node_modules/@atc-radar-sim/shared/dist && cp -r ../shared/dist node_modules/@atc-radar-sim/shared/ && mkdir -p node_modules/@atc-radar-sim/shared/src/data && cp ../shared/src/data/*.js node_modules/@atc-radar-sim/shared/src/data/ && cp ../shared/package.json node_modules/@atc-radar-sim/shared/ || true",
     "start": "next start",
     "lint": "eslint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@atc-radar-sim/shared": "*",
@@ -24,12 +27,18 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "baseline-browser-mapping": "^2.9.18",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

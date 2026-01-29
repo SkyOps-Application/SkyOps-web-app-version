@@ -8,11 +8,16 @@
     "build": "tsc && npm run postbuild",
     "postbuild": "node -e \"const fs=require('fs');const path=require('path');function createBridge(src,dist){const dir=path.dirname(src);fs.mkdirSync(dir,{recursive:true});const rel=path.relative(dir,dist);fs.writeFileSync(src,'module.exports=require('+JSON.stringify(rel)+');\\n');}createBridge('src/data/exercises.js','dist/data/exercises.js');createBridge('src/data/waypoints.js','dist/data/waypoints.js');createBridge('src/utils/coordinates.js','dist/utils/coordinates.js');\"",
     "dev": "tsc --watch",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
   },
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^20.10.5",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
     "typescript": "^5.3.3"
   }
 }
