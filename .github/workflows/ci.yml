@@ -27,11 +27,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: atc-radar-sim/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build shared package
         run: npm run build --workspace=shared
@@ -52,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: atc-radar-sim/shared
+        working-directory: atc-radar-sim
 
     steps:
       - name: Checkout code
@@ -62,15 +60,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: atc-radar-sim/shared/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
-        working-directory: atc-radar-sim
+        run: npm install
 
       - name: Run tests
-        run: npm test
+        run: npm test --workspace=shared
 
   # Test Frontend
   test-frontend:
@@ -78,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: atc-radar-sim/frontend
+        working-directory: atc-radar-sim
 
     steps:
       - name: Checkout code
@@ -88,19 +83,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: atc-radar-sim/frontend/package-lock.json
 
-      - name: Install root dependencies
-        run: npm ci
-        working-directory: atc-radar-sim
+      - name: Install dependencies
+        run: npm install
 
       - name: Build shared package
         run: npm run build --workspace=shared
-        working-directory: atc-radar-sim
 
       - name: Run tests
-        run: npm test
+        run: npm test --workspace=frontend
 
   # Test Python User Service
   test-python:
@@ -118,8 +109,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-          cache-dependency-path: atc-radar-sim/backend/user_service/requirements.txt
 
       - name: Install dependencies
         run: |
@@ -130,6 +119,7 @@ jobs:
         run: pytest tests/ -v --tb=short
         env:
           SECRET_KEY: test-secret-key-for-ci
+          DATABASE_URL: sqlite:///:memory:
 
   # Build verification
   build:
@@ -148,11 +138,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: atc-radar-sim/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build shared package
         run: npm run build --workspace=shared

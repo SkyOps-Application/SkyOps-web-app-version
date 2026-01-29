@@ -4,10 +4,23 @@ Pytest fixtures for user_service tests
 import pytest
 from unittest.mock import MagicMock, patch
 import os
+import sys
 
-# Set test environment variables
+# Set test environment variables BEFORE any imports
 os.environ['SECRET_KEY'] = 'test-secret-key-for-testing'
 os.environ['FIT_API_KEY'] = 'test-api-key'
+os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
+
+# Mock the database module before importing services
+mock_engine = MagicMock()
+mock_session = MagicMock()
+mock_db_session = MagicMock(return_value=mock_session)
+
+# Patch the database module
+sys.modules['database'] = MagicMock()
+sys.modules['database'].db_session = mock_db_session
+sys.modules['database'].engine = mock_engine
+sys.modules['database'].Base = MagicMock()
 
 
 @pytest.fixture
