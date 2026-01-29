@@ -100,8 +100,8 @@ export function Navbar() {
                   fontWeight: 500,
                   textDecoration: 'none',
                   transition: 'all 0.2s',
-                  color: isActive ? '#f59e0b' : '#9ca3af',
-                  backgroundColor: isActive ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                  color: isActive ? '#d946ef' : '#9ca3af',
+                  backgroundColor: isActive ? 'rgba(217, 70, 239, 0.12)' : 'transparent',
                 }}
               >
                 <Icon name={item.icon} size={16} />

@@ -26,10 +26,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary: {
-        background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+        background: 'linear-gradient(135deg, #d946ef, #e879f9)',
         color: '#0a0f1a',
         border: 'none',
-        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.25)',
+        boxShadow: '0 4px 12px rgba(217, 70, 239, 0.25)',
       },
       secondary: {
         background: 'rgba(31, 41, 55, 0.8)',

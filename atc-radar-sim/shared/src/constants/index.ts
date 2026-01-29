@@ -66,6 +66,6 @@ export const RADAR_COLORS = {
 export const UPDATE_INTERVALS = {
   AIRCRAFT_POSITION: 1000,  // 1 second
   SEPARATION_CHECK: 2000,   // 2 seconds
-  UI_REFRESH: 50,           // 50ms (20 FPS)
+  UI_REFRESH: 50,          
 };
 

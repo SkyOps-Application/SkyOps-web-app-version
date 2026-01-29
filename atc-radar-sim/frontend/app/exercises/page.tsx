@@ -20,7 +20,7 @@ const modes = [
     title: 'Start Exercise',
     description: 'Enter the radar simulator and practice air traffic control.',
     href: '/radar',
-    gradient: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+    gradient: 'linear-gradient(135deg, #d946ef, #a21caf)',
     badge: null,
   },
 ];
@@ -130,7 +130,7 @@ export default function ExercisesPage() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    color: '#f59e0b',
+                    color: '#e879f9',
                     fontWeight: 500,
                   }}>
                     <span>Start now</span>
@@ -157,8 +157,8 @@ export default function ExercisesPage() {
                 borderRadius: '9999px',
                 fontSize: '12px',
                 fontWeight: 600,
-                background: 'rgba(245, 158, 11, 0.15)',
-                color: '#fcd34d',
+                background: 'rgba(217, 70, 239, 0.15)',
+                color: '#f0abfc',
               }}>
                 3 exercises
               </span>
@@ -183,11 +183,11 @@ export default function ExercisesPage() {
                       width: '40px',
                       height: '40px',
                       borderRadius: '10px',
-                      background: 'rgba(245, 158, 11, 0.1)',
+                      background: 'rgba(217, 70, 239, 0.1)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#f59e0b',
+                      color: '#d946ef',
                       fontWeight: 700,
                     }}>
                       {num}
@@ -236,7 +236,7 @@ export default function ExercisesPage() {
                         fontSize: '13px',
                         fontWeight: 600,
                         color: '#0a0f1a',
-                        background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                        background: 'linear-gradient(135deg, #d946ef, #e879f9)',
                         textDecoration: 'none',
                         borderRadius: '8px',
                       }}

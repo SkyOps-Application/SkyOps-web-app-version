@@ -5,7 +5,6 @@ WORKDIR /app
 # Copy shared module
 COPY shared ./shared
 WORKDIR /app/shared
-# Install dependencies for shared (typescript) and build it
 RUN npm install
 RUN npm run build
 
@@ -13,16 +12,12 @@ RUN npm run build
 # Backend setup
 WORKDIR /app/backend
 COPY backend/package.json backend/package-lock.json* ./
-# Update shared dependency to local path
 RUN sed -i 's/"@atc-radar-sim\/shared": "[^"]*"/"@atc-radar-sim\/shared": "file:..\/shared"/g' package.json
 RUN npm install
 
 COPY backend ./
 
-# Build Simulator (uses default tsconfig which targets simulator_service)
-# Build Simulator directly with tsc to avoid postbuild conflict
 RUN npx tsc
-# Ensure postbuild runs to setup shared link in builder for verification if needed
 
 
 # Production image

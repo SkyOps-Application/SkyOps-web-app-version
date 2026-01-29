@@ -24,10 +24,12 @@
       "@atc-radar-sim/shared": [
         "../shared/src/index.ts"
       ]
-    }
+    },
+    "jsx": "react-jsx"
   },
   "include": [
-    "simulator_service/**/*"
+    "simulator_service/**/*",
+    "notification_service/**/*"
   ],
   "exclude": [
     "node_modules",

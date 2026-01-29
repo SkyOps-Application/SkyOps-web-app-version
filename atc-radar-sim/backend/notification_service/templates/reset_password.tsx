@@ -20,7 +20,7 @@ interface ResetPasswordEmailProps {
     first_name: string;
 }
 
-const baseUrl = 'http://localhost:3000'; // Frontend URL
+const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3001'; // Frontend URL
 
 export const ResetPasswordEmail = ({
     first_name,

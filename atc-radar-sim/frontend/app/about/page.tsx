@@ -38,7 +38,7 @@ export default function AboutPage() {
               }}>
                 About{' '}
                 <span style={{ 
-                  background: 'linear-gradient(135deg, #f59e0b, #fcd34d)',
+                  background: 'linear-gradient(135deg, #d946ef, #f0abfc)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -61,7 +61,7 @@ export default function AboutPage() {
                   width: '48px',
                   height: '48px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+                  background: 'linear-gradient(135deg, #d946ef, #a21caf)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -122,7 +122,7 @@ export default function AboutPage() {
                       border: '1px solid rgba(255, 255, 255, 0.06)',
                     }}
                   >
-                    <Icon name={feature.icon} size={18} className="text-amber-500" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <Icon name={feature.icon} size={18} className="text-fuchsia-500" style={{ flexShrink: 0, marginTop: '2px' }} />
                     <span style={{ fontSize: '14px', color: '#9ca3af' }}>{feature.text}</span>
                   </div>
                 ))}

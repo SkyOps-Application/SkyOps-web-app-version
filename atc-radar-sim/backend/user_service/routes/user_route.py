@@ -38,7 +38,6 @@ def register_user():
 
     except ValidationError as e:
         current_app.logger.warning(f"Invalid registration data: {e.errors()}")
-        # Parse Pydantic errors to list of dicts that are JSON serializable
         errors = []
         for error in e.errors():
             err_dict = {

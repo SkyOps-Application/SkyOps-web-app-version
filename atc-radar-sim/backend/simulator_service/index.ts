@@ -22,7 +22,6 @@ const io = socketService.initialize(server, {
 // Initialize exercise runner
 const exerciseRunner = new ExerciseRunner(io);
 
-// Setup Socket.IO handlers
 setupSocketHandlers(io, exerciseRunner);
 
 // Start server
@@ -32,7 +31,7 @@ server.listen(env.PORT, () => {
   console.log(`Environment: ${env.NODE_ENV}`);
 });
 
-// Graceful shutdown
+// graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully...');
   exerciseRunner.stop();

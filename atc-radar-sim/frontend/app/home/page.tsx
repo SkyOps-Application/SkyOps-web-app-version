@@ -14,7 +14,7 @@ const features = [
     title: 'Start Training',
     description: 'Begin your ATC simulation exercises',
     href: '/exercises',
-    gradient: 'linear-gradient(135deg, #f59e0b, #ea580c)',
+    gradient: 'linear-gradient(135deg, #d946ef, #a21caf)',
   },
   {
     icon: 'book' as const,
@@ -65,7 +65,7 @@ export default function HomePage() {
               }}>
                 Welcome to{' '}
                 <span style={{ 
-                  background: 'linear-gradient(135deg, #f59e0b, #fcd34d)',
+                  background: 'linear-gradient(135deg, #d946ef, #f0abfc)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
@@ -140,7 +140,7 @@ export default function HomePage() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    color: '#f59e0b',
+                    color: '#d946ef',
                     fontSize: '14px',
                     fontWeight: 500,
                   }}>
@@ -180,10 +180,10 @@ export default function HomePage() {
                 fontSize: '18px',
                 fontWeight: 600,
                 color: '#0a0f1a',
-                background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                background: 'linear-gradient(135deg, #d946ef, #e879f9)',
                 borderRadius: '12px',
                 textDecoration: 'none',
-                boxShadow: '0 4px 16px rgba(245, 158, 11, 0.3)',
+                boxShadow: '0 4px 16px rgba(217, 70, 239, 0.3)',
                 transition: 'all 0.2s ease',
               }}
             >

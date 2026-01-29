@@ -40,7 +40,7 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
     
     if (SpeechRecognition) {
       setIsSupported(true);
-      console.log('✅ Web Speech API is supported');
+      console.log('Web Speech API is supported');
       
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
@@ -77,7 +77,7 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
       };
 
       recognition.onerror = (event: any) => {
-        console.error('❌ Recognition error:', event.error);
+        console.error('Recognition error:', event.error);
         setIsListening(false);
         if (optionsRef.current.onError) {
           optionsRef.current.onError(event.error);
@@ -92,7 +92,7 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
       recognitionRef.current = recognition;
     } else {
       setIsSupported(false);
-      console.error('❌ Web Speech API is not supported in this browser');
+      console.error('Web Speech API is not supported in this browser');
     }
 
     return () => {
@@ -115,11 +115,11 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
       try {
         console.log('🎤 Attempting to start recognition...');
         recognitionRef.current.start();
-        console.log('✅ Recognition start() called successfully');
+        console.log('Recognition start() called successfully');
       } catch (error: any) {
-        console.error('❌ Failed to start recognition:', error);
-        console.error('❌ Error name:', error?.name);
-        console.error('❌ Error message:', error?.message);
+        console.error('Failed to start recognition:', error);
+        console.error('Error name:', error?.name);
+        console.error('Error message:', error?.message);
         
         // If already started, try to stop and restart
         if (error?.name === 'InvalidStateError') {
@@ -130,16 +130,16 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
               try {
                 recognitionRef.current.start();
               } catch (e) {
-                console.error('❌ Failed to restart:', e);
+                console.error('Failed to restart:', e);
               }
             }, 100);
           } catch (e) {
-            console.error('❌ Failed to stop:', e);
+            console.error('Failed to stop:', e);
           }
         }
       }
     } else if (!recognitionRef.current) {
-      console.error('❌ Recognition not initialized');
+      console.error('Recognition not initialized');
     } else if (isListening) {
       console.warn('⚠️ Already listening');
     }
@@ -150,9 +150,9 @@ export function useVoiceCommand(options: UseVoiceCommandOptions = {}) {
     if (recognitionRef.current && isListening) {
       try {
         recognitionRef.current.stop();
-        console.log('✅ Recognition stopped');
+        console.log('Recognition stopped');
       } catch (error) {
-        console.error('❌ Failed to stop recognition:', error);
+        console.error('Failed to stop recognition:', error);
       }
     }
   };

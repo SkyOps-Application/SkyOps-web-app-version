@@ -84,6 +84,11 @@ services:
         value: smtp.example.com
       - key: SMTP_HOST
         value: smtp.gmail.com
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: skyops-frontend
+          property: url
 
   # -------------------------
   # FRONTEND (Next.js)
