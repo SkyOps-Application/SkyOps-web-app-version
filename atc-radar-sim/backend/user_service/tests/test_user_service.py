@@ -45,7 +45,7 @@ class TestCreateUser:
 
     @patch('services.user_service.db_session')
     def test_create_user_requires_password(self, mock_db):
-        """create_user should raise error when password is missing"""
+        """create_user should raise error when password is empty"""
         from services.user_service import create_user
         from models.model_dto import UserSchema
 
@@ -54,7 +54,7 @@ class TestCreateUser:
             first_name='Test',
             last_name='User',
             age=25,
-            password=None
+            password=''
         )
 
         with pytest.raises(ValueError, match="Password is required"):
