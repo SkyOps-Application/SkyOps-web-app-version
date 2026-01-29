@@ -11,3 +11,6 @@ pydantic
 Flask-SQLAlchemy
 Flask-Migrate
 python-dotenv
+pytest
+pytest-mock
+pytest-cov
