@@ -138,7 +138,7 @@ flowchart TB
    ```
 
 > [!TIP]
-> The frontend runs on `http://localhost:3000` and the simulator backend on `http://localhost:4000`.
+> The frontend runs on `http://localhost:3001` and the simulator backend on `http://localhost:4000`.
 
 ### Running the User Service
 
@@ -150,6 +150,13 @@ python app.py
 
 > [!NOTE]
 > The User Service runs on `http://localhost:5001` by default.
+>
+
+### Running application with Docker
+
+```bash
+docker-compose up -d --build
+```
 
 ---
 
