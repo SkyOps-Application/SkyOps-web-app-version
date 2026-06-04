@@ -4,6 +4,7 @@ from flask import Flask
 from queue_consumer import start_consumer
 from database import init_db
 from routes import user_bp, auth_bp
+from utils.errors import register_error_handlers
 import os
 import sys
 from flask_cors import CORS
@@ -22,6 +23,8 @@ logging.basicConfig(
 app = Flask(__name__)
 CORS(app) # Enable CORS for all routes
 app.logger.setLevel(logging.DEBUG)
+register_error_handlers(app)
+
 
 
 @app.route("/")

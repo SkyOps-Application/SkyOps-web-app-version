@@ -26,7 +26,8 @@ export function Navbar() {
     checkAuth();
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
-  }, []);
+  }, [pathname]);
+
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');

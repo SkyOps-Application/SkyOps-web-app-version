@@ -1,5 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+}
 
 :root {
   /* Color System */
@@ -54,8 +58,14 @@
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+}
+
+html, body {
+  font-family: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
+}
+
+input, button, select, textarea {
+  font-family: var(--font-space-grotesk), system-ui, -apple-system, sans-serif;
 }
 
 html {
@@ -64,7 +74,6 @@ html {
 }
 
 body {
-  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
@@ -86,7 +95,15 @@ h6 {
 }
 
 .font-mono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-jetbrains-mono), monospace;
+}
+
+.radar-page-container, .radar-page-container * {
+  font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif !important;
+}
+
+.radar-page-container .font-mono, .radar-page-container .font-mono * {
+  font-family: var(--font-jetbrains-mono), monospace !important;
 }
 
 /* Scrollbar */

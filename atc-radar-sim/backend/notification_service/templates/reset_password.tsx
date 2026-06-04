@@ -27,31 +27,38 @@ export const ResetPasswordEmail = ({
 }: ResetPasswordEmailProps) => {
     return (
         <EmailLayout preview="Reset your SkyOps Password">
-            <Text style={paragraph}>Hi {first_name},</Text>
-            <Text style={paragraph}>
-                We received a request to reset your password for your SkyOps account.
-                If you didn't ask for this, you can safely ignore this email.
-            </Text>
-            <Section style={btnContainer}>
-                <Button style={button} href={`${baseUrl}/reset-password`}>
-                    Reset your password
-                </Button>
+            <Section style={content}>
+                <Text style={paragraph}>Hi {first_name},</Text>
+                <Text style={paragraph}>
+                    We received a request to reset your password for your SkyOps account.
+                    If you didn't ask for this, you can safely ignore this email.
+                </Text>
+                <Section style={btnContainer}>
+                    <Button style={button} href={`${baseUrl}/reset-password`}>
+                        Reset your password
+                    </Button>
+                </Section>
+                <Text style={paragraph}>
+                    Click the button above to go to the reset page.
+                </Text>
+                <Hr style={hr} />
+                <Text style={footer}>
+                    Best regards,<br />
+                    The SkyOps Team
+                </Text>
             </Section>
-            <Text style={paragraph}>
-                Click the button above to go to the reset page.
-            </Text>
-            <Hr style={hr} />
-            <Text style={footer}>
-                Best regards,<br />
-                The SkyOps Team
-            </Text>
         </EmailLayout>
     );
 };
 
 export default ResetPasswordEmail;
 
+const content = {
+    padding: '0 48px',
+};
+
 const paragraph = {
+
     fontSize: '16px',
     lineHeight: '26px',
     color: '#555',
