@@ -11,10 +11,33 @@ import { Button } from '@/components/Button';
 export default function LandingPage() {
   return (
     <PageBackground showGlow={true}>
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-        <div className="text-center space-y-10 max-w-3xl animate-slideUp">
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '80px 24px 40px 24px',
+      }}>
+        {/* Spacer to center the main block vertically */}
+        <div style={{ flex: 1 }} />
+
+        {/* Center Content */}
+        <div style={{
+          textAlign: 'center',
+          maxWidth: '560px',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
           {/* Logo with glow */}
-          <div className="relative inline-block">
+          <div style={{
+            position: 'relative',
+            display: 'inline-block',
+            marginBottom: '48px',
+          }}>
             <div 
               className="absolute inset-0 rounded-full blur-3xl opacity-50"
               style={{ 
@@ -27,53 +50,64 @@ export default function LandingPage() {
               alt="SkyOps Logo"
               width={140}
               height={140}
-              className="relative"
+              style={{ position: 'relative' }}
               priority
             />
           </div>
 
           {/* Title */}
-          <div className="space-y-3">
-            <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight">
+          <div style={{ marginBottom: '40px' }}>
+            <h1 style={{ 
+              fontSize: '48px', 
+              fontWeight: 700, 
+              color: 'white',
+              marginBottom: '12px',
+              letterSpacing: '-0.02em',
+            }}>
               Exercise 1
             </h1>
-            <p className="text-xl text-[var(--text-secondary)]">
+            <p style={{ 
+              fontSize: '18px', 
+              color: 'var(--text-secondary)',
+            }}>
               Air Traffic Control Training
             </p>
           </div>
 
           {/* Quick Actions */}
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link href="/exercise/1/flight-plan">
+          <div style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+            marginBottom: '48px',
+          }}>
+            <Link href="/exercise/1/practice-history" style={{ textDecoration: 'none' }}>
               <Card padding="sm" className="hover:border-[var(--border-default)] transition-colors cursor-pointer">
-                <div className="flex items-center gap-3 px-4 py-2">
-                  <Icon name="chart" size={18} className="text-[var(--accent-primary)]" />
-                  <span className="text-sm font-medium text-white">Flight Plan</span>
-                </div>
-              </Card>
-            </Link>
-            <Link href="/exercise/1/practice-history">
-              <Card padding="sm" className="hover:border-[var(--border-default)] transition-colors cursor-pointer">
-                <div className="flex items-center gap-3 px-4 py-2">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '8px 16px' }}>
                   <Icon name="clock" size={18} className="text-[var(--accent-primary)]" />
-                  <span className="text-sm font-medium text-white">Practice History</span>
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>Practice History</span>
                 </div>
               </Card>
             </Link>
           </div>
 
           {/* Practice Now Button */}
-          <Link href="/radar">
-            <Button size="lg" className="min-w-[240px] text-lg py-5">
+          <Link href="/radar" style={{ textDecoration: 'none' }}>
+            <Button size="lg" style={{ minWidth: '240px', fontSize: '18px', padding: '20px 32px' }}>
               <Icon name="play" size={22} />
               Practice Now
             </Button>
           </Link>
         </div>
 
+        {/* Spacer to push footer down */}
+        <div style={{ flex: 1 }} />
+
         {/* Footer */}
-        <div className="absolute bottom-8 text-center">
-          <p className="text-xs text-[var(--text-muted)]">
+        <div style={{ textAlign: 'center', paddingTop: '40px' }}>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
             © 2026 SkyOps Simulation. All rights reserved.
           </p>
         </div>

@@ -23,6 +23,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,12 +39,18 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters');
+    if (formData.password.length <= 8) {
+      setError('Password must be longer than 8 characters');
+      return;
+    }
+
+    if (!/[a-zA-Z]/.test(formData.password) || !/\d/.test(formData.password)) {
+      setError('Password must contain at least one letter and one number');
       return;
     }
 
     setLoading(true);
+
 
     try {
       // Backend expects: email, password, first_name, last_name, age
@@ -167,10 +174,10 @@ export default function RegisterPage() {
               </div>
 
               {/* Password Row */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '28px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   label="Password"
                   value={formData.password}
                   onChange={handleChange}
@@ -181,7 +188,7 @@ export default function RegisterPage() {
 
                 <Input
                   id="confirmPassword"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   label="Confirm Password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
@@ -190,6 +197,34 @@ export default function RegisterPage() {
                   autoComplete="new-password"
                 />
               </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '24px' }}>
+                <input
+                  type="checkbox"
+                  id="show-password"
+                  checked={showPassword}
+                  onChange={(e) => setShowPassword(e.target.checked)}
+                  style={{
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '4px',
+                    accentColor: '#d946ef',
+                    cursor: 'pointer'
+                  }}
+                />
+                <label 
+                  htmlFor="show-password" 
+                  style={{
+                    fontSize: '14px',
+                    color: '#9ca3af',
+                    userSelect: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Show password
+                </label>
+              </div>
+
 
               <Button
                 type="submit"

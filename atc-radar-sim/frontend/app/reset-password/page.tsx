@@ -3,9 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { AuroraInput } from '@/components/AuroraInput';
-import { GlassBackground } from '@/components/GlassBackground';
-import { GridOverlay } from '@/components/GridOverlay';
 import { API_URL } from '@/lib/config';
 import { PageBackground } from '@/components/PageBackground';
 import { Logo } from '@/components/Logo';
@@ -24,6 +21,7 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
 
@@ -39,8 +37,14 @@ export default function ResetPasswordPage() {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters');
+    if (newPassword.length <= 8) {
+      setError('Password must be longer than 8 characters');
+      setLoading(false);
+      return;
+    }
+
+    if (!/[a-zA-Z]/.test(newPassword) || !/\d/.test(newPassword)) {
+      setError('Password must contain at least one letter and one number');
       setLoading(false);
       return;
     }
@@ -63,8 +67,9 @@ export default function ResetPasswordPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Reset failed');
+        throw new Error(data.detail || data.error || 'Reset failed');
       }
+
 
       setSuccess('Password updated successfully! Redirecting...');
       setTimeout(() => {
@@ -83,17 +88,18 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md space-y-8 animate-fadeIn">
           {/* Header */}
-          <div className="text-center space-y-4">
+          <div className="text-center" style={{ paddingTop: '24px', paddingBottom: '16px' }}>
             <Logo size="md" />
-            <div>
+            <div style={{ marginTop: '16px' }}>
               <h1 className="text-3xl font-bold text-white">
                 Reset password
               </h1>
-              <p className="mt-2 text-[var(--text-secondary)]">
+              <p style={{ marginTop: '12px' }} className="text-[var(--text-secondary)]">
                 Verify your identity to set a new password
               </p>
             </div>
           </div>
+
 
           {/* Form Card */}
           <Card variant="elevated" padding="lg">
@@ -110,23 +116,28 @@ export default function ResetPasswordPage() {
               </div>
             )}
 
-            <form onSubmit={handleReset} className="space-y-5">
+            <form onSubmit={handleReset}>
               {/* Identity Section */}
-              <div className="space-y-4">
-                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">
+              <div style={{ marginBottom: '24px' }}>
+                <p 
+                  className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide"
+                  style={{ marginBottom: '12px' }}
+                >
                   Verify Identity
                 </p>
                 
-                <Input
-                  type="email"
-                  label="Email Address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="pilot@skyops.com"
-                  required
-                />
+                <div style={{ marginBottom: '16px' }}>
+                  <Input
+                    type="email"
+                    label="Email Address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="pilot@skyops.com"
+                    required
+                  />
+                </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4" style={{ marginBottom: '24px' }}>
                   <Input
                     type="text"
                     label="First Name"
@@ -147,17 +158,20 @@ export default function ResetPasswordPage() {
                 </div>
               </div>
 
-              <div className="divider" />
+              <div className="divider" style={{ marginTop: '24px', marginBottom: '24px' }} />
 
               {/* Password Section */}
-              <div className="space-y-4">
-                <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide">
+              <div style={{ marginBottom: '24px' }}>
+                <p 
+                  className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-wide"
+                  style={{ marginBottom: '12px' }}
+                >
                   New Password
                 </p>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4" style={{ marginBottom: '12px' }}>
                   <Input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     label="Password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -166,7 +180,7 @@ export default function ResetPasswordPage() {
                   />
 
                   <Input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     label="Confirm"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -174,16 +188,48 @@ export default function ResetPasswordPage() {
                     required
                   />
                 </div>
+
+                <div className="flex items-center gap-2" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
+                  <input
+                    type="checkbox"
+                    id="show-password"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '4px',
+                      accentColor: '#d946ef',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <label 
+                    htmlFor="show-password" 
+                    style={{
+                      fontSize: '14px',
+                      color: '#9ca3af',
+                      userSelect: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Show password
+                  </label>
+                </div>
               </div>
 
-              <Button
-                type="submit"
-                loading={loading}
-                size="lg"
-              >
-                Reset Password
-              </Button>
+
+              <div style={{ marginTop: '32px', marginBottom: '8px' }}>
+                <Button
+                  type="submit"
+                  loading={loading}
+                  size="lg"
+                >
+                  Reset Password
+                </Button>
+              </div>
             </form>
+
+
 
             <div className="mt-6 pt-6 text-center border-t border-[var(--border-subtle)]">
               <Link
@@ -197,9 +243,10 @@ export default function ResetPasswordPage() {
           </Card>
 
           {/* Footer */}
-          <p className="text-center text-xs text-[var(--text-muted)]">
+          <p className="text-center text-xs text-[var(--text-muted)]" style={{ paddingTop: '24px', paddingBottom: '24px' }}>
             © 2026 SkyOps. All rights reserved.
           </p>
+
         </div>
       </div>
     </PageBackground>

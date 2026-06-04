@@ -169,7 +169,7 @@ export default function RadarPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-[#0a0f1a]">
+    <div className="flex flex-col h-screen bg-[#0a0f1a] radar-page-container">
       {/* Top Control Bar */}
       <header className="bg-[#111827] px-6 h-16 flex items-center justify-between border-b border-[rgba(255,255,255,0.1)]">
         <div className="flex items-center gap-6">

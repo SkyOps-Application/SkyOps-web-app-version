@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -111,7 +112,7 @@ export default function LoginPage() {
               <div style={{ marginBottom: '16px' }}>
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   label="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +122,33 @@ export default function LoginPage() {
                 />
               </div>
 
-              <div style={{ textAlign: 'right', marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input
+                    type="checkbox"
+                    id="show-password"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    style={{
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '4px',
+                      accentColor: '#d946ef',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  <label 
+                    htmlFor="show-password" 
+                    style={{
+                      fontSize: '14px',
+                      color: '#9ca3af',
+                      userSelect: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Show password
+                  </label>
+                </div>
                 <Link
                   href="/forgot-password"
                   style={{ 
@@ -133,6 +160,7 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
+
 
               <Button
                 type="submit"

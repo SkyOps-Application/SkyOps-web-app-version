@@ -204,19 +204,6 @@ export default function ExercisesPage() {
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Link 
-                      href={`/exercise/${num}/flight-plan`}
-                      style={{
-                        padding: '8px 12px',
-                        fontSize: '13px',
-                        color: '#9ca3af',
-                        textDecoration: 'none',
-                        borderRadius: '6px',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      Flight Plan
-                    </Link>
-                    <Link 
                       href={`/exercise/${num}/practice-history`}
                       style={{
                         padding: '8px 12px',
