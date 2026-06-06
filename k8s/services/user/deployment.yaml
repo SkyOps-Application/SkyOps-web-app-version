@@ -15,6 +15,7 @@ spec:
       containers:
         - name: user
           image: atc-radar-sim-user_service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 5001
           env:

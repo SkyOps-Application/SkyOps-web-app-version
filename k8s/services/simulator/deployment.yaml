@@ -15,6 +15,7 @@ spec:
       containers:
         - name: simulator
           image: atc-radar-sim-simulator_service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 4000
           env:

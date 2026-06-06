@@ -15,6 +15,7 @@ spec:
       containers:
         - name: notification
           image: atc-radar-sim-notification_service:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 4000
           env:
