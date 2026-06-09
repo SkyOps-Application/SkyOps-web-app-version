@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: simulator-config
+data:
+  PORT: "4000"
+  CORS_ORIGIN: "*"

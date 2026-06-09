@@ -2,6 +2,7 @@ import redis
 import json
 import os
 import logging
+import time
 
 class RedisService:
     _instance = None
@@ -49,6 +50,7 @@ class RedisService:
         Returns deserialized dict or None.
         """
         if not self.client:
+            time.sleep(1) # Prevent tight loop if not connected
             return None
         
         try:

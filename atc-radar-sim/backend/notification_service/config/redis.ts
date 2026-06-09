@@ -19,4 +19,13 @@ if (redisUrl) {
     port: parseInt(process.env.REDIS_PORT || '6379'),
   });
 }
+
+connection.on('error', (err) => {
+  console.error('Redis Client Error:', err);
+});
+
+connection.on('connect', () => {
+  console.log('Redis Client Connected');
+});
+
 export default connection;
